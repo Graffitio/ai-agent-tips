@@ -1,0 +1,275 @@
+name: Daily AI Tip — Auto Generate & Notify
+
+on:
+  schedule:
+    # 월~금 KST 06:50 = UTC 21:50 (전날)
+    - cron: '50 21 * * 0-4'
+  workflow_dispatch:  # 수동 실행 버튼
+
+permissions:
+  contents: write  # 자동 commit에 필요
+
+jobs:
+  generate-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ────────────────────────────────────
+      # 1. 체크아웃
+      # ────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ────────────────────────────────────
+      # 2. 오늘 날짜 → 주차/요일/팁 정보 계산
+      # ────────────────────────────────────
+      - name: Determine today's schedule
+        id: schedule
+        run: |
+          TODAY=$(TZ='Asia/Seoul' date '+%Y-%m-%d')
+          START_DATE="2026-03-09"
+
+          START_SEC=$(date -d "$START_DATE" +%s)
+          TODAY_SEC=$(date -d "$TODAY" +%s)
+          DIFF_DAYS=$(( (TODAY_SEC - START_SEC) / 86400 ))
+
+          if [ $DIFF_DAYS -lt 0 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Not started yet"; exit 0
+          fi
+
+          WEEK_IDX=$(( DIFF_DAYS / 7 ))
+          WEEK_NUM=$(( WEEK_IDX + 1 ))
+          DAY_IN_WEEK=$(( DIFF_DAYS % 7 ))
+
+          case $DAY_IN_WEEK in
+            0) DAY="mon";; 1) DAY="tue";; 2) DAY="wed";;
+            3) DAY="thu";; 4) DAY="fri";;
+            *) echo "skip=true" >> $GITHUB_OUTPUT; exit 0;;
+          esac
+
+          WEEK_CODE=$(printf "w%02d" $WEEK_NUM)
+          FILE_PATH="docs/${WEEK_CODE}/${DAY}.html"
+
+          # 이미 생성된 파일이 있으면 스킵
+          if [ -f "$FILE_PATH" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Already exists: $FILE_PATH"; exit 0
+          fi
+
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "today=$TODAY" >> $GITHUB_OUTPUT
+          echo "week_code=$WEEK_CODE" >> $GITHUB_OUTPUT
+          echo "week_num=$WEEK_NUM" >> $GITHUB_OUTPUT
+          echo "week_idx=$WEEK_IDX" >> $GITHUB_OUTPUT
+          echo "day=$DAY" >> $GITHUB_OUTPUT
+          echo "day_in_week=$DAY_IN_WEEK" >> $GITHUB_OUTPUT
+          echo "file_path=$FILE_PATH" >> $GITHUB_OUTPUT
+
+      # ────────────────────────────────────
+      # 3. 커리큘럼에서 오늘의 데이터 추출
+      # ────────────────────────────────────
+      - name: Extract curriculum data
+        if: steps.schedule.outputs.skip != 'true'
+        id: curriculum
+        run: |
+          WEEK_IDX=${{ steps.schedule.outputs.week_idx }}
+          DAY=${{ steps.schedule.outputs.day }}
+
+          # jq로 커리큘럼에서 오늘 데이터 추출
+          WEEK_DATA=$(jq -r ".weeks[$WEEK_IDX]" curriculum.json)
+          DAY_DATA=$(echo "$WEEK_DATA" | jq -r ".days.$DAY")
+
+          WEEK_THEME=$(echo "$WEEK_DATA" | jq -r '.theme')
+          PHASE_NUM=$(echo "$WEEK_DATA" | jq -r '.phase')
+          PHASE_LABEL=$(jq -r ".phase_labels[\"$PHASE_NUM\"]" curriculum.json)
+          DAY_TITLE=$(echo "$DAY_DATA" | jq -r '.title')
+          DAY_SUB=$(echo "$DAY_DATA" | jq -r '.sub')
+
+          TIP1_NUM=$(echo "$DAY_DATA" | jq -r '.tips[0].num')
+          TIP1_TITLE=$(echo "$DAY_DATA" | jq -r '.tips[0].title')
+          TIP1_LEVEL=$(echo "$DAY_DATA" | jq -r '.tips[0].level')
+          TIP1_CAT=$(echo "$DAY_DATA" | jq -r '.tips[0].category')
+          TIP1_DESC=$(echo "$DAY_DATA" | jq -r '.tips[0].desc')
+
+          TIP2_NUM=$(echo "$DAY_DATA" | jq -r '.tips[1].num')
+          TIP2_TITLE=$(echo "$DAY_DATA" | jq -r '.tips[1].title')
+          TIP2_LEVEL=$(echo "$DAY_DATA" | jq -r '.tips[1].level')
+          TIP2_CAT=$(echo "$DAY_DATA" | jq -r '.tips[1].category')
+          TIP2_DESC=$(echo "$DAY_DATA" | jq -r '.tips[1].desc')
+
+          WEEK_CODE=${{ steps.schedule.outputs.week_code }}
+          DAY_UPPER=$(echo "$DAY" | tr '[:lower:]' '[:upper:]')
+
+          # 멀티라인 output
+          {
+            echo "week_theme=$WEEK_THEME"
+            echo "phase_label=$PHASE_LABEL"
+            echo "day_title=$DAY_TITLE"
+            echo "day_sub=$DAY_SUB"
+            echo "day_upper=$DAY_UPPER"
+            echo "tip1_num=$TIP1_NUM"
+            echo "tip1_title=$TIP1_TITLE"
+            echo "tip1_level=$TIP1_LEVEL"
+            echo "tip1_cat=$TIP1_CAT"
+            echo "tip1_desc=$TIP1_DESC"
+            echo "tip2_num=$TIP2_NUM"
+            echo "tip2_title=$TIP2_TITLE"
+            echo "tip2_level=$TIP2_LEVEL"
+            echo "tip2_cat=$TIP2_CAT"
+            echo "tip2_desc=$TIP2_DESC"
+          } >> $GITHUB_OUTPUT
+
+      # ────────────────────────────────────
+      # 4. Claude API로 HTML 생성
+      # ────────────────────────────────────
+      - name: Generate HTML via Claude API
+        if: steps.schedule.outputs.skip != 'true'
+        run: |
+          TEMPLATE=$(cat template.html)
+          WEEK_CODE=${{ steps.schedule.outputs.week_code }}
+          DAY=${{ steps.schedule.outputs.day }}
+          DAY_UPPER=${{ steps.curriculum.outputs.day_upper }}
+          TODAY=${{ steps.schedule.outputs.today }}
+
+          # 시스템 프롬프트 구성
+          cat << 'SYSPROMPT' > system_prompt.txt
+          너는 4lynx AI Agent Tips 뉴스레터 생성기야.
+          첨부된 HTML 템플릿의 디자인·CSS·구조를 정확히 따라서 새로운 일일 팁 HTML을 생성해.
+
+          규칙:
+          1. 템플릿의 CSS를 100% 그대로 사용 (색상, 폰트, 레이아웃 변경 금지)
+          2. 로고는 템플릿에 있는 base64 그대로 유지
+          3. 팁 카드는 정확히 2개, 각각 #번호, 레벨 태그, 카테고리, 제목, 본문(2문단), 실전 예시(code 블록) 포함
+          4. 오늘의 한마디, 인사이트, 용어사전(2개) 섹션 포함
+          5. by Ian Jung 유지
+          6. 완성된 HTML만 출력. 설명·마크다운 코드펜스 없이 <!DOCTYPE html>로 시작해서 </html>로 끝나야 함
+          SYSPROMPT
+
+          SYSTEM_PROMPT=$(cat system_prompt.txt)
+
+          # 유저 프롬프트 구성
+          cat << EOF > user_prompt.txt
+          아래 정보로 오늘의 뉴스레터 HTML을 생성해줘.
+
+          [메타 정보]
+          - 주차: ${WEEK_CODE}
+          - 요일: ${DAY_UPPER}
+          - 날짜: ${TODAY}
+          - 주간 테마: ${{ steps.curriculum.outputs.week_theme }}
+          - Phase: ${{ steps.curriculum.outputs.phase_label }}
+          - 헤더 제목: ${{ steps.curriculum.outputs.day_title }}
+          - 헤더 부제: ${{ steps.curriculum.outputs.day_sub }}
+
+          [팁 ①]
+          - 번호: #${{ steps.curriculum.outputs.tip1_num }}
+          - 수준: ${{ steps.curriculum.outputs.tip1_level }}
+          - 카테고리: ${{ steps.curriculum.outputs.tip1_cat }}
+          - 제목: ${{ steps.curriculum.outputs.tip1_title }}
+          - 설명: ${{ steps.curriculum.outputs.tip1_desc }}
+
+          [팁 ②]
+          - 번호: #${{ steps.curriculum.outputs.tip2_num }}
+          - 수준: ${{ steps.curriculum.outputs.tip2_level }}
+          - 카테고리: ${{ steps.curriculum.outputs.tip2_cat }}
+          - 제목: ${{ steps.curriculum.outputs.tip2_title }}
+          - 설명: ${{ steps.curriculum.outputs.tip2_desc }}
+
+          [참고 템플릿]
+          ${TEMPLATE}
+          EOF
+
+          USER_PROMPT=$(cat user_prompt.txt)
+
+          # Claude API 호출
+          jq -n \
+            --arg system "$SYSTEM_PROMPT" \
+            --arg user "$USER_PROMPT" \
+            '{
+              model: "claude-sonnet-4-5-20250929",
+              max_tokens: 16000,
+              system: $system,
+              messages: [{ role: "user", content: $user }]
+            }' > request.json
+
+          RESPONSE=$(curl -s -X POST \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${{ secrets.ANTHROPIC_API_KEY }}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d @request.json)
+
+          # 응답에서 HTML 추출
+          echo "$RESPONSE" | jq -r '.content[0].text' > generated.html
+
+          # HTML 유효성 확인
+          if ! head -1 generated.html | grep -q "<!DOCTYPE"; then
+            echo "❌ HTML 생성 실패"
+            echo "$RESPONSE" | jq '.error // .content[0].text' | head -20
+            exit 1
+          fi
+
+          # 파일 배치
+          mkdir -p "docs/${WEEK_CODE}"
+          mv generated.html "${{ steps.schedule.outputs.file_path }}"
+          echo "✅ 생성 완료: ${{ steps.schedule.outputs.file_path }}"
+
+      # ────────────────────────────────────
+      # 5. 자동 commit & push
+      # ────────────────────────────────────
+      - name: Commit and push
+        if: steps.schedule.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "🎯 ${{ steps.schedule.outputs.week_code }} ${{ steps.curriculum.outputs.day_upper }}: #${{ steps.curriculum.outputs.tip1_num }} #${{ steps.curriculum.outputs.tip2_num }}"
+          git push
+
+      # ────────────────────────────────────
+      # 6. Pages 배포 대기
+      # ────────────────────────────────────
+      - name: Wait for Pages deployment
+        if: steps.schedule.outputs.skip != 'true'
+        run: sleep 60
+
+      # ────────────────────────────────────
+      # 7. Google Chat 알림
+      # ────────────────────────────────────
+      - name: Notify Google Chat
+        if: steps.schedule.outputs.skip != 'true'
+        run: |
+          OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
+          REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          WEEK_CODE=${{ steps.schedule.outputs.week_code }}
+          DAY=${{ steps.schedule.outputs.day }}
+          PAGE_URL="https://${OWNER}.github.io/${REPO}/${WEEK_CODE}/${DAY}.html"
+
+          cat << EOF > payload.json
+          {
+            "cardsV2": [{
+              "cardId": "tipCard",
+              "card": {
+                "header": {
+                  "title": "🎯 오늘의 AI 에이전트 팁",
+                  "subtitle": "${{ steps.schedule.outputs.today }}"
+                },
+                "sections": [{
+                  "header": "${{ steps.schedule.outputs.week_code }} · ${{ steps.curriculum.outputs.day_upper }}",
+                  "widgets": [
+                    {"decoratedText": {"topLabel": "TIP ①", "text": "#${{ steps.curriculum.outputs.tip1_num }} ${{ steps.curriculum.outputs.tip1_title }}"}},
+                    {"decoratedText": {"topLabel": "TIP ②", "text": "#${{ steps.curriculum.outputs.tip2_num }} ${{ steps.curriculum.outputs.tip2_title }}"}},
+                    {"buttonList": {"buttons": [{"text": "📖 오늘의 팁 읽기", "onClick": {"openLink": {"url": "${PAGE_URL}"}}}]}}
+                  ]
+                }]
+              }
+            }]
+          }
+          EOF
+
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
+
+          echo "✅ 알림 발송 완료"
