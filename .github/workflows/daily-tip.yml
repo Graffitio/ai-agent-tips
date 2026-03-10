@@ -192,20 +192,16 @@ jobs:
               messages: [{ role: "user", content: $user }]
             }' > request.json
 
-          RESPONSE=$(curl -s -X POST \
-            https://api.anthropic.com/v1/messages \
-            -H "x-api-key: ${{ secrets.ANTHROPIC_API_KEY }}" \
-            -H "anthropic-version: 2023-06-01" \
-            -H "content-type: application/json" \
-            -d @request.json)
+          # 응답에서 HTML 추출 — 마크다운 코드펜스 제거
+          echo "$RESPONSE" | jq -r '.content[0].text' \
+            | sed '1{/^```/d}' \
+            | sed '${/^```/d}' \
+            > generated.html
 
-          # 응답에서 HTML 추출
-          echo "$RESPONSE" | jq -r '.content[0].text' > generated.html
-
-          # HTML 유효성 확인
-          if ! head -1 generated.html | grep -q "<!DOCTYPE"; then
+          # HTML 유효성 확인 (앞쪽 빈 줄 무시)
+          if ! grep -q "<!DOCTYPE" generated.html; then
             echo "❌ HTML 생성 실패"
-            echo "$RESPONSE" | jq '.error // .content[0].text' | head -20
+            head -5 generated.html
             exit 1
           fi
 
