@@ -160,18 +160,24 @@ jobs:
         if: github.event.inputs.notify == 'yes'
         env:
           WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          WEEK_CODE: ${{ steps.info.outputs.week_code }}
+          DAY: ${{ steps.info.outputs.day }}
+          DAY_UPPER: ${{ steps.info.outputs.day_upper }}
+          TARGET_DATE: ${{ steps.info.outputs.target_date }}
+          TIP1_NUM: ${{ steps.info.outputs.tip1_num }}
+          TIP1_TITLE: ${{ steps.info.outputs.tip1_title }}
+          TIP2_NUM: ${{ steps.info.outputs.tip2_num }}
+          TIP2_TITLE: ${{ steps.info.outputs.tip2_title }}
         run: |
           OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
           REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
-          WEEK_CODE="${{ steps.info.outputs.week_code }}"
-          DAY="${{ steps.info.outputs.day }}"
           PAGE_URL="https://${OWNER}.github.io/${REPO}/${WEEK_CODE}/${DAY}.html"
 
           jq -n \
-            --arg today "${{ steps.info.outputs.target_date }}" \
-            --arg header "${{ steps.info.outputs.week_code }} · ${{ steps.info.outputs.day_upper }}" \
-            --arg tip1 "#${{ steps.info.outputs.tip1_num }} ${{ steps.info.outputs.tip1_title }}" \
-            --arg tip2 "#${{ steps.info.outputs.tip2_num }} ${{ steps.info.outputs.tip2_title }}" \
+            --arg today "$TARGET_DATE" \
+            --arg header "${WEEK_CODE} · ${DAY_UPPER}" \
+            --arg tip1 "#${TIP1_NUM} ${TIP1_TITLE}" \
+            --arg tip2 "#${TIP2_NUM} ${TIP2_TITLE}" \
             --arg url "$PAGE_URL" \
             '{
               cardsV2: [{
