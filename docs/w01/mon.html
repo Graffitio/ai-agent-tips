@@ -93,7 +93,7 @@
       <div class="header-author">by <span>Ian Jung</span></div>
     </div>
     <div class="header-right">
-      <div class="header-date">2026.03.09 MON<br>☕ 3 min read</div>
+      <div class="header-date">2026.03.11 MON<br>☕ 3 min read</div>
       <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
     </div>
   </div>
@@ -118,20 +118,21 @@
         <h2 class="tip-title">구체적으로 질문하면 구체적으로 답한다</h2>
       </div>
       <div class="tip-body">
-        <p>"마케팅 전략 알려줘"라고 하면 AI는 교과서 같은 일반론을 꺼냅니다. 하지만 <strong>누가, 무엇을, 왜, 어떤 조건에서</strong> 필요한지를 함께 말하면, AI는 마치 그 상황을 직접 겪은 것처럼 구체적인 답을 만들어냅니다.</p><p>핵심 공식: <strong>"[나의 상황] + [원하는 것] + [제약 조건]"</strong>. 이 세 요소만 포함하면 프롬프트의 질이 확 올라갑니다.</p>
+        <p>모호한 질문은 모호한 답을 만듭니다. "좋은 콘텐츠 아이디어 줘"라고 하면 AI는 일반적인 조언만 반복합니다. 하지만 <strong>산업, 타겟 오디언스, 플랫폼, 목표</strong>까지 함께 전달하면, AI는 마치 당신의 상황을 깊이 이해하고 있는 것처럼 맞춤형 답변을 만들어냅니다.</p><p>핵심: 질문에 <strong>Who, What, Why, Where, When, How</strong>의 맥락을 최대한 담으세요. 한 문장이라도 더 구체할수록 AI의 답변이 정확해집니다.</p>
         <div class="tip-example">
-          <div class="tip-example-label">💬 Before / After</div>
-          <code>❌ Before:
-"마케팅 전략 알려줘"
-→ 4P 분석, STP 전략 등 교과서적 답변
+          <div class="tip-example-label">💬 모호함 vs 구체적</div>
+          <code>❌ 모호함:
+"블로그 글 주제 추천해줘"
+→ 일반적인 주제 리스트만 반환
 
-✅ After:
-"나는 반려동물 간식 D2C 브랜드를 운영해.
-월 광고 예산 300만원이고, 타겟은
-30대 1인 가구 반려견 보호자야.
-인스타그램 중심의 3개월 마케팅 전략을
-월별 액션 플랜으로 정리해줘."
-→ 구체적인 채널·예산·일정이 포함된 답변</code>
+✅ 구체적:
+"나는 B2B SaaS 기업의 마케팅 담당자고,
+월 1,000명의 개발자를 타겟해.
+우리 제품은 API 관리 플랫폼이야.
+블로그를 통해 기술적 신뢰도를 높이고
+싶은데, 다음 분기에 올릴 글 주제 5개를
+난이도별로 제안해줘."
+→ 당신의 사업에 딱 맞는 주제 5개</code>
         </div>
       </div>
       <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
@@ -146,27 +147,27 @@
         <h2 class="tip-title">한 번에 하나씩 — 복합 질문을 쪼개라</h2>
       </div>
       <div class="tip-body">
-        <p>"A 분석하고, B 비교하고, C 추천도 해줘"처럼 <strong>여러 작업을 한 프롬프트에 담으면</strong> AI는 어디에 집중해야 할지 헷갈립니다. 결과적으로 모든 항목이 얕아지죠.</p><p><strong>하나의 프롬프트 = 하나의 요청</strong> 원칙을 지키세요. 각 단계의 결과를 확인한 뒤 다음 질문으로 넘어가면, 각 답변의 깊이가 눈에 띄게 달라집니다.</p>
+        <p>"A 분석하고, B 작성하고, C 수정도 해줘"처럼 여러 작업을 한 번에 담으면, AI는 자원을 분산시켜 모든 것을 피상적으로 처리합니다. 깊이 있는 답변을 원한다면, <strong>질문을 단계로 나누세요.</strong></p><p><strong>한 프롬프트 = 한 요청</strong>. 각 단계의 결과를 읽고 확인한 후 다음 질문을 전달하면, 각 답변의 정교함이 눈에 띄게 올라갑니다. 또한 중간에 방향을 수정할 수도 있습니다.</p>
         <div class="tip-example">
-          <div class="tip-example-label">💬 Before / After</div>
-          <code>❌ Before (한 번에 다 물어보기):
-"우리 경쟁사 3곳 분석하고, 우리 제품
-장단점도 정리하고, 차별화 전략도
-추천해줘. 그리고 광고 카피도 써줘."
-→ 4가지 모두 피상적인 답변
+          <div class="tip-example-label">💬 한 번에 vs 단계별</div>
+          <code>❌ 한 번에 (피상적):
+"우리 경쟁사 3곳을 비교 분석해.
+그리고 우리 강점도 정리하고
+차별화 전략도 만들고 광고 카피도 써줘."
+→ 4가지 모두 얕은 수준
 
-✅ After (하나씩 단계별로):
-1️⃣ "A사, B사, C사의 핵심 강점을
-   각각 3가지씩 정리해줘."
-   → 확인 후
-
-2️⃣ "그 분석을 바탕으로, 우리 제품이
-   가진 차별점 3가지를 도출해줘."
-   → 확인 후
-
-3️⃣ "그 차별점을 살린 인스타 광고
-   카피를 3가지 버전으로 써줘."
-→ 각 단계가 깊고 연결된 답변</code>
+✅ 단계별 (깊고 구체적):
+[1단계] "A사, B사, C사의 마케팅 전략을
+       각각 분석해줘. 채널, 메시지, 타겟.
+       
+[2단계] (결과 확인 후)
+       "그 분석을 보니, 우리 제품이
+       가진 고유한 강점 3가지는?"
+       
+[3단계] (결과 확인 후)
+       "그 강점을 강조하는 인스타그램
+       광고 카피 3버전을 써줘."
+→ 각 단계가 논리적으로 연결되고 깊음</code>
         </div>
       </div>
       <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
@@ -175,7 +176,7 @@
 
   <div class="insight-box">
     <div class="section-label">💡 오늘의 인사이트</div>
-    <p>오늘 배운 두 가지 — <strong>"구체적으로"와 "하나씩"</strong> — 은 이후 25주 동안 배울 모든 고급 기법의 토대입니다. 어떤 기법이든 결국 "구체적으로 하나의 요청을 전달하는 것"에서 출발합니다. 오늘부터 AI에게 질문할 때 3초만 멈추고 생각해 보세요: <strong>"이 질문에 내 상황이 담겨 있는가? 요청이 하나인가?"</strong></p>
+    <p>아무리 좋은 AI 모델도, <strong>받는 입력이 좋아야 좋은 출력을 만듭니다.</strong> 오늘의 두 원칙 — 구체적으로, 하나씩 — 은 모든 고급 프롬프팅의 기초입니다. 내일부터는 이 기초 위에 더 많은 기법들을 쌓아갈 텐데, 이 두 가지만 지켜도 이미 대부분의 사람들보다 훨씬 나은 결과를 얻을 수 있습니다. 매번 질문하기 전에 "구체적인가? 하나인가?" 체크하는 습관을 들이세요.</p>
   </div>
 
   <div class="glossary">
@@ -184,12 +185,12 @@
     <div class="glossary-item">
       <div class="glossary-term">프롬프트</div>
       <div class="glossary-en">Prompt</div>
-      <div class="glossary-def">AI에게 전달하는 입력 텍스트 전체를 말합니다. 질문, 지시, 맥락, 예시 등이 모두 포함됩니다.</div>
+      <div class="glossary-def">AI에게 전달하는 모든 입력 정보를 말합니다. 질문, 지시사항, 맥락, 예시, 제약 조건 등이 포함되며, AI의 출력 품질을 결정하는 가장 중요한 요소입니다.</div>
     </div>
     <div class="glossary-item">
-      <div class="glossary-term">프롬프트 분리</div>
+      <div class="glossary-term">프롬프트 분해</div>
       <div class="glossary-en">Prompt Decomposition</div>
-      <div class="glossary-def">복잡한 작업을 여러 개의 단순한 프롬프트로 나누는 기법. 각 단계에서 결과를 확인하고 다음으로 넘어가므로 정확도와 깊이가 향상됩니다.</div>
+      <div class="glossary-def">복잡한 작업을 여러 개의 단순하고 명확한 요청으로 나누는 기법입니다. 각 단계에서 결과를 확인하며 진행하므로 정확도와 깊이가 대폭 향상됩니다.</div>
     </div>
   </div>
 </main>
