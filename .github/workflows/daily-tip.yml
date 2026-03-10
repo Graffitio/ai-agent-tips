@@ -315,39 +315,49 @@ jobs:
       # ────────────────────────────────────
       - name: Notify Google Chat
         if: steps.schedule.outputs.skip != 'true'
+        env:
+          WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          TODAY: ${{ steps.schedule.outputs.today }}
+          WEEK_CODE: ${{ steps.schedule.outputs.week_code }}
+          DAY: ${{ steps.schedule.outputs.day }}
+          DAY_UPPER: ${{ steps.curriculum.outputs.day_upper }}
+          TIP1: "#${{ steps.curriculum.outputs.tip1_num }} ${{ steps.curriculum.outputs.tip1_title }}"
+          TIP2: "#${{ steps.curriculum.outputs.tip2_num }} ${{ steps.curriculum.outputs.tip2_title }}"
         run: |
           OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
           REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
-          WEEK_CODE=${{ steps.schedule.outputs.week_code }}
-          DAY=${{ steps.schedule.outputs.day }}
           PAGE_URL="https://${OWNER}.github.io/${REPO}/${WEEK_CODE}/${DAY}.html"
 
-          cat << EOF > payload.json
-          {
-            "cardsV2": [{
-              "cardId": "tipCard",
-              "card": {
-                "header": {
-                  "title": "🎯 오늘의 AI 에이전트 팁",
-                  "subtitle": "${{ steps.schedule.outputs.today }}"
-                },
-                "sections": [{
-                  "header": "${{ steps.schedule.outputs.week_code }} · ${{ steps.curriculum.outputs.day_upper }}",
-                  "widgets": [
-                    {"decoratedText": {"topLabel": "TIP ①", "text": "#${{ steps.curriculum.outputs.tip1_num }} ${{ steps.curriculum.outputs.tip1_title }}"}},
-                    {"decoratedText": {"topLabel": "TIP ②", "text": "#${{ steps.curriculum.outputs.tip2_num }} ${{ steps.curriculum.outputs.tip2_title }}"}},
-                    {"buttonList": {"buttons": [{"text": "📖 오늘의 팁 읽기", "onClick": {"openLink": {"url": "${PAGE_URL}"}}}]}}
-                  ]
-                }]
-              }
-            }]
-          }
-          EOF
+          jq -n \
+            --arg today "$TODAY" \
+            --arg header "${WEEK_CODE} · ${DAY_UPPER}" \
+            --arg tip1 "$TIP1" \
+            --arg tip2 "$TIP2" \
+            --arg url "$PAGE_URL" \
+            '{
+              cardsV2: [{
+                cardId: "tipCard",
+                card: {
+                  header: {
+                    title: "🎯 오늘의 AI 에이전트 팁",
+                    subtitle: $today
+                  },
+                  sections: [{
+                    header: $header,
+                    widgets: [
+                      {decoratedText: {topLabel: "TIP ①", text: $tip1}},
+                      {decoratedText: {topLabel: "TIP ②", text: $tip2}},
+                      {buttonList: {buttons: [{text: "📖 오늘의 팁 읽기", onClick: {openLink: {url: $url}}}]}}
+                    ]
+                  }]
+                }
+              }]
+            }' > payload.json
 
           curl -s -X POST \
             -H "Content-Type: application/json" \
             -d @payload.json \
-            "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
+            "$WEBHOOK_URL"
 
           echo "✅ 알림 발송 완료"
 
