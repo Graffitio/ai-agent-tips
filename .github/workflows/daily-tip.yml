@@ -2,13 +2,11 @@ name: Daily AI Tip — Auto Generate & Notify
 
 on:
   schedule:
-    # 월~금 KST 07:00 = UTC 22:00 (전날)
-    # 일~목 UTC 22:00 실행 → 월~금 KST 07:00 도착
     - cron: '0 22 * * 0-4'
-  workflow_dispatch:  # 수동 실행 버튼
+  workflow_dispatch:
 
 permissions:
-  contents: write  # 자동 commit에 필요
+  contents: write
 
 jobs:
   generate-and-notify:
@@ -16,15 +14,11 @@ jobs:
 
     steps:
 
-      # ────────────────────────────────────
-      # 1. 체크아웃
-      # ────────────────────────────────────
+      # ── 1. 체크아웃 ──
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ────────────────────────────────────
-      # 2. 오늘 날짜 → 주차/요일/팁 정보 계산
-      # ────────────────────────────────────
+      # ── 2. 오늘 날짜 → 주차/요일 계산 ──
       - name: Determine today's schedule
         id: schedule
         run: |
@@ -53,7 +47,6 @@ jobs:
           WEEK_CODE=$(printf "w%02d" $WEEK_NUM)
           FILE_PATH="docs/${WEEK_CODE}/${DAY}.html"
 
-          # 이미 생성된 파일이 있으면 스킵
           if [ -f "$FILE_PATH" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "Already exists: $FILE_PATH"; exit 0
@@ -68,9 +61,7 @@ jobs:
           echo "day_in_week=$DAY_IN_WEEK" >> $GITHUB_OUTPUT
           echo "file_path=$FILE_PATH" >> $GITHUB_OUTPUT
 
-      # ────────────────────────────────────
-      # 3. 커리큘럼에서 오늘의 데이터 추출
-      # ────────────────────────────────────
+      # ── 3. 커리큘럼 데이터 추출 ──
       - name: Extract curriculum data
         if: steps.schedule.outputs.skip != 'true'
         id: curriculum
@@ -99,7 +90,6 @@ jobs:
           TIP2_CAT=$(echo "$DAY_DATA" | jq -r '.tips[1].category')
           TIP2_DESC=$(echo "$DAY_DATA" | jq -r '.tips[1].desc')
 
-          WEEK_CODE=${{ steps.schedule.outputs.week_code }}
           DAY_UPPER=$(echo "$DAY" | tr '[:lower:]' '[:upper:]')
 
           {
@@ -120,9 +110,7 @@ jobs:
             echo "tip2_desc=$TIP2_DESC"
           } >> $GITHUB_OUTPUT
 
-      # ────────────────────────────────────
-      # 4. Claude API로 HTML 생성
-      # ────────────────────────────────────
+      # ── 4. Claude API로 HTML 생성 ──
       - name: Generate HTML via Claude API
         if: steps.schedule.outputs.skip != 'true'
         env:
@@ -187,7 +175,6 @@ jobs:
           [참고 템플릿]
           ${TEMPLATE}"
 
-          # Claude API 호출 — jq로 안전하게 JSON 구성
           jq -n \
             --arg system "$SYSTEM_PROMPT" \
             --arg user "$USER_PROMPT" \
@@ -205,11 +192,13 @@ jobs:
             -H "content-type: application/json" \
             -d @request.json)
 
-          # 응답에서 HTML 추출 — 마크다운 코드펜스 제거
-          echo "$RESPONSE" | jq -r '.content[0].text' \
-            | sed '1{/^```/d}' \
-            | sed '${/^```/d}' \
-            > generated.html
+          # 응답 → 파일 저장 → 코드펜스 인플레이스 제거
+          echo "$RESPONSE" | jq -r '.content[0].text' > raw_output.txt
+          sed -i '1s/^```html$//' raw_output.txt
+          sed -i '1s/^```$//' raw_output.txt
+          sed -i '$s/^```$//' raw_output.txt
+          sed -i '/^[[:space:]]*$/d' raw_output.txt
+          mv raw_output.txt generated.html
 
           # HTML 유효성 확인
           if ! grep -q "<!DOCTYPE" generated.html; then
@@ -218,14 +207,11 @@ jobs:
             exit 1
           fi
 
-          # 파일 배치
           mkdir -p "docs/${WEEK_CODE}"
           mv generated.html "${{ steps.schedule.outputs.file_path }}"
           echo "✅ 생성 완료: ${{ steps.schedule.outputs.file_path }}"
 
-      # ────────────────────────────────────
-      # 5. [금요일만] 주간 다이제스트 생성
-      # ────────────────────────────────────
+      # ── 5. [금요일만] 주간 다이제스트 생성 ──
       - name: Generate weekly digest (Friday only)
         if: steps.schedule.outputs.skip != 'true' && steps.schedule.outputs.day == 'fri'
         env:
@@ -235,7 +221,6 @@ jobs:
         run: |
           TEMPLATE=$(cat template.html)
 
-          # 이번 주 월~금 전체 팁 요약 추출
           WEEK_SUMMARY=$(jq -r --argjson idx "$WEEK_IDX" '
             .weeks[$idx] as $w |
             "주차: \($w.week)\n테마: \($w.theme)\nPhase: \(.phase_labels[($w.phase|tostring)])\n\n" +
@@ -249,14 +234,11 @@ jobs:
           첨부된 HTML 템플릿의 CSS·디자인을 기반으로 주간 다이제스트 HTML을 생성해.
 
           규칙:
-          1. 주간 요약 구성:
-             - 오늘의 한마디 (이번 주 요약 소개)
-             - 월~금 5개의 카드 (각 카드에 요일, 제목, 팁 2개 요약)
-             - 카드별 왼쪽에 요일별 색상 바 (MON=보라, TUE=파랑, WED=초록, THU=노랑, FRI=빨강)
-             - 이번 주의 큰 그림 (네이비 배경의 인사이트 박스)
-          2. 로고, by Ian Jung, Phase 배지, 푸터 유지
-          3. 템플릿의 CSS 색상·폰트 100% 유지
-          4. 완성된 HTML 코드만 출력할 것. 마크다운 코드펜스(백틱)를 절대 사용하지 마. 설명도 붙이지 마. 응답은 반드시 <!DOCTYPE html>로 시작하고 </html>로 끝나야 함."
+          1. 주간 요약 구성: 오늘의 한마디, 월~금 5개 카드, 이번 주의 큰 그림
+          2. 카드별 왼쪽 색상 바 (MON=보라, TUE=파랑, WED=초록, THU=노랑, FRI=빨강)
+          3. 로고, by Ian Jung, Phase 배지, 푸터 유지
+          4. 템플릿의 CSS 색상·폰트 100% 유지
+          5. 완성된 HTML 코드만 출력할 것. 마크다운 코드펜스(백틱)를 절대 사용하지 마. 설명도 붙이지 마. 응답은 반드시 <!DOCTYPE html>로 시작하고 </html>로 끝나야 함."
 
           DIGEST_USER="아래 데이터로 주간 다이제스트 HTML을 생성해줘.
 
@@ -282,10 +264,13 @@ jobs:
             -H "content-type: application/json" \
             -d @digest_request.json)
 
-          echo "$RESPONSE" | jq -r '.content[0].text' \
-            | sed '1{/^```/d}' \
-            | sed '${/^```/d}' \
-            > digest.html
+          # 응답 → 파일 저장 → 코드펜스 인플레이스 제거
+          echo "$RESPONSE" | jq -r '.content[0].text' > raw_digest.txt
+          sed -i '1s/^```html$//' raw_digest.txt
+          sed -i '1s/^```$//' raw_digest.txt
+          sed -i '$s/^```$//' raw_digest.txt
+          sed -i '/^[[:space:]]*$/d' raw_digest.txt
+          mv raw_digest.txt digest.html
 
           if ! grep -q "<!DOCTYPE" digest.html; then
             echo "⚠️ 다이제스트 생성 실패 — 스킵"
@@ -295,9 +280,7 @@ jobs:
             echo "✅ 다이제스트 생성 완료: docs/${WEEK_CODE}/digest.html"
           fi
 
-      # ────────────────────────────────────
-      # 6. 자동 commit & push
-      # ────────────────────────────────────
+      # ── 6. 자동 commit & push ──
       - name: Commit and push
         if: steps.schedule.outputs.skip != 'true'
         run: |
@@ -307,16 +290,12 @@ jobs:
           git commit -m "🎯 ${{ steps.schedule.outputs.week_code }} ${{ steps.curriculum.outputs.day_upper }}: #${{ steps.curriculum.outputs.tip1_num }} #${{ steps.curriculum.outputs.tip2_num }}"
           git push
 
-      # ────────────────────────────────────
-      # 7. Pages 배포 대기
-      # ────────────────────────────────────
+      # ── 7. Pages 배포 대기 ──
       - name: Wait for Pages deployment
         if: steps.schedule.outputs.skip != 'true'
         run: sleep 60
 
-      # ────────────────────────────────────
-      # 8. Google Chat 알림
-      # ────────────────────────────────────
+      # ── 8. Google Chat 알림 ──
       - name: Notify Google Chat
         if: steps.schedule.outputs.skip != 'true'
         env:
@@ -365,9 +344,7 @@ jobs:
 
           echo "✅ 알림 발송 완료"
 
-      # ────────────────────────────────────
-      # 9. [금요일만] 다이제스트 알림
-      # ────────────────────────────────────
+      # ── 9. [금요일만] 다이제스트 알림 ──
       - name: Notify digest (Friday only)
         if: steps.schedule.outputs.skip != 'true' && steps.schedule.outputs.day == 'fri'
         env:
