@@ -1,0 +1,198 @@
+name: Manual Tip — Generate & Notify
+
+on:
+  workflow_dispatch:
+    inputs:
+      week:
+        description: '주차 (예: w01)'
+        required: true
+        default: 'w01'
+      day:
+        description: '요일 (mon/tue/wed/thu/fri)'
+        required: true
+        default: 'mon'
+      notify:
+        description: 'Google Chat 알림 발송?'
+        required: true
+        default: 'yes'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse inputs
+        id: info
+        run: |
+          WEEK_CODE="${{ github.event.inputs.week }}"
+          DAY="${{ github.event.inputs.day }}"
+          DAY_UPPER=$(echo "$DAY" | tr '[:lower:]' '[:upper:]')
+
+          WEEK_NUM=$(echo "$WEEK_CODE" | sed 's/w//' | sed 's/^0//')
+          WEEK_IDX=$(( WEEK_NUM - 1 ))
+
+          DAY_DATA=$(jq -r ".weeks[$WEEK_IDX].days.$DAY" curriculum.json)
+
+          if [ "$DAY_DATA" = "null" ]; then
+            echo "❌ ${WEEK_CODE}/${DAY} 데이터가 curriculum.json에 없습니다"
+            exit 1
+          fi
+
+          WEEK_DATA=$(jq -r ".weeks[$WEEK_IDX]" curriculum.json)
+          WEEK_THEME=$(echo "$WEEK_DATA" | jq -r '.theme')
+          PHASE_NUM=$(echo "$WEEK_DATA" | jq -r '.phase')
+          PHASE_LABEL=$(jq -r ".phase_labels[\"$PHASE_NUM\"]" curriculum.json)
+          DAY_TITLE=$(echo "$DAY_DATA" | jq -r '.title')
+          DAY_SUB=$(echo "$DAY_DATA" | jq -r '.sub')
+
+          TIP1_NUM=$(echo "$DAY_DATA" | jq -r '.tips[0].num')
+          TIP1_TITLE=$(echo "$DAY_DATA" | jq -r '.tips[0].title')
+          TIP1_LEVEL=$(echo "$DAY_DATA" | jq -r '.tips[0].level')
+          TIP1_CAT=$(echo "$DAY_DATA" | jq -r '.tips[0].category')
+          TIP1_DESC=$(echo "$DAY_DATA" | jq -r '.tips[0].desc')
+
+          TIP2_NUM=$(echo "$DAY_DATA" | jq -r '.tips[1].num')
+          TIP2_TITLE=$(echo "$DAY_DATA" | jq -r '.tips[1].title')
+          TIP2_LEVEL=$(echo "$DAY_DATA" | jq -r '.tips[1].level')
+          TIP2_CAT=$(echo "$DAY_DATA" | jq -r '.tips[1].category')
+          TIP2_DESC=$(echo "$DAY_DATA" | jq -r '.tips[1].desc')
+
+          START_DATE=$(jq -r '.start_date' curriculum.json)
+          START_SEC=$(date -d "$START_DATE" +%s)
+          DAY_OFFSETS="mon:0 tue:1 wed:2 thu:3 fri:4"
+          OFFSET=$(echo "$DAY_OFFSETS" | tr ' ' '\n' | grep "^${DAY}:" | cut -d: -f2)
+          TARGET_SEC=$(( START_SEC + WEEK_IDX * 7 * 86400 + OFFSET * 86400 ))
+          TARGET_DATE=$(date -d "@$TARGET_SEC" '+%Y.%m.%d')
+
+          FILE_PATH="docs/${WEEK_CODE}/${DAY}.html"
+
+          {
+            echo "week_code=$WEEK_CODE"
+            echo "day=$DAY"
+            echo "day_upper=$DAY_UPPER"
+            echo "week_idx=$WEEK_IDX"
+            echo "week_theme=$WEEK_THEME"
+            echo "phase_label=$PHASE_LABEL"
+            echo "day_title=$DAY_TITLE"
+            echo "day_sub=$DAY_SUB"
+            echo "tip1_num=$TIP1_NUM"
+            echo "tip1_title=$TIP1_TITLE"
+            echo "tip1_level=$TIP1_LEVEL"
+            echo "tip1_cat=$TIP1_CAT"
+            echo "tip1_desc=$TIP1_DESC"
+            echo "tip2_num=$TIP2_NUM"
+            echo "tip2_title=$TIP2_TITLE"
+            echo "tip2_level=$TIP2_LEVEL"
+            echo "tip2_cat=$TIP2_CAT"
+            echo "tip2_desc=$TIP2_DESC"
+            echo "target_date=$TARGET_DATE"
+            echo "file_path=$FILE_PATH"
+          } >> $GITHUB_OUTPUT
+
+      - name: Generate HTML via Claude API
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TEMPLATE=$(cat template.html)
+
+          SYSTEM_PROMPT="너는 4lynx AI Agent Tips 뉴스레터 생성기야. 첨부된 HTML 템플릿의 디자인·CSS·구조를 정확히 따라서 새로운 일일 팁 HTML을 생성해. 규칙: 1) 템플릿의 CSS를 100% 그대로 사용 2) 로고는 ../assets/logo.png 경로 사용 3) 팁 카드는 정확히 2개 4) 오늘의 한마디, 인사이트, 용어사전(2개) 포함 5) by Ian Jung 유지 6) 완성된 HTML만 출력. 코드펜스 금지. <!DOCTYPE html>로 시작, </html>로 끝날 것."
+
+          USER_PROMPT="아래 정보로 뉴스레터 HTML을 생성해줘. [메타] 주차:${{ steps.info.outputs.week_code }} 요일:${{ steps.info.outputs.day_upper }} 날짜:${{ steps.info.outputs.target_date }} 테마:${{ steps.info.outputs.week_theme }} Phase:${{ steps.info.outputs.phase_label }} 제목:${{ steps.info.outputs.day_title }} 부제:${{ steps.info.outputs.day_sub }} [팁1] #${{ steps.info.outputs.tip1_num }} ${{ steps.info.outputs.tip1_level }} ${{ steps.info.outputs.tip1_cat }} ${{ steps.info.outputs.tip1_title }} ${{ steps.info.outputs.tip1_desc }} [팁2] #${{ steps.info.outputs.tip2_num }} ${{ steps.info.outputs.tip2_level }} ${{ steps.info.outputs.tip2_cat }} ${{ steps.info.outputs.tip2_title }} ${{ steps.info.outputs.tip2_desc }} [템플릿] ${TEMPLATE}"
+
+          jq -n \
+            --arg system "$SYSTEM_PROMPT" \
+            --arg user "$USER_PROMPT" \
+            '{
+              model: "claude-haiku-4-5-20251001",
+              max_tokens: 16000,
+              system: $system,
+              messages: [{ role: "user", content: $user }]
+            }' > request.json
+
+          curl -s -X POST \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d @request.json > response.json
+
+          python3 extract_html.py < response.json > generated.html
+
+          if [ $? -ne 0 ]; then
+            echo "❌ HTML 생성 실패"
+            exit 1
+          fi
+
+          mkdir -p "docs/${{ steps.info.outputs.week_code }}"
+          mv generated.html "${{ steps.info.outputs.file_path }}"
+          echo "✅ 생성 완료: ${{ steps.info.outputs.file_path }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "📝 Manual: ${{ steps.info.outputs.week_code }} ${{ steps.info.outputs.day_upper }} #${{ steps.info.outputs.tip1_num }} #${{ steps.info.outputs.tip2_num }}"
+          git push
+
+      - name: Wait for Pages deployment
+        run: sleep 60
+
+      - name: Notify Google Chat
+        if: github.event.inputs.notify == 'yes'
+        env:
+          WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          TIP1: "#${{ steps.info.outputs.tip1_num }} ${{ steps.info.outputs.tip1_title }}"
+          TIP2: "#${{ steps.info.outputs.tip2_num }} ${{ steps.info.outputs.tip2_title }}"
+          WEEK_CODE: ${{ steps.info.outputs.week_code }}
+          DAY: ${{ steps.info.outputs.day }}
+          DAY_UPPER: ${{ steps.info.outputs.day_upper }}
+          TARGET_DATE: ${{ steps.info.outputs.target_date }}
+        run: |
+          OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
+          REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          PAGE_URL="https://${OWNER}.github.io/${REPO}/${WEEK_CODE}/${DAY}.html"
+
+          jq -n \
+            --arg today "$TARGET_DATE" \
+            --arg header "${WEEK_CODE} · ${DAY_UPPER}" \
+            --arg tip1 "$TIP1" \
+            --arg tip2 "$TIP2" \
+            --arg url "$PAGE_URL" \
+            '{
+              cardsV2: [{
+                cardId: "tipCard",
+                card: {
+                  header: {
+                    title: "🎯 AI 에이전트 팁",
+                    subtitle: $today
+                  },
+                  sections: [{
+                    header: $header,
+                    widgets: [
+                      {decoratedText: {topLabel: "TIP ①", text: $tip1}},
+                      {decoratedText: {topLabel: "TIP ②", text: $tip2}},
+                      {buttonList: {buttons: [{text: "📖 팁 읽기", onClick: {openLink: {url: $url}}}]}}
+                    ]
+                  }]
+                }
+              }]
+            }' > payload.json
+
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "$WEBHOOK_URL"
+
+          echo "✅ 알림 발송 완료"
