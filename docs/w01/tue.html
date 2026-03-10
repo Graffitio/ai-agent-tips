@@ -93,7 +93,7 @@
       <div class="header-author">by <span>Ian Jung</span></div>
     </div>
     <div class="header-right">
-      <div class="header-date">2026.03.10 TUE<br>☕ 3 min read</div>
+      <div class="header-date">2026.03.12 TUE<br>☕ 3 min read</div>
       <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
     </div>
   </div>
@@ -102,7 +102,7 @@
 <main class="container" style="padding-top:4px;padding-bottom:32px;">
   <div class="intro">
     <div class="section-label">👋 오늘의 한마디</div>
-    <p>같은 질문을 던져도 <strong>"왜 묻는지"</strong>를 알려주는 것과 모르는 것은 천지차이입니다. AI는 당신의 의도를 알면 알수록 더 정교하고 깊이 있는 답을 만듭니다. 오늘은 목적 선언과 분량 조절 — 답변을 내가 원하는 방향과 크기로 다듬는 두 가지 핵심 기법을 배웁니다.</p>
+    <p>같은 질문이어도 <strong>"왜 묻는지"</strong>를 알려주면 AI의 답변이 완전히 달라집니다. 또한 <strong>"얼마나 긴 답변을 원하는지"</strong>를 명확히 하면, AI는 당신이 원하는 정확한 크기와 깊이로 답을 만들어냅니다. 오늘은 이 두 가지 핵심 기법을 배웁니다.</p>
   </div>
 
   <div class="tips">
@@ -118,25 +118,23 @@
         <h2 class="tip-title">"왜 묻는지"를 알려주면 답이 달라진다</h2>
       </div>
       <div class="tip-body">
-        <p>AI는 당신의 최종 목표를 알 때 더 나은 답을 줍니다. <strong>"마케팅 전략을 알고 싶습니다"</strong>와 <strong>"3개월 안에 신입 마케터를 온보딩하기 위해 마케팅 전략을 정리하고 싶습니다"</strong>는 같은 질문이 아니거든요.</p><p>핵심은 <strong>[내가 이걸 왜 필요로 하는가]</strong>를 문장에 담는 것입니다. 목적을 선언하면 AI는 그에 맞춰 깊이와 형식을 자동 조절합니다.</p>
+        <p>AI는 당신의 마음을 읽지 못합니다. 그래서 <strong>"이 정보를 왜 필요로 하는가"</strong>를 명시하면, AI는 그 목적에 맞춰 답변의 방향과 초점을 조정합니다. 같은 주제도 용도에 따라 완전히 다른 답이 필요하기 때문입니다.</p><p><strong>핵심 공식: "[주제] + [구체적인 목적]"</strong>을 함께 전달하세요. 예를 들어 "마케팅 전략"이 필요한 이유가 <strong>초기 고객 확보</strong>인지, <strong>재구매율 증대</strong>인지, <strong>브랜드 인지도 확장</strong>인지에 따라 AI의 답변 초점이 완전히 달라집니다.</p>
         <div class="tip-example">
           <div class="tip-example-label">💬 Before / After</div>
-          <code>❌ Before (목적 없음):
-"SNS 콘텐츠 기획 방법을 알려줘"
-→ 일반적인 팁과 교과서식 프레임워크
+          <code>❌ Before:
+"콘텐츠 마케팅 전략을 알려줘"
+→ 일반적인 콘텐츠 마케팅 기법들
 
-✅ After (목적 선언):
-"우리 팀은 이번주부터 SNS 콘텐츠
-제작을 시작하는데, 팀원들이 일관성
-있게 작업할 수 있도록 콘텐츠
-기획 체크리스트를 만들어야 해.
-어떤 단계와 항목이 필요할까?"
-→ 실무 적용 가능한 구체적 체크리스트</code>
+✅ After:
+"우리는 AI 교육 플랫폼인데, 현재 가입자
+500명에서 3개월 안에 2,000명으로
+늘려야 해. 이를 위한 콘텐츠 마케팅
+전략과 우선순위를 정해줄래?"
+→ 초기 성장 단계에 최적화된 전략</code>
         </div>
       </div>
       <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
     </article>
-    
     <article class="tip-card" id="tip-2">
       <div class="tip-header" onclick="toggleTip('tip-2')">
         <div class="tip-meta">
@@ -147,26 +145,22 @@
         <h2 class="tip-title">"3줄로" vs "상세하게" — 분량을 지정하라</h2>
       </div>
       <div class="tip-body">
-        <p>AI가 만드는 답변의 길이를 조절하는 것도 프롬프트의 중요한 부분입니다. <strong>분량 지정이 없으면</strong> AI는 "중간 수준"의 길이로 안전하게 답합니다. 하지만 당신이 <strong>"한 줄 요약"이나 "1000자 분석"</strong>을 명시하면, 그 제약 안에서 가장 효율적인 정보를 담아냅니다.</p><p>분량 지정은 단순히 길이 조절이 아니라 <strong>정보 밀도를 결정하는 강력한 신호</strong>입니다.</p>
+        <p>모든 상황에 같은 길이의 답변이 필요한 것은 아닙니다. <strong>아이디어 탐색 단계에서는 한 줄 정리가, 실행 단계에서는 상세 설명이 필요</strong>합니다. 프롬프트에 <strong>"3줄로", "한 문단으로", "이 주제에 대해 5분 분량으로"</strong>처럼 분량을 명확히 지정하세요.</p><p>AI는 당신이 정한 분량에 맞춰 정보 밀도와 깊이를 자동으로 조절합니다. 이는 시간을 절약하고 당신이 원하는 정확한 형태의 답변을 얻는 가장 효율적인 방법입니다.</p>
         <div class="tip-example">
           <div class="tip-example-label">💬 Before / After</div>
-          <code>❌ Before (분량 지정 없음):
-"우리 경쟁사의 강점을 분석해줘"
-→ 3~4개 경쟁사, 각각 5~6개 강점
-   (너무 길거나 너무 얕음)
+          <code>❌ Before:
+"AI 시대의 마케터 역할이 뭐야?"
+→ 길고 일반적인 답변들
 
-✅ After (분량 명시):
-"우리 경쟁사 A사의 핵심 강점 3가지를
-한 문장씩 정리해줘"
-→ A사 · 강점 1: [한 문장]
-   A사 · 강점 2: [한 문장]
-   A사 · 강점 3: [한 문장]
-   (명확하고 활용 가능한 형태)
+✅ After (상황별 분량 지정):
+"AI 시대의 마케터 역할을 한 줄로
+정리해줄래?"
+→ 핵심만 간결하게
 
-또는:
-"우리 경쟁사 분석 보고서를 300자
-분량으로 정리해줘"
-→ 정확히 원하는 길이의 압축된 분석</code>
+"위 내용을 기반으로, 마케터가 갖춰야
+할 구체적인 스킬 3가지를 각각
+200자 분량으로 설명해줘."
+→ 실행 가능한 깊이의 정보</code>
         </div>
       </div>
       <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
@@ -175,7 +169,7 @@
 
   <div class="insight-box">
     <div class="section-label">💡 오늘의 인사이트</div>
-    <p>오늘 배운 두 가지 — <strong>목적 선언</strong>과 <strong>분량 조절</strong> — 은 AI 답변의 "방향성"과 "해상도"를 동시에 정하는 기법입니다. 좋은 프롬프트란 기술적으로 완벽한 것이 아니라 <strong>"AI가 당신의 진짜 필요를 이해할 수 있도록 가이드해주는 것"</strong>입니다. 내일부터는 AI에게 물을 때 항상 두 가지를 먼저 생각하세요: 나는 이걸 왜 필요로 하나? 그리고 어느 정도 깊이와 길이로 답해주길 원하나?</p>
+    <p><strong>"왜"와 "얼마나"</strong> — 이 두 질문은 프롬프트의 품질을 결정하는 가장 중요한 요소입니다. 당신이 왜 그 정보를 필요로 하는지, 그 정보를 어떻게 사용할 예정인지를 AI에게 알려주면, AI는 더 이상 일반론을 반복하지 않습니다. 대신 당신의 구체적인 상황과 목적에 맞춘 <strong>맞춤형 답변</strong>을 만들어냅니다. 이것이 AI를 제대로 활용하는 사람들의 공통점입니다.</p>
   </div>
 
   <div class="glossary">
@@ -183,14 +177,13 @@
     
     <div class="glossary-item">
       <div class="glossary-term">목적 선언</div>
-      <div class="glossary-en">Intent Statement</div>
-      <div class="glossary-def">프롬프트에서 "왜 이 질문을 하는지"를 명시적으로 드러내는 것. AI가 최종 목표를 이해하면 더 정교한 답변을 생성할 수 있습니다.</div>
+      <div class="glossary-en">Intent Declaration</div>
+      <div class="glossary-def">질문할 때 그 질문의 목적을 함께 명시하는 것. AI가 답변의 방향과 관점을 정확히 이해하도록 돕습니다.</div>
     </div>
-    
     <div class="glossary-item">
-      <div class="glossary-term">분량 조절</div>
+      <div class="glossary-term">분량 제약</div>
       <div class="glossary-en">Length Constraint</div>
-      <div class="glossary-def">답변의 길이나 형식을 "한 줄", "300자", "3가지 항목" 등으로 명시하는 기법. 정보 밀도와 깊이를 함께 제어합니다.</div>
+      <div class="glossary-def">프롬프트에서 원하는 답변의 길이나 형식을 미리 지정하는 기법. "3줄로", "500자 이내", "글머리 5개" 등으로 표현합니다.</div>
     </div>
   </div>
 </main>
