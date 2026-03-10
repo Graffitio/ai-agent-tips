@@ -132,44 +132,9 @@ jobs:
         run: |
           TEMPLATE=$(cat template.html)
 
-          SYSTEM_PROMPT="너는 4lynx AI Agent Tips 뉴스레터 생성기야.
-          첨부된 HTML 템플릿의 디자인·CSS·구조를 정확히 따라서 새로운 일일 팁 HTML을 생성해.
+          SYSTEM_PROMPT="너는 4lynx AI Agent Tips 뉴스레터 생성기야. 첨부된 HTML 템플릿의 디자인·CSS·구조를 정확히 따라서 새로운 일일 팁 HTML을 생성해. 규칙: 1) 템플릿의 CSS를 100% 그대로 사용 2) 로고는 템플릿에 있는 base64 그대로 유지 3) 팁 카드는 정확히 2개 4) 오늘의 한마디, 인사이트, 용어사전(2개) 포함 5) by Ian Jung 유지 6) 완성된 HTML만 출력. 코드펜스 금지. <!DOCTYPE html>로 시작, </html>로 끝날 것."
 
-          규칙:
-          1. 템플릿의 CSS를 100% 그대로 사용 (색상, 폰트, 레이아웃 변경 금지)
-          2. 로고는 템플릿에 있는 base64 그대로 유지
-          3. 팁 카드는 정확히 2개, 각각 #번호, 레벨 태그, 카테고리, 제목, 본문(2문단), 실전 예시(code 블록) 포함
-          4. 오늘의 한마디, 인사이트, 용어사전(2개) 섹션 포함
-          5. by Ian Jung 유지
-          6. 완성된 HTML 코드만 출력할 것. 마크다운 코드펜스(백틱)를 절대 사용하지 마. 설명도 붙이지 마. 응답은 반드시 <!DOCTYPE html>로 시작하고 </html>로 끝나야 함."
-
-          USER_PROMPT="아래 정보로 오늘의 뉴스레터 HTML을 생성해줘.
-
-          [메타 정보]
-          - 주차: ${WEEK_CODE}
-          - 요일: ${DAY_UPPER}
-          - 날짜: ${TODAY}
-          - 주간 테마: ${WEEK_THEME}
-          - Phase: ${PHASE_LABEL}
-          - 헤더 제목: ${DAY_TITLE}
-          - 헤더 부제: ${DAY_SUB}
-
-          [팁 ①]
-          - 번호: #${TIP1_NUM}
-          - 수준: ${TIP1_LEVEL}
-          - 카테고리: ${TIP1_CAT}
-          - 제목: ${TIP1_TITLE}
-          - 설명: ${TIP1_DESC}
-
-          [팁 ②]
-          - 번호: #${TIP2_NUM}
-          - 수준: ${TIP2_LEVEL}
-          - 카테고리: ${TIP2_CAT}
-          - 제목: ${TIP2_TITLE}
-          - 설명: ${TIP2_DESC}
-
-          [참고 템플릿]
-          ${TEMPLATE}"
+          USER_PROMPT="아래 정보로 오늘의 뉴스레터 HTML을 생성해줘. [메타] 주차:${WEEK_CODE} 요일:${DAY_UPPER} 날짜:${TODAY} 테마:${WEEK_THEME} Phase:${PHASE_LABEL} 제목:${DAY_TITLE} 부제:${DAY_SUB} [팁1] #${TIP1_NUM} ${TIP1_LEVEL} ${TIP1_CAT} ${TIP1_TITLE} ${TIP1_DESC} [팁2] #${TIP2_NUM} ${TIP2_LEVEL} ${TIP2_CAT} ${TIP2_TITLE} ${TIP2_DESC} [템플릿] ${TEMPLATE}"
 
           jq -n \
             --arg system "$SYSTEM_PROMPT" \
@@ -181,29 +146,17 @@ jobs:
               messages: [{ role: "user", content: $user }]
             }' > request.json
 
-          RESPONSE=$(curl -s -X POST \
+          curl -s -X POST \
             https://api.anthropic.com/v1/messages \
             -H "x-api-key: ${ANTHROPIC_API_KEY}" \
             -H "anthropic-version: 2023-06-01" \
             -H "content-type: application/json" \
-            -d @request.json)
+            -d @request.json > response.json
 
-          # Python으로 HTML 추출 — 코드펜스 제거 확실하게
-          echo "$RESPONSE" | python3 -c "
-          import sys, json, re
-          resp = json.load(sys.stdin)
-          text = resp['content'][0]['text']
-          # 앞뒤 코드펜스 제거
-          text = re.sub(r'^\s*\`\`\`html?\s*\n?', '', text)
-          text = re.sub(r'\n?\s*\`\`\`\s*$', '', text)
-          text = text.strip()
-          print(text)
-          " > generated.html
+          python3 extract_html.py < response.json > generated.html
 
-          # HTML 유효성 확인
-          if ! grep -q '<!DOCTYPE' generated.html; then
-            echo '❌ HTML 생성 실패'
-            head -5 generated.html
+          if [ $? -ne 0 ]; then
+            echo "❌ HTML 생성 실패"
             exit 1
           fi
 
@@ -222,29 +175,16 @@ jobs:
 
           WEEK_SUMMARY=$(jq -r --argjson idx "$WEEK_IDX" '
             .weeks[$idx] as $w |
-            "주차: \($w.week)\n테마: \($w.theme)\nPhase: \(.phase_labels[($w.phase|tostring)])\n\n" +
+            "주차: \($w.week) 테마: \($w.theme) Phase: \(.phase_labels[($w.phase|tostring)])" +
             (["mon","tue","wed","thu","fri"] | map(
               . as $d | $w.days[$d] |
-              "[\($d | ascii_upcase)] \(.title)\n  TIP1: #\(.tips[0].num) \(.tips[0].title) (\(.tips[0].level))\n  TIP2: #\(.tips[1].num) \(.tips[1].title) (\(.tips[1].level))"
-            ) | join("\n\n"))
+              " [\($d | ascii_upcase)] \(.title) TIP1:#\(.tips[0].num) \(.tips[0].title)(\(.tips[0].level)) TIP2:#\(.tips[1].num) \(.tips[1].title)(\(.tips[1].level))"
+            ) | join(""))
           ' curriculum.json)
 
-          DIGEST_SYSTEM="너는 4lynx AI Agent Tips 주간 다이제스트 생성기야.
-          첨부된 HTML 템플릿의 CSS·디자인을 기반으로 주간 다이제스트 HTML을 생성해.
+          DIGEST_SYSTEM="너는 4lynx AI Agent Tips 주간 다이제스트 생성기야. 규칙: 1) 주간 요약: 오늘의 한마디, 월~금 5개 카드, 큰 그림 2) 카드 왼쪽 색상바(MON=보라 TUE=파랑 WED=초록 THU=노랑 FRI=빨강) 3) 로고, by Ian Jung, Phase 배지 유지 4) 템플릿 CSS 100% 유지 5) HTML만 출력. 코드펜스 금지. <!DOCTYPE html>로 시작."
 
-          규칙:
-          1. 주간 요약 구성: 오늘의 한마디, 월~금 5개 카드, 이번 주의 큰 그림
-          2. 카드별 왼쪽 색상 바 (MON=보라, TUE=파랑, WED=초록, THU=노랑, FRI=빨강)
-          3. 로고, by Ian Jung, Phase 배지, 푸터 유지
-          4. 템플릿의 CSS 색상·폰트 100% 유지
-          5. 완성된 HTML 코드만 출력할 것. 마크다운 코드펜스(백틱)를 절대 사용하지 마. 설명도 붙이지 마. 응답은 반드시 <!DOCTYPE html>로 시작하고 </html>로 끝나야 함."
-
-          DIGEST_USER="아래 데이터로 주간 다이제스트 HTML을 생성해줘.
-
-          ${WEEK_SUMMARY}
-
-          [참고 템플릿]
-          ${TEMPLATE}"
+          DIGEST_USER="주간 다이제스트 HTML 생성. ${WEEK_SUMMARY} [템플릿] ${TEMPLATE}"
 
           jq -n \
             --arg system "$DIGEST_SYSTEM" \
@@ -256,30 +196,21 @@ jobs:
               messages: [{ role: "user", content: $user }]
             }' > digest_request.json
 
-          RESPONSE=$(curl -s -X POST \
+          curl -s -X POST \
             https://api.anthropic.com/v1/messages \
             -H "x-api-key: ${ANTHROPIC_API_KEY}" \
             -H "anthropic-version: 2023-06-01" \
             -H "content-type: application/json" \
-            -d @digest_request.json)
+            -d @digest_request.json > digest_response.json
 
-          # Python으로 HTML 추출 — 코드펜스 제거 확실하게
-          echo "$RESPONSE" | python3 -c "
-          import sys, json, re
-          resp = json.load(sys.stdin)
-          text = resp['content'][0]['text']
-          text = re.sub(r'^\s*\`\`\`html?\s*\n?', '', text)
-          text = re.sub(r'\n?\s*\`\`\`\s*$', '', text)
-          text = text.strip()
-          print(text)
-          " > digest.html
+          python3 extract_html.py < digest_response.json > digest.html
 
-          if ! grep -q '<!DOCTYPE' digest.html; then
+          if [ $? -ne 0 ]; then
             echo "⚠️ 다이제스트 생성 실패 — 스킵"
             rm -f digest.html
           else
             mv digest.html "docs/${WEEK_CODE}/digest.html"
-            echo "✅ 다이제스트 생성 완료: docs/${WEEK_CODE}/digest.html"
+            echo "✅ 다이제스트 생성 완료"
           fi
 
       - name: Commit and push
