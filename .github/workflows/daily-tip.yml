@@ -153,6 +153,16 @@ jobs:
             -H "content-type: application/json" \
             -d @request.json > response.json
 
+          echo "=== response.json 크기 ==="
+          wc -c response.json
+          echo "=== 처음 100바이트 ==="
+          head -c 100 response.json
+          echo ""
+          echo "=== python3 버전 ==="
+          python3 --version
+          echo "=== extract_html.py 존재 확인 ==="
+          ls -la extract_html.py
+
           python3 extract_html.py < response.json > generated.html
 
           if [ $? -ne 0 ]; then
