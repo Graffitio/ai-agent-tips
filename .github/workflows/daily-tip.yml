@@ -14,11 +14,9 @@ jobs:
 
     steps:
 
-      # ── 1. 체크아웃 ──
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── 2. 오늘 날짜 → 주차/요일 계산 ──
       - name: Determine today's schedule
         id: schedule
         run: |
@@ -61,7 +59,6 @@ jobs:
           echo "day_in_week=$DAY_IN_WEEK" >> $GITHUB_OUTPUT
           echo "file_path=$FILE_PATH" >> $GITHUB_OUTPUT
 
-      # ── 3. 커리큘럼 데이터 추출 ──
       - name: Extract curriculum data
         if: steps.schedule.outputs.skip != 'true'
         id: curriculum
@@ -110,7 +107,6 @@ jobs:
             echo "tip2_desc=$TIP2_DESC"
           } >> $GITHUB_OUTPUT
 
-      # ── 4. Claude API로 HTML 생성 ──
       - name: Generate HTML via Claude API
         if: steps.schedule.outputs.skip != 'true'
         env:
@@ -192,17 +188,21 @@ jobs:
             -H "content-type: application/json" \
             -d @request.json)
 
-          # 응답 → 파일 저장 → 코드펜스 인플레이스 제거
-          echo "$RESPONSE" | jq -r '.content[0].text' > raw_output.txt
-          sed -i '1s/^```html$//' raw_output.txt
-          sed -i '1s/^```$//' raw_output.txt
-          sed -i '$s/^```$//' raw_output.txt
-          sed -i '/^[[:space:]]*$/d' raw_output.txt
-          mv raw_output.txt generated.html
+          # Python으로 HTML 추출 — 코드펜스 제거 확실하게
+          echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          resp = json.load(sys.stdin)
+          text = resp['content'][0]['text']
+          # 앞뒤 코드펜스 제거
+          text = re.sub(r'^\s*\`\`\`html?\s*\n?', '', text)
+          text = re.sub(r'\n?\s*\`\`\`\s*$', '', text)
+          text = text.strip()
+          print(text)
+          " > generated.html
 
           # HTML 유효성 확인
-          if ! grep -q "<!DOCTYPE" generated.html; then
-            echo "❌ HTML 생성 실패"
+          if ! grep -q '<!DOCTYPE' generated.html; then
+            echo '❌ HTML 생성 실패'
             head -5 generated.html
             exit 1
           fi
@@ -211,7 +211,6 @@ jobs:
           mv generated.html "${{ steps.schedule.outputs.file_path }}"
           echo "✅ 생성 완료: ${{ steps.schedule.outputs.file_path }}"
 
-      # ── 5. [금요일만] 주간 다이제스트 생성 ──
       - name: Generate weekly digest (Friday only)
         if: steps.schedule.outputs.skip != 'true' && steps.schedule.outputs.day == 'fri'
         env:
@@ -264,15 +263,18 @@ jobs:
             -H "content-type: application/json" \
             -d @digest_request.json)
 
-          # 응답 → 파일 저장 → 코드펜스 인플레이스 제거
-          echo "$RESPONSE" | jq -r '.content[0].text' > raw_digest.txt
-          sed -i '1s/^```html$//' raw_digest.txt
-          sed -i '1s/^```$//' raw_digest.txt
-          sed -i '$s/^```$//' raw_digest.txt
-          sed -i '/^[[:space:]]*$/d' raw_digest.txt
-          mv raw_digest.txt digest.html
+          # Python으로 HTML 추출 — 코드펜스 제거 확실하게
+          echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          resp = json.load(sys.stdin)
+          text = resp['content'][0]['text']
+          text = re.sub(r'^\s*\`\`\`html?\s*\n?', '', text)
+          text = re.sub(r'\n?\s*\`\`\`\s*$', '', text)
+          text = text.strip()
+          print(text)
+          " > digest.html
 
-          if ! grep -q "<!DOCTYPE" digest.html; then
+          if ! grep -q '<!DOCTYPE' digest.html; then
             echo "⚠️ 다이제스트 생성 실패 — 스킵"
             rm -f digest.html
           else
@@ -280,7 +282,6 @@ jobs:
             echo "✅ 다이제스트 생성 완료: docs/${WEEK_CODE}/digest.html"
           fi
 
-      # ── 6. 자동 commit & push ──
       - name: Commit and push
         if: steps.schedule.outputs.skip != 'true'
         run: |
@@ -290,12 +291,10 @@ jobs:
           git commit -m "🎯 ${{ steps.schedule.outputs.week_code }} ${{ steps.curriculum.outputs.day_upper }}: #${{ steps.curriculum.outputs.tip1_num }} #${{ steps.curriculum.outputs.tip2_num }}"
           git push
 
-      # ── 7. Pages 배포 대기 ──
       - name: Wait for Pages deployment
         if: steps.schedule.outputs.skip != 'true'
         run: sleep 60
 
-      # ── 8. Google Chat 알림 ──
       - name: Notify Google Chat
         if: steps.schedule.outputs.skip != 'true'
         env:
@@ -344,7 +343,6 @@ jobs:
 
           echo "✅ 알림 발송 완료"
 
-      # ── 9. [금요일만] 다이제스트 알림 ──
       - name: Notify digest (Friday only)
         if: steps.schedule.outputs.skip != 'true' && steps.schedule.outputs.day == 'fri'
         env:
