@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W01 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="none"/><text x="10" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#3569B8">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W01 · THU</div>
+      <h1 class="header-title">AI 답변을 믿되, 확인하는 습관을 들여라</h1>
+      <p class="header-sub">팩트체크의 기본기와 출처 요청의 올바른 사용법</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.12 THU<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>AI는 정말 유능하지만, <strong>완벽하지 않습니다.</strong> 때로는 그럴듯하지만 잘못된 답을 말합니다. 특히 구체적인 통계, 최신 정보, 특정 분야의 기술 용어는 더욱 그렇죠. 오늘은 <strong>AI를 신뢰하면서도 검증하는 균형</strong>을 배웁니다. 언제 의심하고, 언제 확인하고, 어떻게 물어볼지를 알아봅시다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#007</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">검증 기초</span>
+        </div>
+        <h2 class="tip-title">팩트체크 습관 — AI 답변을 신뢰하되 확인하라</h2>
+      </div>
+      <div class="tip-body">
+        <p>AI의 답변은 기본적으로 <strong>확률 기반</strong>입니다. "가장 그럴듯한 다음 단어"를 계속 이으면서 답을 만들기 때문이죠. 따라서 <strong>그럴듯하면서도 틀린 답</strong>을 할 수 있습니다. 특히 주의할 부분은:</p><p><strong>1) 구체적인 숫자와 통계</strong> — "2023년 한국 스타트업 투자액은 8조 5천억원입니다"처럼 구체적인 수치는 반드시 확인하세요.<br><strong>2) 최신 정보</strong> — 학습 데이터 기준 이후의 정보(뉴스, 기술, 규정 변화)는 틀릴 가능성이 높습니다.<br><strong>3) 특정 분야 전문 용어</strong> — 의료, 법률, 금융 같은 분야의 정확한 정의는 검증이 필수입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 체크리스트</div>
+          <code>✅ AI 답변 검증 3단계:
+
+1️⃣ "이건 언제 기준 정보인가?"
+   → AI의 학습 데이터 기준 확인
+
+2️⃣ "이 정보가 중요한가?"
+   → 의사결정에 영향을 미치는가?
+   → 그렇다면 반드시 확인
+
+3️⃣ "어디서 확인할까?"
+   → 공식 기관, 신뢰할 만한 뉴스,
+   → 책, 논문, 전문가 의견</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#008</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">출처 요구</span>
+        </div>
+        <h2 class="tip-title">"근거를 알려줘"의 효과와 한계를 알아두자</h2>
+      </div>
+      <div class="tip-body">
+        <p>"출처를 알려줘"라는 질문은 강력하지만, <strong>만능은 아닙니다.</strong> AI가 출처를 말할 때, 그것이 실제로 존재하는지, 그 출처가 정말 그 내용을 담고 있는지는 AI가 보장하지 못합니다. <strong>이를 "할루시네이션"이라고 부릅니다</strong> — AI가 있는 것처럼 거짓 참고문헌을 만들어내는 현상이죠.</p><p>올바른 활용법은: <strong>출처를 구한 뒤 직접 확인하는 것</strong>입니다. AI의 답변이 "~에서 나온 정보"라고 했다면, 그 출처를 실제로 찾아 검증하세요. 간단한 체크만으로도 신뢰성이 크게 높아집니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Before / After</div>
+          <code>❌ Before (출처만 믿기):
+"스티브 잡스가 2005년 스탠포드 졸업식
+에서 이런 말을 했대"
+→ AI가 제시한 출처만 믿고 사용
+
+✅ After (출처 확인까지):
+Q: "그 연설 어디서 찾을 수 있어?"
+A: "스탠포드 대학 공식 영상, 유튜브
+   스티브 잡스 공식 채널 등..."
+→ 실제로 찾아본 후 정확성 확인</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>AI 검증의 핵심은 "신뢰"와 "의심"의 균형</strong>입니다. AI를 완전히 믿는 것도, 완전히 의심하는 것도 답이 아닙니다. 대신 <strong>"이 정보가 중요한가?"</strong>라는 질문을 항상 던지세요. 의사결정의 기초가 되는 정보라면 검증하고, 창의적 아이디어의 시작점이라면 AI의 답을 거침없이 받아들이세요. 정보의 중요도에 따라 검증 강도를 조절하는 것 — 이것이 AI 시대의 지혜입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">팩트체크</div>
+      <div class="glossary-en">Fact-check</div>
+      <div class="glossary-def">주어진 정보나 주장이 사실에 부합하는지 확인하고 검증하는 과정입니다. AI 답변의 신뢰성을 높이기 위한 필수 단계입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">할루시네이션</div>
+      <div class="glossary-en">Hallucination</div>
+      <div class="glossary-def">AI가 실제로 존재하지 않는 정보나 출처를 마치 참인 것처럼 생성하는 현상입니다. 특히 구체적인 통계나 책 제목, 논문 등에서 자주 발생합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
