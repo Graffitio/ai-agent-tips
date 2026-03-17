@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W02 WED — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1" /><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1" /></linearGradient></linearGradient></defs><text x="0" y="26" font-family="Arial, sans-serif" font-size="28" font-weight="900" fill="url(#grad1)">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W02 · WED</div>
+      <h1 class="header-title">나만의 커스텀 지시문 만들기와<br>이메일 초안 작성 도우미</h1>
+      <p class="header-sub">매번 반복하는 요청을 자동화 · 요점만 주면 정중한 메일이 완성</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.18 WED<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>똑같은 작업을 매번 반복하고 계신가요? <strong>"커스텀 지시문"</strong>으로 AI를 나만의 도우미로 만들 수 있습니다. 그리고 가장 실용적인 활용처 중 하나가 바로 <strong>이메일 작성</strong>입니다. 오늘은 이 두 가지를 함께 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#015</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">사전 설정</span>
+        </div>
+        <h2 class="tip-title">나만의 커스텀 지시문 만들기</h2>
+      </div>
+      <div class="tip-body">
+        <p>AI 서비스(ChatGPT, Claude 등)의 설정에서 "Custom Instructions" 또는 "시스템 프롬프트" 기능을 찾아보세요. 여기에 당신의 작업 스타일, 선호도, 역할을 미리 입력해두면, <strong>매번 같은 말을 반복할 필요가 없어집니다.</strong></p><p>예를 들어 "항상 마크다운 형식으로 답변해줘", "존댓글을 사용해줘", "데이터 기반의 답변만 줘" 같은 기본 설정을 한 번만 해두면, 이후 모든 대화에 자동 적용됩니다. <strong>매번 30초씩 절약되는 것이 모이면 일 년에 150시간이 됩니다.</strong></p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 커스텀 지시문 예시</div>
+          <code>당신의 역할:
+- 마케팅 콘텐츠 전략 자문가
+- 데이터 기반의 조언만 제공
+
+응답 스타일:
+- 마크다운 형식 (## 제목, - 불릿)
+- 항상 3-5개 항목으로 정리
+- 실행 가능한 액션 플랜 포함
+- 존댓말 사용
+
+주의사항:
+- 추측이나 가정은 명시하기
+- 근거 없는 주장은 하지 않기
+- 항상 "다만" 이나 "주의할 점" 포함</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#016</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">실무 활용</span>
+        </div>
+        <h2 class="tip-title">이메일 초안 작성 도우미</h2>
+      </div>
+      <div class="tip-body">
+        <p>비즈니스 이메일을 쓰다가 "이 표현이 너무 딱딱한가?", "이 부분이 오해의 소지는 없을까?" 걱정해본 적 있으신가요? AI에게 <strong>"[상황] + [전하고 싶은 요점] + [톤"을 전달하면, 정중하고 명확한 이메일을 단 몇 초에 완성할 수 있습니다.</strong></p><p>중요한 것은 "AI가 완성본을 주는 것"이 아니라, <strong>여러분의 아이디어를 다듬어주는 도우미 역할</strong>을 한다는 점입니다. 생성된 초안을 바탕으로 2-3번 수정 요청을 거치면 완벽한 결과물이 나옵니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Before / After</div>
+          <code>❌ 초안 없이 맨땅에서 쓰기:
+- 단어 선택에 고민
+- 문맥 검토 반복
+- 완성까지 15분 이상 소요
+
+✅ AI 초안 → 다듬기:
+1️⃣ 프롬프트:
+"협력사에게 계약 연장 거부 통보하는
+비즈니스 이메일을 정중하고 명확하게
+작성해줘. 앞으로도 좋은 관계를 유지
+하길 원하는 톤으로."
+
+2️⃣ AI 초안 생성 (30초)
+
+3️⃣ 당신이 수정/다듬기 (3분)
+
+결과: 완성도 높은 메일 + 총 시간 3-4분</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>"커스텀 지시문"과 "초안 작성"</strong>은 AI를 "대화하는 도구"에서 "생산성 도구"로 업그레이드하는 출발점입니다. 이 두 가지를 제대로 설정하면, 일주일에 최소 2-3시간의 반복 작업을 절약할 수 있습니다. 더 중요한 것은, 절약된 시간으로 더 창의적인 일에 집중할 수 있다는 점입니다. 오늘 바로 당신의 AI 설정을 열어보세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">커스텀 지시문</div>
+      <div class="glossary-en">Custom Instructions</div>
+      <div class="glossary-def">AI 서비스에 미리 입력해두는 기본 설정. 사용자의 역할, 선호도, 응답 스타일 등을 지정하면, 이후의 모든 대화에 자동으로 적용됩니다. ChatGPT, Claude 등 주요 AI 플랫폼에서 지원합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">AI 초안 작성</div>
+      <div class="glossary-en">AI-Assisted Drafting</div>
+      <div class="glossary-def">AI에게 기본 요소(상황, 목표, 톤)를 전달하면 초벌 원고를 생성하고, 사용자가 이를 수정·다듬는 방식의 글쓰기 기법입니다. 완벽함보다는 생산성을 우선으로 합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
