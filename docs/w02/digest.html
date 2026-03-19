@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W02 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --col-mon:#9D6BA8;--col-tue:#4A90E2;--col-wed:#27AE60;--col-thu:#F5D547;--col-fri:#E74C3C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;display:flex;flex-direction:row}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-color-bar{width:6px;flex-shrink:0}
+  .tip-card.mon .tip-color-bar{background:var(--col-mon)}
+  .tip-card.tue .tip-color-bar{background:var(--col-tue)}
+  .tip-card.wed .tip-color-bar{background:var(--col-wed)}
+  .tip-card.thu .tip-color-bar{background:var(--col-thu)}
+  .tip-card.fri .tip-color-bar{background:var(--col-fri)}
+  .tip-content{flex:1;display:flex;flex-direction:column}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-day{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--navy-deep);letter-spacing:0.06em}
+  .tip-day.mon{color:var(--col-mon)}
+  .tip-day.tue{color:var(--col-tue)}
+  .tip-day.wed{color:var(--col-wed)}
+  .tip-day.thu{color:var(--col-thu)}
+  .tip-day.fri{color:var(--col-fri)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%233569B8' width='40' height='40' rx='6'/%3E%3Ctext x='50%' y='50%' font-size='24' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'%3E4%3C/text%3E%3C/svg%3E" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W02</div>
+      <h1 class="header-title">AI 도구 선택과<br>일상 활용</h1>
+      <p class="header-sub">ChatGPT, Claude, Gemini부터 파일 업로드, 커스텀 지시문까지</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.10-14 MON-FRI<br>☕ 15 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>AI 도구는 마치 다양한 악기와 같습니다. 같은 곡도 피아노와 기타로 다르게 울린다면, ChatGPT와 Claude도 같은 질문에 다르게 답합니다. 2주차는 <strong>"어떤 도구를 언제 쓸지"</strong> 아는 것에서 시작합니다. 그리고 더 나아가 파일 업로드, 커스텀 지시문처럼 각 도구의 고유한 기능을 내 일상에 녹여내는 방법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 5개 팁</div>
+    
+    <article class="tip-card mon" id="tip-mon-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-mon-1')">
+          <div class="tip-meta">
+            <span class="tip-day mon">MON</span>
+            <span class="tip-num">#011</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">ChatGPT vs Claude vs Gemini 비교</h2>
+        </div>
+        <div class="tip-body">
+          <p>세 가지 주요 AI 도구의 특성을 안다면, 작업에 맞는 도구를 선택할 수 있습니다.</p>
+          <p><strong>ChatGPT</strong>는 가장 균형 잡혀 있습니다. 실시간 웹 검색, 파일 업로드, 이미지 생성까지 가능해 일상 업무에 최적. <strong>Claude</strong>는 긴 문맥 처리가 강점으로, 100페이지 논문 분석이나 복잡한 코드 리뷰에 탁월. <strong>Gemini</strong>는 이미지 이해 능력이 가장 뛰어나고, 한국 검색 결과 활용이 자연스럽습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📊 도구 비교표</div>
+            <code>ChatGPT → 웹 검색 ○ | 파일 업로드 ○ | 이미지 생성 ○ | 추천: 종합 업무
+Claude → 긴 문맥 ◎ | 논리력 ◎ | 코드 분석 ◎ | 추천: 정밀 분석 작업
+Gemini → 이미지 이해 ◎ | 한국 검색 ○ | 빠른 응답 ◎ | 추천: 시각 기반 작업</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-mon-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card mon" id="tip-mon-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-mon-2')">
+          <div class="tip-meta">
+            <span class="tip-day mon">MON</span>
+            <span class="tip-num">#012</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">웹 검색 기능 활용하기</h2>
+        </div>
+        <div class="tip-body">
+          <p>"지금 현재 날씨는?" 같은 실시간 정보가 필요할 때, ChatGPT의 웹 검색 기능이 없다면 학습 데이터 기준의 오래된 정보만 제공합니다.</p>
+          <p>ChatGPT Plus 구독 시 웹 검색을 활성화하면, 최신 뉴스, 주가, 날씨, 제품 리뷰 등을 실시간으로 반영한 답변을 얻을 수 있습니다. 특히 업계 뉴스나 경쟁사 정보 조사에 유용합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💡 활용 팁</div>
+            <code>웹 검색 활성화 위치:
+1. ChatGPT 대화 창 → 톱니바퀴 (설정)
+2. "웹 검색" 토글 ON
+3. 검색이 필요한 질문 시 자동으로 최신 정보 수집
+
+예시 질문:
+"2024년 인공지능 산업 투자 트렌드가 어떻게 변했어?"
+"애플 신제품 예상 출시일과 스펙은?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-mon-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-tue-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-tue-1')">
+          <div class="tip-meta">
+            <span class="tip-day tue">TUE</span>
+            <span class="tip-num">#013</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">파일 업로드로 맥락 제공하기</h2>
+        </div>
+        <div class="tip-body">
+          <p>"이 보고서 요약해줘", "이 이미지의 텍스트를 추출해줘" — 파일을 직접 업로드하면 AI가 정확한 맥락을 이해합니다.</p>
+          <p>ChatGPT와 Claude 모두 PDF, 이미지, 엑셀, 워드 파일 등을 지원합니다. 특히 Claude는 한 번에 여러 파일을 업로드할 수 있어, 경쟁사 자료 3개를 한 번에 비교 분석하는 식의 업무에 강점입니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📎 파일 업로드 활용 사례</div>
+            <code>✓ PDF 계약서 → 주요 조항 추출 및 위험 요소 분석
+✓ 엑셀 판매 데이터 → 월별 추이 분석 및 인사이트 도출
+✓ 이미지 영수증 → OCR로 텍스트 추출 및 분류
+✓ 음성 녹음 → 타이핑 및 요약 (ChatGPT)
+✓ 여러 파일 → 종합 비교 분석 (Claude 추천)</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-tue-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-tue-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-tue-2')">
+          <div class="tip-meta">
+            <span class="tip-day tue">TUE</span>
+            <span class="tip-num">#014</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">대화 기록 관리와 정리</h2>
+        </div>
+        <div class="tip-body">
+          <p>AI와의 대화는 쌓이면 점점 복잡해집니다. 한 번에 20개 이상의 톱니바퀴 설정 변경 요청이 들어오면, AI도 헷갈립니다.</p>
+          <p><strong>대화를 주제별로 분리</strong>하는 습관을 들이세요. 마케팅 전략 수립은 하나의 스레드, 코드 리뷰는 별도 스레드로 진행하면, 각 대화가 맥락을 잃지 않고 점점 정교해집니다. ChatGPT와 Claude 모두 대화 제목을 자동으로 생성하고, 폴더 분류도 지원합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📁 스레드 분리 예시</div>
+            <code>1️⃣ "2024 분기별 마케팅 전략" 스레드
+   → 시장 분석 → 채널 선택 → 일정 계획 → 최종 안
+
+2️⃣ "Python 데이터 전처리" 스레드
+   → 라이브러리 추천 → 코드 리뷰 → 성능 최적화
+
+3️⃣ "이메일 템플릿 작성" 스레드
+   → 구조 설계 → 초안 작성 → 피드백 반영
+
+✓ 장점: 각 주제별로 대화 히스토리 확인 용이
+✓ 장점: 같은 프로젝트의 진전 상황을 한눈에 파악</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-tue-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-wed-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-wed-1')">
+          <div class="tip-meta">
+            <span class="tip-day wed">WED</span>
+            <span class="tip-num">#015</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">나만의 커스텀 지시문 만들기</h2>
+        </div>
+        <div class="tip-body">
+          <p>매번 "친절하게 설명해", "불릿 포인트로 정리해", "비유를 섞어줘"라고 반복하는 것은 비효율적입니다. 커스텀 지시문(System Prompt)을 설정해 두면, 모든 대화에서 AI가 당신의 선호도를 자동으로 반영합니다.</p>
+          <p><strong>ChatGPT Premium</strong>에서 설정 > "Custom instructions" 클릭 후, "How would you like ChatGPT to respond?" 섹션에 당신의 스타일을 정의하면 됩니다. 예를 들어 "마케터 입장에서 항상 고객 관점을 먼저 생각해줘. 데이터 기반 근거를 항상 포함해"라고 쓰면, 이후 모든 마케팅 관련 질문에서 그 기준이 자동 적용됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">✨ 커스텀 지시문 예시</div>
+            <code>【예시 1: 마케터용】
+"너는 경험 7년의 B2B 마케팅 매니저야.
+모든 전략을 제시할 때:
+1. 고객 페르소나를 먼저 정의
+2. 경쟁사 벤치마킹 포함
+3. 월별 KPI와 예산 배분
+4. 실패 가능성과 대응책도 함께"
+
+【예시 2: 디자이너용】
+"너는 프로덕션 디자인 리더야.
+모든 피드백을 줄 때:
+1. UX 관점에서 먼저 평가
+2. 접근성(접근성) 이슈 확인
+3. 명확한 개선안 제시
+4. Before/After 비교"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-wed-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-wed-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-wed-2')">
+          <div class="tip-meta">
+            <span class="tip-day wed">WED</span>
+            <span class="tip-num">#016</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">이메일 초안 작성 도우미</h2>
+        </div>
+        <div class="tip-body">
+          <p>가장 현실적인 AI 활용 중 하나가 이메일입니다. 반복적인 이메일, 특히 "정중하지만 단호하게" 거절하기, "팀을 동기부여시키기" 같은 톤앤매너가 필요한 이메일은 AI가 진정한 가치를 발휘합니다.</p>
+          <p>요령: 구체적인 상황을 제시하세요. "거절 이메일 써줘" ❌ → "스타트업 지원자를 거절하는데, 좋은 후보였지만 경험 부족이 이유. 장래에 다시 지원하도록 격려하는 톤으로 작성해줘" ✓</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📧 이메일 프롬프트 예시</div>
+            <code>【상황 기술 예시】
+"내용: 팀 회의 일정 변경 공지
+톤: 공식적이지만 친근하게
+수신자: 마케팅팀 5명
+주요 내용: 수요일 오후 2시 → 목요일 오전 10시로 변경
+추가: 목요일에 새로운 캠페인 결과도 공유할 예정
+
+이 정보를 바탕으로 이메일 초안 작성해줘."
+
+→ AI가 생성:
+Subject: 🔄 팀 회의 시간 변경 안내 (수요일 → 목요일)
+
+안녕하세요 여러분,
+
+마케팅팀 주간 회의 일정을 다음과 같이 변경하게 되어 안내 드립니다.
+
+[변경 전] 수요일 오후 2시
+[변경 후] 목요일 오전 10시 ...</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-wed-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-thu-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-thu-1')">
+          <div class="tip-meta">
+            <span class="tip-day thu">THU</span>
+            <span class="tip-num">#017</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">회의록 요약 & 액션 아이템 추출</h2>
+        </div>
+        <div class="tip-body">
+          <p>1시간 회의 영상을 다시 보는 것은 낭비입니다. 이 작업이 AI의 가장 현실적인 가치 중 하나입니다.</p>
+          <p>방법: 회의 음성을 ChatGPT나 Claude에 업로드하거나, 회의록 텍스트 파일을 제공하면, "주요 의사결정", "액션 아이템", "담당자별 할당" 같은 구조로 정리해줍니다. 특히 Claude는 긴 파일을 한 번에 처리하기 좋습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📝 회의록 정리 프롬프트</div>
+            <code>회의록 파일을 업로드한 후:
+
+"이 회의록을 다음 구조로 정리해줘:
+
+1️⃣ 회의 주제 (한 줄)
+2️⃣ 참석자
+3️⃣ 주요 의사결정 (3개)
+4️⃣ 액션 아이템 (누가, 뭘, 언제까지)
+5️⃣ 다음 회의 예정일
+
+---
+결과 예시:
+【주제】 Q2 마케팅 예산 편성 회의
+【참석자】 PM, 마케팅리더, 디자인리더
+【주요 의사결정】
+- SNS 광고에 예산 40% 배분
+- 인플루언서 마케팅은 금지 결정
+- 콘텐츠 제작 외주 업체 3사 선정
+
+【액션 아이템】
+- 김과장: SNS 채널별 예산 배분표 작성 (수요일까지)
+- 이대리: 외주 업체 계약서 검토 (목요일까지)
+- 박리더: 팀 회의 공유 슬라이드 제작 (금요일까지)
+
+【다음 회의】 2024.04.15(월) 10:00"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-thu-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-thu-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-thu-2')">
+          <div class="tip-meta">
+            <span class="tip-day thu">THU</span>
+            <span class="tip-num">#018</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">번역을 넘어선 로컬라이징</h2>
+        </div>
+        <div class="tip-body">
+          <p>단순 번역과 로컬라이징은 다릅니다. "Thank you for your trust" 를 "감사합니다"로 옮기는 것은 번역. 한국 문화에 맞게 "우리 팀을 믿어주셔서 정말 고마워요"로 다시 쓰는 것이 로컬라이징입니다.</p>
+          <p>AI에게 단순히 "번역해줘" 대신 "한국의 [업종] 고객을 대상으로 한 톤으로 로컬라이징해줘"라고 지시하면, 문화적 맥락도 함께 고려한 더 자연스러운 결과물을 얻을 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">🌍 로컬라이징 예시</div>
+            <code>원문 (영문 SaaS 마케팅):
+"We're disrupting the industry with cutting-edge AI."
+
+❌ 단순 번역:
+"우리는 최첨단 AI로 산업을 혼란에 빠뜨리고 있습니다."
+
+✓ 로컬라이징 (한국 B2B 고객 대상):
+"우리는 AI 기술로 기존 업계의 관행을 효율적으로 바꾸고 있습니다."
+
+---
+
+프롬프트 예시:
+"다음 영문 카피를 한국의 중견기업 IT담당자에게 호소력 있게 
+로컬라이징해줘. 한국에서는 '혁신', '효율'이 강한 메시지야:
+
+[원문 삽입]"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-thu-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-fri-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-fri-1')">
+          <div class="tip-meta">
+            <span class="tip-day fri">FRI</span>
+            <span class="tip-num">#019</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">학습 도우미로 활용하기</h2>
+        </div>
+        <div class="tip-body">
+          <p>"Python 배우고 싶어"라고만 하면 AI는 교과서 같은 커리큘럼을 내놓습니다. 하지만 "나는 현재 개발자인데, 데이터 분석 직무로 이직하고 싶어. 3개월 안에 기본기를 갖추려고 해"라고 하면, 개인 맞춤 학습 경로를 제시합니다.</p>
+          <p>더 나아가, 학습 과정에서 "프로젝트 기반" 요청도 가능합니다. "코로나19 확진자 데이터를 분석하는 Python 프로젝트를 만들어줄래? 팬더스, 맷플롯립, 세아본 라이브러리는 꼭 써야 해"라고 하면, 실습 코드와 설명을 함께 받을 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">🎓 학습 프롬프트 구조</div>
+            <code>【기본 정보】
+- 현재 실력: 
+- 목표:
+- 기한:
+
+【예시】
+"현재 실력: Python 기초 (변수, 반복문, 함수는 안다)
+목표: 데이터 분석 직무 이직
+기한: 3개월
+제약: 주 15시간만 공부할 수 있어
+
+이 조건에서 최적의 학습 로드맵을 만들어줘. 
+추천 교재, 유튜브 채널, 실습 프로젝트도 함께."</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-fri-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-fri-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-fri-2')">
+          <div class="tip-meta">
+            <span class="tip-day fri">FRI</span>
+            <span class="tip-num">#020</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+          </div>
+          <h2 class="tip-title">AI 활용 습관 만들기</h2>
+        </div>
+        <div class="tip-body">
+          <p>1주일간 배운 것들(구체적 질문, 하나씩 묻기)과 2주일간 배운 것들(도구 선택, 파일 업로드, 커스텀 지시문)을 일상에 녹이려면 "습관화"가 필수입니다.</p>
+          <p>가장 현실적인 방법: "매일 3번 AI를 써보기"라는 작은 목표부터 시작하세요. 아침에 이메일 하나, 오후에 회의 요약 하나, 저녁에 학습 질문 하나. 이렇게 반복하면 2주면 AI 사용이 자연스러워집니다. 그 다음, 자신이 자주 하는 작업 3개를 정해 AI로 자동화하기에 도전해 보세요.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">📅 30일 AI 활용 습관 만들기</div>
+            <code>【1-10일: 익숙해지기】
+✓ 매일 이메일 1개 + 회의 요약 1개 + 학습 질문 1개 작성
+✓ 각 도구(ChatGPT, Claude, Gemini)를 한 번씩 써보기
+✓ 커스텀 지시문 1개 만들어보기
+
+【11-20일: 패턴 인식】
+✓ "이 작업은 항상 Claude가 더 좋네" 같은 패턴 찾기
+✓ 파일 업로드를 한 번 이상 실제 업무에 적용
+✓ 가장 자주 하는 작업 3개 정하기
+
+【21-30일: 자동화】
+✓ 선택한 3개 작업에 대한 "마이 템플릿 프롬프트" 작성
+✓ 매주 월요일 주간 계획을 AI로 정리하기
+✓ 월 1회 "AI 활용 회고" — 뭐가 잘 되고, 뭐가 아직 서툰지 정리
+
+【기대 효과】
+→ 30일 후: AI 사용이 자연스러워짐 (마우스처럼)
+→ 월간 약 10-15시간 절감
+→ 더 중요한 일에 집중할 여유 생김</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-fri-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 이주의 큰 그림</div>
+    <p>1주일은 <strong>"어떻게 질문할지"</strong>를 배웠다면, 이주는 <strong>"어떤 도구로"</strong>를 다뤘습니다. 그리고 그 도구들을 실제로 "내 일상"에 녹여내는 방법을 배웠죠. 다음 주부터는 더 고급 기법들 — 특정 직무별 프롬프트(마케터, 디자이너, 개발자 등)에 들어갑니다. 하지만 그 모든 것의 기초는 "구체적으로", "하나씩", 그리고 "옳은 도구 선택" 이 세 가지입니다. 이주의 팁들이 몸에 밸 때까지, 계속 반복해 보세요. 3주차부터는 정말 다릅니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이주의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">컨텍스트 윈도우</div>
+      <div class="glossary-en">Context Window</div>
+      <div class="glossary-def">AI가 한 번에 처리할 수 있는 최대 텍스트 길이. Claude의 컨텍스트 윈도우는 100K(약 100페이지), ChatGPT는 128K로, 긴 문서 처리 시 Claude가 유리합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">시스템 프롬프트 (System Prompt)</div>
+      <div class="glossary-en">System Prompt / Custom Instructions</div>
+      <div class="glossary-def">AI의 기본 성격과 행동 방식을 정의하는 지시문. "너는 친절한 비즈니스 컨설턴트야"처럼 설정하면, 모든 대화에서 그 역할을 유지합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">로컬라이징</div>
+      <div class="glossary-en">Localization</div>
+      <div class="glossary-def">콘텐츠를 특정 국가나 문화의 언어, 관례, 감정에 맞게 적응시키는 과정. 단순 번역을 넘어 문화적 맥락을 포함합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">액션 아이템</div>
+      <div class="glossary-en">Action Item</div>
+      <div class="glossary-def">회의나 프로젝트에서 나온 구체적인 실행 과제. 보통 "담당자", "내용", "마감일"을 포함합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY DIGEST — by Ian Jung</div>
+    <div class="footer-note">3주차는 직무별 프롬프트로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
