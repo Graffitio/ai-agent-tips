@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W03 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#1B1464;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#3569B8;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <text x="10" y="35" font-family="Arial, sans-serif" font-size="32" font-weight="900" fill="url(#logoGrad)">4lynx</text>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W03 · MON</div>
+      <h1 class="header-title">5W1H로 프롬프트<br>구조화하기</h1>
+      <p class="header-sub">누가·무엇을·왜·어디서·언제·어떻게 · 분석해줘 vs 생각해봐의 차이</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.23 MON<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>좋은 프롬프트는 우연이 아닙니다. 체계적인 구조에서 나옵니다. 오늘은 신문 기자들이 쓰는 <strong>"5W1H"</strong> 프레임을 프롬프트에 적용하는 방법과, 같은 요청도 문장 한 줄의 차이로 결과가 달라지는 <strong>"행동 동사의 힘"</strong>을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#021</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">프레임워크</span>
+        </div>
+        <h2 class="tip-title">5W1H로 프롬프트 구조화하기</h2>
+      </div>
+      <div class="tip-body">
+        <p>뉴스 기사의 첫 문장에는 언제나 5W1H(Who, What, When, Where, Why, How)가 담겨 있습니다. <strong>프롬프트도 같은 원리</strong>입니다. 이 여섯 가지 요소를 의식적으로 배치하면, AI가 당신의 의도를 정확히 파악합니다.</p>
+        <ul style="margin-left:16px;margin-top:10px;color:var(--text-secondary);">
+          <li style="margin-bottom:6px;font-size:14px;"><strong>Who (누가):</strong> 당신의 역할, 직업, 입장</li>
+          <li style="margin-bottom:6px;font-size:14px;"><strong>What (무엇을):</strong> 필요한 결과물의 형태와 내용</li>
+          <li style="margin-bottom:6px;font-size:14px;"><strong>Why (왜):</strong> 목적, 배경, 최종 사용처</li>
+          <li style="margin-bottom:6px;font-size:14px;"><strong>Where (어디서):</strong> 채널, 플랫폼, 매체</li>
+          <li style="margin-bottom:6px;font-size:14px;"><strong>When (언제):</strong> 시간, 기한, 시의성</li>
+          <li style="margin-bottom:6px;font-size:14px;"><strong>How (어떻게):</strong> 형식, 톤, 구조</li>
+        </ul>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Before / After</div>
+          <code>❌ Before (뭉뚱그린 요청):
+"블로그 글을 써줘"
+→ 주제, 길이, 톤 모두 불명확
+
+✅ After (5W1H 적용):
+"나는 (Who) 마케팅 대행사 팀장이고,
+타겟 고객은 (What) 초보 SNS 마케터야.
+(Why) 이들에게 인스타그램 해시태그
+전략을 쉽게 설명하기 위해
+(Where) 회사 블로그에
+(When) 이번 주 목요일까지
+(How) 1,500자 분량의 실용적인 가이드를
+만들어 줄 수 있어?"
+→ 모든 조건이 명확한 답변</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#022</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">언어 선택</span>
+        </div>
+        <h2 class="tip-title">행동 동사로 시작하기</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>"분석해줘" vs "생각해봐"</strong> — 같은 의도 같은 주제도 동사 하나로 결과가 완전히 달라집니다. 약한 동사("해줘", "설명해줘")보다는 <strong>행동 동사(Action Verb)</strong>를 쓸 때 AI의 답변이 훨씬 구체적이고 실행 가능합니다.</p>
+        <div style="margin-top:10px;background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:13px;color:var(--navy-deep);line-height:1.7;">
+            <strong style="color:var(--blue-brand);">추천하는 행동 동사들:</strong><br>
+            분석하다, 비교하다, 평가하다, 도출하다, 구조화하다, 체계화하다, 발굴하다, 최적화하다, 검증하다, 시뮬레이션하다
+          </div>
+        </div>
+        <p>반면 <strong>피해야 할 약한 표현들</strong>: "어떻게 생각해?", "괜찮을까?", "도움이 될까?"</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 동사의 차이가 만드는 결과</div>
+          <code>❌ 약한 동사:
+"우리 경쟁사 전략을 생각해봐"
+→ 피상적이고 두루뭉술한 해석
+
+✅ 강한 행동 동사:
+"우리 경쟁사 3곳의 마케팅 전략을
+다음 5가지 기준으로 분석해줘:
+(1) 타겟 세그먼트 (2) 메시지 톤
+(3) 채널 선택 (4) 콘텐츠 유형
+(5) 차별화 요소"
+→ 체계적이고 비교 가능한 분석</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>5W1H + 행동 동사</strong> — 이 두 기법은 "무엇을 묻느냐"의 영역입니다. 지난 2주 동안 배운 "구체적으로, 하나씩"은 질문의 <strong>태도</strong>였다면, 오늘은 질문의 <strong>구조</strong>입니다. 이 둘이 합쳐지면 당신의 프롬프트는 AI 입장에서 "답하고 싶은" 명확한 요청이 됩니다. 다음주부터는 이 기초 위에서 더 고급 기법들을 쌓아올립니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">5W1H 프레임</div>
+      <div class="glossary-en">5W1H Framework</div>
+      <div class="glossary-def">저널리즘과 커뮤니케이션의 기본 원칙. Who(누가), What(무엇을), When(언제), Where(어디서), Why(왜), How(어떻게)의 여섯 요소로 상황을 체계적으로 설명하는 기법입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">행동 동사</div>
+      <div class="glossary-en">Action Verb</div>
+      <div class="glossary-def">명확한 행동과 결과를 나타내는 강한 동사. 프롬프트에서는 분석, 비교, 평가, 도출 등 구체적 동작을 명령하는 동사를 사용하면 AI의 응답 수준이 높아집니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
