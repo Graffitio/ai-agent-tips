@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W03 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjMzU2OUI4Ii8+PHBhdGggZD0iTTEwIDEySDEwLjAxVjEySDEwWk0xMCAxNkgxMC4wMVYxNkgxMFpNMTAgMjBIMTAuMDFWMjBIMTBaTTE0IDEySDE0LjAxVjEySDE0Wk0xNCAxNkgxNC4wMVYxNkgxNFpNMTQgMjBIMTQuMDFWMjBIMTRaTTE4IDEySDE4LjAxVjEySDE4Wk0xOCAxNkgxOC4wMVYxNkgxOFpNMTggMjBIMTguMDFWMjBIMThaTTIyIDEySDIyLjAxVjEySAoyMloiIGZpbGw9IndoaXRlIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W03 · THU</div>
+      <h1 class="header-title">역할 전환으로 다각도 분석과 페르소나 카드 만들기</h1>
+      <p class="header-sub">한 AI, 여러 관점 · 재사용 가능한 역할 프로필</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.26 THU<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>같은 질문이라도 <strong>"누가 답하는지"</strong>에 따라 결과가 완전히 달라집니다. AI에게 특정한 역할이나 페르소나를 부여하면, 더 깊고 목적지향적인 답변을 받을 수 있습니다. 오늘은 한 AI로부터 여러 관점의 답변을 얻는 <strong>역할 전환 프롬프트 기법</strong>과, 반복 사용할 수 있는 <strong>페르소나 카드</strong> 만드는 법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#027</span>
+          <span class="tip-tag tag-intermediate">📚 중급</span>
+          <span class="tip-category">역할 전환</span>
+        </div>
+        <h2 class="tip-title">멀티 페르소나 · 역할 전환으로 다각도 분석</h2>
+      </div>
+      <div class="tip-body">
+        <p>한 가지 주제에 대해 여러 관점을 원할 때, 단순히 "여러 시각에서 분석해줘"라고 하면 AI는 교과서적 나열만 합니다. 하지만 <strong>AI에게 구체적인 역할을 부여</strong>하고 그 역할의 관점에서만 답하도록 하면, 각 관점이 훨씬 깊고 현실적이 됩니다.</p><p><strong>핵심: 한 번의 멀티 질문 대신, 역할을 바꾸며 여러 번의 단독 질문</strong>을 하세요. 마치 회의실에서 CEO, 마케터, 기술자, 소비자 각각의 입장에서 발언하게 하는 것처럼.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 역할 전환 프롬프트 패턴</div>
+          <code>【프롬프트 1】
+"너는 이 스타트업의 CFO(재무담당)야.
+[스타트업 정보를 입력]
+이 사업 모델의 재정적 위험요소 3가지와
+각각의 대응책을 제시해줘."
+
+【프롬프트 2】
+"너는 이 스타트업의 CMO(마케팅담당)야.
+[같은 스타트업 정보를 입력]
+이 제품/서비스의 시장 진입 전략을
+경쟁사 대비 3가지 포지셔닝으로 제시해줘."
+
+【프롬프트 3】
+"너는 이 스타트업의 초기 투자자야.
+[같은 스타트업 정보를 입력]
+이 사업에 투자하기 전에 반드시 확인해야 할
+5가지 질문을 만들어줘."
+
+→ 같은 사업도 3가지 완전히 다른 관점의
+  구체적이고 실무적인 분석을 얻음</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#028</span>
+          <span class="tip-tag tag-intermediate">📚 중급</span>
+          <span class="tip-category">페르소나 설계</span>
+        </div>
+        <h2 class="tip-title">페르소나 카드 만들기 · 재사용 가능한 역할 프로필</h2>
+      </div>
+      <div class="tip-body">
+        <p>매번 역할을 설명하는 것은 번거롭습니다. 그래서 <strong>자주 쓸 역할들을 "페르소나 카드"로 미리 정의</strong>해두면, 나중에 한 문장으로 불러낼 수 있습니다. 마치 실제 팀원을 고용해두는 것처럼요.</p><p>좋은 페르소나 카드에는 <strong>이름, 직책, 전문성, 스타일, 제약조건</strong>이 포함됩니다. 이것들을 정의하면 AI의 답변이 일관되고 예측 가능해집니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📋 페르소나 카드 템플릿</div>
+          <code>【마케팅 담당자 - Maya】
+이름: Maya Chen
+직책: Senior Growth Marketer
+전문성: D2C 스타트업, SNS 마케팅, 
+        데이터 기반 A/B 테스트
+스타일: 직설적, 실무 중심, 
+        숫자와 ROI 언어로 소통
+제약: 월 예산 500만원 이상은 없음,
+      B2B보다는 B2C 전문
+
+【분석 담당자 - Alex】
+이름: Alex Park
+직책: Data Analyst
+전문성: 시장 조사, 경쟁사 분석,
+        트렌드 리포팅
+스타일: 객관적, 팩트 기반,
+        항상 출처 명시
+제약: 과거 3년 데이터만 신뢰,
+      추측은 "~일 가능성"으로 표현
+
+【이후 프롬프트】
+"Maya의 관점에서, 우리 신제품 출시
+마케팅 전략을 3가지 채널별로 제시해줘."
+→ 카드를 정의했으므로 한 문장 호출로 OK</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>역할 전환</strong>은 단순한 기법이 아닙니다. 이것은 <strong>"AI를 여러 전문가로 구성된 팀으로 활용하는 방법"</strong>입니다. CEO의 관점, 마케터의 관점, 엔지니어의 관점이 다르듯이, AI도 역할에 따라 다른 우선순위와 인사이트를 제공합니다. 특히 페르소나 카드를 만들어두면, 같은 팀원을 반복해서 부를 수 있으므로 일관성 있는 결과를 얻을 수 있습니다. 오늘부터 자신의 업무에 필요한 3~5개의 페르소나 카드를 만들어보세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">페르소나</div>
+      <div class="glossary-en">Persona</div>
+      <div class="glossary-def">가상으로 만든 인물 프로필. 마케팅에서는 타겟 고객을, 프롬프트 작성에서는 AI가 담당할 역할과 성향을 정의하는 데 사용됩니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">역할 기반 프롬프팅</div>
+      <div class="glossary-en">Role-Based Prompting</div>
+      <div class="glossary-def">AI에게 특정 직책이나 전문성을 가진 인물의 역할을 부여하고, 그 관점에서만 답변하도록 하는 기법. 같은 질문도 역할에 따라 전혀 다른 답변을 만들어냅니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
