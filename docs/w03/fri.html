@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W03 FRI — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><text x="10" y="30" font-size="28" font-weight="900" fill="#1B1464" font-family="Arial">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W03 · FRI</div>
+      <h1 class="header-title">시스템 프롬프트로<br>전용 에이전트 설계</h1>
+      <p class="header-sub">정체성+규칙+포맷의 3요소 · 찬반 양측을 모두 AI가 수행</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.27 FRI<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>시스템 프롬프트는 단순한 지시가 아닙니다. AI에게 <strong>"누구인지"</strong>, <strong>"어떻게 행동해야 하는지"</strong>, <strong>"어떤 형식으로 답해야 하는지"</strong>를 명확히 정의하는 것입니다. 이 3가지 요소를 제대로 조합하면, 일반 ChatGPT가 전문가처럼 변신합니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#029</span>
+          <span class="tip-tag tag-advanced">🔥 고급</span>
+          <span class="tip-category">에이전트 설계</span>
+        </div>
+        <h2 class="tip-title">시스템 프롬프트의 3요소: 정체성+규칙+포맷</h2>
+      </div>
+      <div class="tip-body">
+        <p>좋은 시스템 프롬프트는 항상 3층 구조를 가집니다. 첫째, <strong>정체성(Identity)</strong> — AI가 어떤 역할을 맡을지 명시합니다. 둘째, <strong>규칙(Rules)</strong> — 그 역할 속에서 지켜야 할 행동 원칙을 정합니다. 셋째, <strong>포맷(Format)</strong> — 답변이 어떤 형태로 나와야 하는지 구체화합니다.</p><p>이 3가지를 순서대로 배치하면, AI는 마치 미리 훈련받은 전문가처럼 일관되게 동작합니다. 단순히 "해줘"라는 지시보다 훨씬 정확합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 시스템 프롬프트 템플릿</div>
+          <code>[정체성]
+당신은 UX 카피라이터다. 
+10년 경력의 스타트업 마케터로서,
+사용자 심리를 이해하고 명확한 메시지를
+만드는 것이 전문이다.
+
+[규칙]
+1. 비즈니스 용어는 피하고 일상 언어를 쓴다.
+2. 한 문장은 15단어를 넘지 않는다.
+3. 불필요한 설명 없이 액션 중심으로 쓴다.
+
+[포맷]
+카피를 제시할 때는 다음 형식으로 답한다:
+---
+[버전 1] (감정 중심)
+[버전 2] (이성 중심)
+[버전 3] (긴급감 중심)
+---
+각 버전 아래 괄호로 (타겟: OOO) 명시</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#030</span>
+          <span class="tip-tag tag-advanced">🔥 고급</span>
+          <span class="tip-category">디베이트 시뮬</span>
+        </div>
+        <h2 class="tip-title">역할 간 토론 시뮬레이션: AI가 찬성, 반대를 모두 수행</h2>
+      </div>
+      <div class="tip-body">
+        <p>복잡한 결정을 할 때, 한 AI에게 한쪽 의견만 물으면 부족합니다. 대신 <strong>같은 AI에게 찬성자와 반대자 역할을 차례로 하도록</strong> 지시하세요. 시스템 프롬프트로 "당신은 이제 찬성 전문가"와 "당신은 이제 반대 전문가" 페르소나를 명확히 분리하면, AI는 각 입장의 진정한 논거를 제시합니다.</p><p>이는 직관적 판단의 함정을 피하게 해줍니다. 양쪽 의견을 균형있게 본 뒤 결정하는 것이 훨씬 현명합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 디베이트 시스템 프롬프트</div>
+          <code>[첫 번째 턴]
+당신은 '신입 직원 재택근무 허용' 정책의 
+"찬성 입장"을 대변하는 HR 컨설턴트다.
+최소 3가지 강력한 근거를 제시하되,
+경영진을 설득할 수 있는 데이터와 
+사례를 포함해야 한다.
+
+---
+
+[두 번째 턴]
+이제 당신은 같은 정책의 "반대 입장"을
+대변하는 운영 관리 전문가다.
+첫 번째 의견의 허점을 지적하면서,
+자신의 3가지 우려를 명확히 제시하라.
+
+---
+
+[결론]
+양쪽 논거를 모두 검토한 뒤,
+어떤 입장이 더 설득력 있는지,
+그리고 보완할 점은 무엇인지 분석하라.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>시스템 프롬프트는 <strong>"일회성 지시"가 아닙니다.</strong> 한 번 제대로 설계하면 같은 작업을 반복할 때마다 일관된 품질을 유지합니다. 마치 훈련받은 팀원처럼요. 오늘 배운 정체성-규칙-포맷 3요소를 기억하고, 자주 하는 작업부터 자신만의 시스템 프롬프트를 만들어보세요. 처음에는 5분이 걸리지만, 나중에는 몇 시간을 절약해줄 것입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">시스템 프롬프트</div>
+      <div class="glossary-en">System Prompt</div>
+      <div class="glossary-def">AI 모델의 기본 동작 방식을 정의하는 프롬프트입니다. 사용자 입력 전에 미리 설정되어, AI가 모든 응답에서 일관된 태도·스타일·규칙을 따르도록 합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">페르소나 설정</div>
+      <div class="glossary-en">Persona Definition</div>
+      <div class="glossary-def">AI에게 특정 역할이나 직업, 성격, 전문성을 부여하는 기법입니다. "당신은 UX 디자이너입니다"처럼 정체성을 명확히 하면, AI의 응답이 그 역할에 맞게 조정됩니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>

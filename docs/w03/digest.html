@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W03 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#9D6BD8;--tue:#3569B8;--wed:#10B981;--thu:#F59E0B;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;display:flex}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-color-bar{width:5px;flex-shrink:0}
+  .tip-card.mon .tip-color-bar{background:var(--mon)}
+  .tip-card.tue .tip-color-bar{background:var(--tue)}
+  .tip-card.wed .tip-color-bar{background:var(--wed)}
+  .tip-card.thu .tip-color-bar{background:var(--thu)}
+  .tip-card.fri .tip-color-bar{background:var(--fri)}
+  .tip-content{flex:1}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W03 · MON-FRI</div>
+      <h1 class="header-title">프롬프트를 설계하는 법</h1>
+      <p class="header-sub">구조, 템플릿, 버전 관리, 역할 전환, 시스템 프롬프트 — 5일간의 완벽한 가이드</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.17-21<br>☕ 15 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘 주간의 한마디</div>
+    <p>프롬프트는 기술이 아닙니다. <strong>프롬프트는 설계입니다.</strong> 이번 주는 프롬프트를 정확하게 설계하는 5가지 방법을 배웁니다. 5W1H 구조에서 시작해 역할 전환과 시스템 프롬프트까지 — 단계별로 당신의 AI 워크플로우를 강화하세요.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 카드</div>
+    
+    <article class="tip-card mon" id="tip-1">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-1')">
+          <div class="tip-meta">
+            <span class="tip-num">#021</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">구조화</span>
+          </div>
+          <h2 class="tip-title">5W1H로 프롬프트 구조화하기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>Who(누가) / What(무엇을) / When(언제) / Where(어디서) / Why(왜) / How(어떻게)</strong> — 이 여섯 가지 요소를 명확히 하면, 아무리 복잡한 요청도 AI가 정확하게 이해합니다.</p><p>각 요소를 한두 문장으로 정리해서 프롬프트에 포함하세요. 이것만으로도 답변의 정확도가 극도로 높아집니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 5W1H 체크리스트</div>
+            <code>Who: 나는 스타트업 마케팅 담당자
+What: 6개월 로드맵을 만들고 싶음
+When: 3월부터 8월까지
+Where: 인스타그램 & 블로그 채널
+Why: 신제품 출시 전 커뮤니티 구축
+How: 주 3회 콘텐츠, 월 1회 라이브
+
+→ 이 6가지를 명시하면 답변이 구체적</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card mon" id="tip-2">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-2')">
+          <div class="tip-meta">
+            <span class="tip-num">#022</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">시작</span>
+          </div>
+          <h2 class="tip-title">행동 동사로 시작하기</h2>
+        </div>
+        <div class="tip-body">
+          <p>"~알려줘", "~설명해줘" 같은 수동적 표현 대신 <strong>행동 동사로 시작</strong>하세요. "분석하다", "정리하다", "비교하다", "추천하다" 같은 동사가 AI의 실행 의지를 높입니다.</p><p>"생각해줄래?"보다 "다음을 분석해줄래?"가 훨씬 더 구체적인 답변을 이끌어냅니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 Before / After</div>
+            <code>❌ 수동형:
+"우리 경쟁사에 대해서 알려줄래?"
+
+✅ 행동 동사로:
+"우리 경쟁사 3곳을 다음 5가지 항목으로
+분석해줄래: 가격대, 타겟층, 강점, 
+약점, 차별화 포인트"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-3">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-3')">
+          <div class="tip-meta">
+            <span class="tip-num">#023</span>
+            <span class="tip-tag tag-intermediate">📚 중급</span>
+            <span class="tip-category">템플릿</span>
+          </div>
+          <h2 class="tip-title">프롬프트 템플릿 만들기</h2>
+        </div>
+        <div class="tip-body">
+          <p>매번 같은 형태의 요청을 한다면 <strong>프롬프트 템플릿을 만들고 재사용</strong>하세요. [X], [Y], [Z] 같은 플레이스홀더를 두고, 상황에 맞춰 채워넣으면 시간도 절약하고 일관성도 유지됩니다.</p><p>특히 반복되는 업무(보고서, 분석, 제안서)일수록 템플릿의 효과가 극대화됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 템플릿 예시</div>
+            <code>나는 [역할]이다.
+[상황]에서 [목표]를 달성하려고 한다.
+제약 조건: [제약 1], [제약 2]
+다음 형식으로 [결과물]을 만들어줘:
+[형식 요구사항]
+
+---
+예시:
+나는 소셜미디어 매니저다.
+제품 출시 3주 전에 인스타 콘텐츠를
+미리 기획하려고 한다.
+제약: 주 3회, 교육적 톤, 시각+텍스트
+다음 형식으로 콘텐츠 캘린더를 만들어줘:
+날짜 | 주제 | 카피 | 포스팅 형태</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-4">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-4')">
+          <div class="tip-meta">
+            <span class="tip-num">#024</span>
+            <span class="tip-tag tag-intermediate">📚 중급</span>
+            <span class="tip-category">조건</span>
+          </div>
+          <h2 class="tip-title">조건문 넣기: if-then 프롬프트</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>"만약 X라면, Y를 해줘"</strong> 형태의 if-then 프롬프트는 AI가 특정 상황에서 다른 답변을 주도록 합니다. 단순한 조건부 지시보다 훨씬 더 강력하고 유연한 응답을 만들어냅니다.</p><p>이를 여러 번 연쇄하면, AI의 의사결정 프로세스를 완전히 제어할 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 If-Then 예시</div>
+            <code>다음 판단에 따라 다르게 답변해줘:
+
+If 고객이 B2B라면,
+Then 계약금, 지속성, ROI를 강조
+
+If 고객이 B2C라면,
+Then 즉각적 효과, 사용 편의성 강조
+
+If 고객이 초기 스타트업이라면,
+Then 저예산 옵션, 점진적 확장 제안
+
+Q: "우리 제품 사고팔기 어떻게 할까?"
+당신 회사 매출: 500만 원/월 (B2C 스타트업)</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-5">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-5')">
+          <div class="tip-meta">
+            <span class="tip-num">#025</span>
+            <span class="tip-tag tag-intermediate">📚 중급</span>
+            <span class="tip-category">버전관리</span>
+          </div>
+          <h2 class="tip-title">프롬프트 버전 관리하기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>좋은 프롬프트는 한 번에 나오지 않습니다.</strong> 프롬프트 v1.0, v1.1, v2.0 같이 버전을 관리하면서 반복적으로 개선하세요. 각 버전마다 무엇을 바꿨는지, 왜 바꿨는지 기록해두면 더욱 좋습니다.</p><p>깃허브나 노션 같은 도구에 프롬프트 라이브러리를 만들고 관리하는 것도 극히 권장됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 버전 관리 예시</div>
+            <code>📋 프롬프트: "경쟁사 분석"
+
+v1.0 (초안)
+- 요청: "경쟁사 분석해줘"
+- 결과: 너무 일반적, 우리 상황 反映 안 됨
+
+v1.1 (상황 추가)
+- 추가: 우리 제품, 타겟층, 가격대 명시
+- 결과: 더 구체적이지만 양식이 산만함
+
+v2.0 (양식 정규화)
+- 추가: 분석 항목 5가지 명시, 마크다운 형식 지정
+- 결과: 재사용 가능한 템플릿화된 답변</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-6">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-6')">
+          <div class="tip-meta">
+            <span class="tip-num">#026</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">페르소나</span>
+          </div>
+          <h2 class="tip-title">"넌 ~전문가야"로 시작하기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>"You are a [역할]. [역할의 특성]."</strong> 이 단순한 한 문장이 AI의 답변 톤과 수준을 완전히 바꿉니다. 단순히 정보를 주는 것이 아니라, 특정 관점과 전문성을 가진 AI로 "역할극"을 시킬 수 있습니다.</p><p>마케팅 전문가, 데이터 분석가, 세일즈 코치, 창의적인 라이터 — 필요한 관점의 전문가가 되도록 AI를 "지시"하세요.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 역할 지정 예시</div>
+            <code>❌ 일반적인 요청:
+"우리 제품 마케팅 전략 짜줘"
+
+✅ 역할을 지정한 요청:
+"You are a product marketing leader
+with 10+ years of SaaS experience.
+당신의 경험을 바탕으로 우리 제품의
+3개월 마케팅 전략을 짜줘.
+(상황: [detail...])"
+
+→ 더 깊고, 경험 있는 조언 같은 톤의 답변</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-7">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-7')">
+          <div class="tip-meta">
+            <span class="tip-num">#027</span>
+            <span class="tip-tag tag-intermediate">📚 중급</span>
+            <span class="tip-category">다각도분석</span>
+          </div>
+          <h2 class="tip-title">역할 전환으로 다각도 분석</h2>
+        </div>
+        <div class="tip-body">
+          <p>같은 문제를 다양한 역할의 관점에서 분석하면 훨씬 깊이 있는 인사이트를 얻습니다. <strong>경영진으로서, 고객으로서, 경쟁사로서</strong> — 각 입장에서 당신의 제품/전략/문제를 분석하도록 요청하세요.</p><p>이것이 바로 "AI 자문진 구성하기"의 첫 단계입니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 역할 전환 예시</div>
+            <code>우리 제품을 다음 3가지 관점에서 분석해줘:
+
+1️⃣ CEO 관점: 
+"이 제품의 사업성, ROI, 위험 요소는?"
+
+2️⃣ 고객 관점:
+"이 제품을 써봤을 때 가장 불편한 점은?"
+
+3️⃣ 경쟁사 관점:
+"우리 경쟁사라면 이 제품을 어떻게 이길까?"
+
+→ 각 답변이 다르고, 함께 보면 완전한 그림</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-8">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-8')">
+          <div class="tip-meta">
+            <span class="tip-num">#028</span>
+            <span class="tip-tag tag-intermediate">📚 중급</span>
+            <span class="tip-category">페르소나</span>
+          </div>
+          <h2 class="tip-title">페르소나 카드 만들기</h2>
+        </div>
+        <div class="tip-body">
+          <p>역할 전환을 더 체계적으로 하려면 <strong>페르소나 카드</strong>를 만드세요. 이름, 직급, 경력, 관심사, 의사결정 기준까지 상세하게 정의하면, AI가 훨씬 더 일관되고 깊이 있는 역할극을 할 수 있습니다.</p><p>한 번 만들어두면 계속 재사용할 수 있는 자산이 됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 페르소나 카드 템플릿</div>
+            <code>📋 페르소나: "Sarah - CMO"
+
+이름: Sarah Kim
+직급: Chief Marketing Officer
+회사 규모: B2B SaaS, 100명 규모
+경력: 마케팅 12년 (스타트업 4곳)
+KPI: CAC 30% 감소, 월 리드 500개
+선호 채널: LinkedIn, 업계 이벤트
+성향: 데이터 중심, ROI 우선
+痛点: 마케팅 팀 규모 작음
+
+요청: "Sarah로서, 우리의
+B2B 마케팅 전략을 평가해줘"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-9">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-9')">
+          <div class="tip-meta">
+            <span class="tip-num">#029</span>
+            <span class="tip-tag tag-advanced">🎓 고급</span>
+            <span class="tip-category">시스템</span>
+          </div>
+          <h2 class="tip-title">시스템 프롬프트로 전용 에이전트 설계</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>시스템 프롬프트</strong>는 모든 대화의 기초가 되는 AI의 핵심 인격을 정의합니다. ChatGPT, Claude 등에서는 별도의 "시스템 메시지"로 설정할 수 있습니다. 당신의 특정 업무에 맞춘 전용 에이전트를 만들려면, 시스템 프롬프트부터 설계해야 합니다.</p><p>이것이 "나만의 AI 어시스턴트"를 만드는 가장 강력한 방법입니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 시스템 프롬프트 예시</div>
+            <code>Role: 당신은 스타트업 마케팅 전략가
+
+Constraints:
+- 항상 데이터 기반 조언
+- 월 마케팅 예산 500만원 이내 가정
+- B2C 초기 제품 중심
+
+Behavior:
+- 매 답변마다 구체적 액션 아이템 제시
+- 각 제안의 예상 효과 수치화
+- 항상 A/B 테스트 방식 제안
+- 분석 깊이: 초급자 수준 설명 필수
+
+Output Format:
+[아이디어] | [액션] | [예상 결과] | [우선순위]</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-10">
+      <div class="tip-color-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-10')">
+          <div class="tip-meta">
+            <span class="tip-num">#030</span>
+            <span class="tip-tag tag-advanced">🎓 고급</span>
+            <span class="tip-category">토론</span>
+          </div>
+          <h2 class="tip-title">역할 간 토론 시뮬레이션</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>여러 AI 에이전트가 각자 다른 역할을 맡아 토론하도록</strong> 설계하면, 복잡한 문제에 대한 다층적 인사이트를 얻을 수 있습니다. 마치 실제 경영진 회의를 벌이는 것처럼요. 이것은 단순 분석을 넘어 "의사결정을 위한 AI 컨설팅"입니다.</p><p>예: CEO와 CFO와 CTO가 당신의 제품 전략을 놓고 토론하는 시뮬레이션</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 토론 시뮬레이션 예시</div>
+            <code>역할별 토론: 우리 신제품 출시 전략
+
+Participant 1 - CEO (공격적)
+Participant 2 - CFO (보수적)
+Participant 3 - CTO (기술 중심)
+
+주제: "3개월 후 MVP 출시, 예산 3억"
+
+각각 자신의 입장에서 의견 제시 후,
+서로를 질문하고 반박하는 형태로
+토론을 진행해줄래? 최종 합의안까지.</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 이번 주의 인사이트</div>
+    <p>이번 주 5일간 배운 것들은 모두 같은 목적으로 수렴합니다: <strong>"AI를 당신의 사고 방식에 맞춘 도구로 만드는 것"</strong>입니다. 5W1H로 시작해 시스템 프롬프트와 토론 시뮬레이션까지 — 각 단계는 AI와의 상호작용을 더 깊고 정교하게 만듭니다. 특히 프롬프트 버전 관리와 페르소나 카드는 일회성이 아닌 <strong>장기적 자산</strong>입니다. 이번 주부터 시작한 프롬프트 라이브러리를 잘 관리하면, 앞으로 몇 개월 후 당신은 AI를 마치 인내심 있는 동료처럼 다룰 수 있을 겁니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이번 주의 핵심 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">5W1H</div>
+      <div class="glossary-en">Who, What, When, Where, Why, How</div>
+      <div class="glossary-def">프롬프트의 기본 구조화 프레임워크. 누가, 무엇을, 언제, 어디서, 왜, 어떻게를 명확히 하면 AI의 이해도와 답변 정확도가 극대화됩니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">시스템 프롬프트</div>
+      <div class="glossary-en">System Prompt</div>
+      <div class="glossary-def">모든 대화의 기초가 되는 AI의 핵심 지시사항. 역할, 제약 조건, 행동 방식 등을 정의하여 AI를 특정 목적의 에이전트로 만듭니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">페르소나</div>
+      <div class="glossary-en">Persona</div>
+      <div class="glossary-def">역할극을 위한 상세한 캐릭터 정의. 이름, 직급, 경력, 특성, KPI 등을 구체화하여 AI가 일관되고 깊이 있는 관점을 유지할 수 있도록 합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">프롬프트 템플릿</div>
+      <div class="glossary-en">Prompt Template</div>
+      <div class="glossary-def">반복되는 업무를 위한 프롬프트의 표준화된 형식. [X], [Y] 같은 플레이스홀더를 두어 상황마다 재사용하면 시간과 일관성을 모두 얻을 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · W03 WEEKLY — by Ian Jung</div>
+    <div class="footer-note">다음 주는 프롬프트 고급 기법으로 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
