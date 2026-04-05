@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W05 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAyOCAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHJ4PSI2IiBmaWxsPSIjMUI2MzZCIi8+PHBhdGggZD0iTTcgOEwyMSAyME03IDIwTDIxIDgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W05 · MON</div>
+      <h1 class="header-title">단계별로 생각하게 하라 — CoT과 추론</h1>
+      <p class="header-sub">하나씩 생각해봐의 힘 · Step 1→2→3 지정하기</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.06 MON<br>☕ 3 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>AI가 답변하는 방식도 인간처럼 <strong>"한 번에 결론으로 간다"</strong> vs <strong>"차근차근 생각한 뒤 답한다"</strong>는 차이가 있습니다. 같은 질문인데도 추론 과정을 명시적으로 요청하면, 정확도와 신뢰도가 눈에 띄게 높아집니다. 오늘은 그 마법의 기법, <strong>CoT(Chain-of-Thought)</strong>를 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#041</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">CoT 기초</span>
+        </div>
+        <h2 class="tip-title">단계별로 생각하게 하라 — CoT</h2>
+      </div>
+      <div class="tip-body">
+        <p>"최적의 마케팅 채널은?"이라고 물으면, AI는 즉시 답을 냅니다. 하지만 <strong>"1단계: 우리 고객의 특성은?, 2단계: 각 채널의 특성은?, 3단계: 최적 채널은?"</strong>이라고 단계를 명시하면, AI는 각 단계를 차근차근 검토한 뒤 답합니다.</p><p>이것이 <strong>CoT(Chain-of-Thought)</strong>의 핵심입니다. 추론의 중간 단계를 명시적으로 요구하는 것만으로도 답변의 논리가 단단해집니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Before / After</div>
+          <code>❌ Before (단계 없이):
+"우리 B2B SaaS 제품의 최고의
+마케팅 채널은 뭐야?"
+→ 한 두 줄의 일반적인 답변
+
+✅ After (CoT 적용):
+"우리 B2B SaaS 제품의 최고의
+마케팅 채널을 찾기 위해 다음
+단계로 생각해줘:
+1단계: 우리 타겟 고객의 특성
+     (산업, 규모, 의사결정 구조)
+2단계: 각 채널별 특성과 강점
+     (LinkedIn, Google Ads, 
+      Content Marketing 등)
+3단계: 각 특성을 매칭한 최적 채널
+→ 각 단계가 논리적으로 연결된 답변</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#042</span>
+          <span class="tip-tag tag-intermediate">💎 중급</span>
+          <span class="tip-category">구조화된 사고</span>
+        </div>
+        <h2 class="tip-title">추론 중간 단계를 명시적으로 요구하라</h2>
+      </div>
+      <div class="tip-body">
+        <p>CoT의 형태는 다양합니다. <strong>"먼저 생각하고, 그 다음 답해"</strong>, <strong>"Step 1, Step 2, Step 3"</strong>, <strong>"이유 → 검토 → 결론"</strong> 등 명확한 구조를 강제하는 것이 핵심입니다.</p><p>중요한 의사결정이나 분석이 필요할 때는 <strong>구체적인 스텝 수를 정하고</strong> 각 단계에서 <strong>"왜?"</strong>를 묻는 것이 효과적입니다. 이를 통해 AI의 "생각하는 과정"을 볼 수 있고, 문제가 있으면 어느 단계에서인지 파악할 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Step 1→2→3 지정 예시</div>
+          <code>🎯 예시: 신제품 출시 시기 결정
+
+"우리 신제품의 최적 출시 시기를
+다음 3 단계로 분석해줘:
+
+Step 1: 시장 준비도 분석
+- 고객의 준비 수준
+- 경쟁사의 움직임
+- 규제 환경
+
+Step 2: 내부 준비도 검토
+- 제품 완성도
+- 마케팅 자료 준비
+- 영업팀 교육 상황
+
+Step 3: 최적 출시 시기 결정
+- 위 두 분석을 고려한 추천 시점
+- 위험 요소와 대응책"
+
+→ 각 단계가 명확하고, 최종 결론이
+논리적으로 검증된 답변</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>CoT는 단순한 "생각해 보라는 지시"가 아닙니다.</strong> 명확한 단계를 강제함으로써 AI가 성급한 결론에 도달하기 전에, 각 전제를 검토하도록 하는 기법입니다. 복잡한 문제일수록, 고위험의 의사결정일수록 CoT의 가치가 더 커집니다. 이번 주부터는 중요한 질문할 때마다 <strong>"먼저 Step 1, Step 2, Step 3로 생각해봐"</strong> 이 한 문장을 더하는 습관을 들여보세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">CoT</div>
+      <div class="glossary-en">Chain-of-Thought</div>
+      <div class="glossary-def">AI에게 추론 과정을 단계별로 명시하도록 요구하는 프롬프팅 기법. 직접 답변을 요구하는 것이 아니라, 생각하는 과정을 거쳐서 답하도록 유도하여 정확도를 높입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">추론</div>
+      <div class="glossary-en">Reasoning</div>
+      <div class="glossary-def">주어진 정보와 논리를 바탕으로 새로운 결론을 도출하는 과정. AI의 추론 과정이 명확할수록, 그 결과의 신뢰도가 높아집니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
