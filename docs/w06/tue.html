@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W06 TUE — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3569B8;stop-opacity:1" /><stop offset="100%" style="stop-color:#1B1464;stop-opacity:1" /></linearGradient></defs><rect width="120" height="120" fill="url(#logoGrad)" rx="20"/><text x="60" y="75" font-family="JetBrains Mono" font-size="48" font-weight="900" fill="white" text-anchor="middle">4L</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W06 · TUE</div>
+      <h1 class="header-title">자기 일관성: 같은 질문 여러 번과 멀티 에이전트 시뮬레이션</h1>
+      <p class="header-sub">다수결로 정답 확률 높이기 · 생성자·비평가·편집자 역할 분담</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.14 TUE<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>AI의 답변이 항상 정확할까요? 아닙니다. 특히 <strong>복잡한 추론이나 창의적인 작업</strong>에서는 운의 영향이 큽니다. 하지만 <strong>같은 질문을 여러 번 반복하고 다수결을 취하면</strong> 정확도가 크게 올라갑니다. 오늘은 이 "자기 일관성"과 <strong>여러 역할의 에이전트를 동시에 가동하는</strong> 고급 기법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#053</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">자기 일관성</span>
+        </div>
+        <h2 class="tip-title">같은 질문 여러 번 — 다수결로 정답 확률 높이기</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>자기 일관성(Self-Consistency)</strong>은 간단하지만 강력한 기법입니다. 동일한 질문을 여러 번 반복하되, <strong>매번 약간 다른 추론 경로를 거쳐서</strong> 최종 답변이 도출되도록 하는 것입니다. 그 후 가장 많이 나온 답변을 선택하는 다수결 방식을 사용합니다.</p><p>특히 <strong>수학 문제, 논리 추론, 창의적 아이디어 도출</strong>에서 효과가 큽니다. 일반적으로 3~5회 반복 후 다수결을 취하면 정확도가 15~30% 향상됩니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 실행 방법</div>
+          <code>🎯 1단계: 기본 질문 설정
+"당신은 논리적 추론 전문가입니다.
+A사의 월 광고비는 B사의 2배입니다.
+C사는 A사보다 50% 적게 씁니다.
+A사의 광고비가 600만원이라면,
+B사와 C사는 각각 얼마인가요?"
+
+🔄 2단계: 3~5회 반복 요청
+(매번 동일한 질문 또는
+"다시 한번 차근차근 계산해줘"로 변형)
+
+✅ 3단계: 가장 많이 나온 답변 선택
+- 1회차: B사 300만원, C사 300만원
+- 2회차: B사 300만원, C사 300만원
+- 3회차: B사 300만원, C사 300만원
+→ 모두 같은 답 → 높은 신뢰도</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#054</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">멀티 에이전트</span>
+        </div>
+        <h2 class="tip-title">멀티 에이전트 시뮬레이션 — 역할 분담으로 품질 높이기</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>생성자(Generator) → 비평가(Critic) → 편집자(Editor)</strong> 세 가지 역할을 순차적으로 실행하는 고급 기법입니다. 마치 팀이 함께 작업하는 것처럼 AI가 각 역할을 번갈아 수행하면서, 초안의 약점을 보완하고 최종 결과물의 완성도를 높입니다.</p><p>이 기법은 <strong>콘텐츠 작성, 기획안 수립, 전략 수립</strong> 등 복잡한 창의 작업에서 특히 효과적입니다. 한 번에 모든 것을 요청하는 것보다 각 역할을 명확히 분리하면 깊이 있는 결과를 얻습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 3단계 프로세스</div>
+          <code>🎭 1단계: 생성자 역할
+"당신은 창의적 콘텐츠 작가입니다.
+스타트업 CEO를 위한
+'시간 관리의 3가지 원칙'이라는
+블로그 포스트 초안을 써줘.
+(500자 이상)"
+
+🎭 2단계: 비평가 역할
+"당신은 엄격한 콘텐츠 에디터입니다.
+위 초안에서 부족한 점을 지적해줘:
+1) 논거가 충분한가?
+2) 실제 사례가 있는가?
+3) 독자의 액션 유도가 명확한가?
+개선 방안도 함께 제시해줘."
+
+🎭 3단계: 편집자 역할
+"당신은 최종 편집자입니다.
+비평가의 피드백을 반영하여
+초안을 다시 작성해줘.
+더 구체적이고 실행 가능하게."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>오늘의 두 기법 — <strong>자기 일관성과 멀티 에이전트 시뮬레이션</strong> — 은 AI를 단순한 답변 도구에서 <strong>신뢰할 수 있는 조력자로 격상</strong>시킵니다. 특히 중요한 결정이나 창의적 작업 앞에서는 "한 번의 완벽한 질문"보다 <strong>"여러 번의 검증된 답변"</strong>이 훨씬 가치 있습니다. 앞으로는 AI에게 물어볼 때, 시간이 조금 더 걸리더라도 이 두 기법을 병합하면, 초안 품질이 완전히 달라질 것을 경험하게 될 겁니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">자기 일관성</div>
+      <div class="glossary-en">Self-Consistency</div>
+      <div class="glossary-def">동일한 질문을 여러 번 반복하여 다양한 추론 경로를 거쳐 답변을 도출한 후, 가장 많이 나온 결과를 선택하는 기법. 특히 복잡한 추론 작업에서 정확도를 크게 향상시킵니다.</div>
+    </div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">멀티 에이전트 시뮬레이션</div>
+      <div class="glossary-en">Multi-Agent Simulation</div>
+      <div class="glossary-def">생성자, 비평가, 편집자 등 여러 역할을 AI가 순차적으로 수행하여 최종 결과물의 품질을 높이는 방식. 팀 협업을 AI로 시뮬레이션하는 것으로, 단순 반복보다 깊이 있는 결과를 생성합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
