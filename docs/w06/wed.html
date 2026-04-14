@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W06 WED — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMUIxNDY0Ii8+Cjwvc3ZnPg==" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W06 · WED</div>
+      <h1 class="header-title">프롬프트 디버깅<br>체크리스트와 RACE 프레임워크</h1>
+      <p class="header-sub">원하는 결과가 안 나올 때 점검법 · Role·Action·Context·Expected output</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.15 WED<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 1 · 프롬프트 기본기</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>프롬프트를 썼는데 결과가 마음에 들지 않을 때, 무작정 다시 쓰는 것보다 <strong>"뭐가 빠졌나?"</strong>를 체계적으로 점검하는 것이 훨씬 효율적입니다. 오늘은 <strong>디버깅 체크리스트</strong>와 이를 실행하는 프레임워크인 <strong>RACE</strong>를 소개합니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#055</span>
+          <span class="tip-tag tag-advanced">⭐ 고급</span>
+          <span class="tip-category">프롬프트 디버깅</span>
+        </div>
+        <h2 class="tip-title">고급 디버깅 프롬프트 디버깅 체크리스트</h2>
+      </div>
+      <div class="tip-body">
+        <p>AI의 답변이 만족스럽지 않을 때, 다음 체크리스트를 순서대로 확인하세요. <strong>대부분의 문제는 이 다섯 가지 중 하나</strong>입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">✅ 프롬프트 디버깅 5단계</div>
+          <code>1️⃣ 역할(Role) 확인
+   → AI가 어떤 입장에서 답해야 하는지 명시했는가?
+   예: "마케팅 전문가로서", "초등학생도 이해할 수 있게"
+
+2️⃣ 맥락(Context) 확인
+   → 충분한 배경 정보를 제공했는가?
+   예: 산업, 타겟, 현재 상황, 제약 조건
+
+3️⃣ 출력 형식(Format) 확인
+   → 원하는 결과 형식을 명시했는가?
+   예: "JSON 형식으로", "표 형태로", "3줄 요약"
+
+4️⃣ 예시(Examples) 추가
+   → 모범 답변을 하나라도 보여줬는가?
+   예: Before/After, 좋은 예시 1개 이상
+
+5️⃣ 명확성(Clarity) 점검
+   → 모호한 표현이 있는가?
+   예: "좀 더", "충분히" → "구체적으로 수정"</code>
+        </div>
+        <p style="margin-top:12px">이 체크리스트를 훑으면서 빠진 부분에 정보를 <strong>하나씩 추가</strong>하세요. 보통 3개 이상 추가하면 결과 품질이 크게 달라집니다.</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#056</span>
+          <span class="tip-tag tag-intermediate">💙 중급</span>
+          <span class="tip-category">프레임워크</span>
+        </div>
+        <h2 class="tip-title">중급 RACE RACE 프레임워크</h2>
+      </div>
+      <div class="tip-body">
+        <p>좋은 프롬프트의 필수 요소 4가지를 담은 프레임워크가 <strong>RACE</strong>입니다. 이 순서대로 프롬프트를 구성하면 AI의 답변 정확도가 비약적으로 올라갑니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🎯 RACE 프레임워크 구조</div>
+          <code>R (Role) - 역할 정의
+   ↳ AI가 취할 입장, 전문성, 톤앤매너
+
+A (Action) - 수행할 작업
+   ↳ 구체적으로 무엇을 해야 하는가?
+
+C (Context) - 맥락 제공
+   ↳ 배경, 상황, 제약, 대상 정보
+
+E (Expected output) - 기대 결과 정의
+   ↳ 형식, 길이, 스타일, 예시</code>
+        </div>
+        <p style="margin-top:12px"><strong>실제 예시</strong>로 보겠습니다:</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 RACE 프레임워크 실제 사용</div>
+          <code>R: 넌 경험 많은 UX 디자이너야.
+   유저 중심의 직관적인 설명을 한다.
+
+A: 앱의 온보딩 플로우를 3단계로
+   재설계해줘.
+
+C: 우리 앱은 AI 일정 관리 도구고,
+   타겟은 직장인 25-40세.
+   현재 온보딩은 기능 설명 중심인데,
+   너무 길어서 이탈률이 높아.
+
+E: 각 단계별로 스크린 설명, 유저 액션,
+   목표를 표 형태로 정리해줘.
+   왜 이렇게 설계했는지 1줄 근거도.</code>
+        </div>
+        <p style="margin-top:12px">RACE의 각 요소가 명확할수록, AI의 답변도 더 <strong>정확하고 깊어</strong>집니다. 처음엔 시간이 걸리지만, 한두 번 연습하면 습관이 됩니다.</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>"좋은 프롬프트"는 타고나는 것이 아니라 "체계적으로 만드는 것"</strong>입니다. 오늘 배운 디버깅 체크리스트와 RACE 프레임워크는 이를 위한 도구일 뿐입니다. 이제부터 AI에게 질문할 때마다 "내 프롬프트에 R, A, C, E가 모두 있나?"를 확인하세요. 이것만으로도 당신의 프롬프트 실력은 한 단계 업그레이드됩니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">프롬프트 디버깅</div>
+      <div class="glossary-en">Prompt Debugging</div>
+      <div class="glossary-def">AI의 답변이 예상과 다를 때, 프롬프트의 어느 부분이 부족하거나 모호한지 체계적으로 찾아내고 수정하는 과정입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">RACE 프레임워크</div>
+      <div class="glossary-en">RACE Framework</div>
+      <div class="glossary-def">Role(역할), Action(작업), Context(맥락), Expected output(기대 결과)의 네 가지 요소로 프롬프트를 구조화하는 방법론. 프롬프트의 완성도와 일관성을 높입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
