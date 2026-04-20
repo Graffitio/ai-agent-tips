@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W07 TUE — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1"/><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1"/></linearGradient></defs><rect width="32" height="32" rx="6" fill="url(#lg1)"/><text x="16" y="22" font-family="JetBrains Mono" font-size="18" font-weight="700" fill="white" text-anchor="middle">4</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W07 · TUE</div>
+      <h1 class="header-title">업종별 프롬프트 베스트 프랙티스와 프롬프트 A/B 테스트 방법론</h1>
+      <p class="header-sub">마케팅·개발·기획·영업·HR — 어떤 프롬프트가 더 나은지 비교</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.21 TUE<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>좋은 프롬프트는 정해진 정답이 아닙니다. <strong>업종과 상황에 맞춰 계속 개선되는 것</strong>입니다. 마케팅과 개발, 기획과 영업에서 필요한 프롬프트는 분명히 다릅니다. 오늘은 각 업종별 핵심 사례와 함께, <strong>어떤 프롬프트가 더 나은지 객관적으로 판단하는 A/B 테스트 방법론</strong>을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#063</span>
+          <span class="tip-tag tag-intermediate">📈 중급</span>
+          <span class="tip-category">업종별 사례</span>
+        </div>
+        <h2 class="tip-title">업종별 프롬프트 베스트 프랙티스</h2>
+      </div>
+      <div class="tip-body">
+        <p>같은 AI여도 마케팅, 개발, 기획, 영업, HR에서 쓰는 프롬프트는 구조부터 다릅니다. 각 업종이 중시하는 <strong>요소, 데이터 형식, 출력 방식</strong>이 다르기 때문입니다. 각 업종의 핵심 구조를 알면 프롬프트 작성 속도가 3배 이상 빨라집니다.</p>
+        
+        <p><strong>📊 마케팅:</strong> [타겟·채널·KPI] 중심. 수치화된 목표와 제약조건이 중요합니다.</p>
+        <p><strong>💻 개발:</strong> [기술스택·요구사항·제약] 중심. 코드 예시와 에러 핸들링까지 명시합니다.</p>
+        <p><strong>🎯 기획:</strong> [사용자·문제·솔루션] 중심. 페르소나와 시나리오 기반으로 작성합니다.</p>
+        <p><strong>🤝 영업:</strong> [고객상황·제품차별점·성과지표] 중심. 고객 관점의 문제를 먼저 제시합니다.</p>
+        <p><strong>👥 HR:</strong> [직무·레벨·맥락·목표] 중심. 기업문화와 가치관을 포함합니다.</p>
+        
+        <div class="tip-example">
+          <div class="tip-example-label">💬 마케팅 프롬프트 구조</div>
+          <code>당신은 [B2C 식품 마케터]입니다.
+타겟: [25-40세, 건강식 관심층, 월수입 400만원 이상]
+제품: [무가염 견과류 스낵]
+채널: [인스타그램, 유튜브쇼츠]
+월예산: [200만원]
+목표: [2개월 내 월 매출 5,000만원]
+경쟁사: [A사, B사의 차별점 분석함]
+
+이 조건에서 다음주 SNS 콘텐츠 4개를
+포맷별로(카루셀·릴스·타이포·LTV) 작성해줘.
+각 콘텐츠의 예상 도달율도 함께.</code>
+        </div>
+
+        <div class="tip-example">
+          <div class="tip-example-label">💬 개발 프롬프트 구조</div>
+          <code>당신은 [React 풀스택 개발자]입니다.
+프레임워크: [Next.js 14]
+데이터베이스: [PostgreSQL + Prisma]
+인증: [NextAuth.js]
+환경: [프로덕션에 배포될 API]
+제약: [응답시간 200ms 이하]
+
+[사용자 인증 후 개인화 대시보드] 기능을
+구현해줘. API 엔드포인트 3개
+(GET /dashboard, POST /preference, DELETE /user)와
+에러 핸들링(401, 403, 500)을 TypeScript 타입까지.
+보안 고려사항도 함께.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#064</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">A/B 테스트</span>
+        </div>
+        <h2 class="tip-title">프롬프트 A/B 테스트 방법론</h2>
+      </div>
+      <div class="tip-body">
+        <p>프롬프트도 마케팅 캠페인처럼 <strong>A/B 테스트로 최적화</strong>할 수 있습니다. 어떤 프롬프트가 더 좋은 결과를 내는지 객관적으로 판단하려면 <strong>테스트 설계</strong>부터 시작해야 합니다.</p>
+
+        <p><strong>📋 3단계 A/B 테스트 프로세스:</strong></p>
+        <p><strong>1단계 - 변수 선택:</strong> 한 번에 하나의 요소만 바꿉니다. (예: 톤앤매너, 구조, 길이, 예시 유무)</p>
+        <p><strong>2단계 - 동일 조건 테스트:</strong> 같은 입력 데이터로 A·B를 각각 5회 이상 실행해 평균을 냅니다. (온도, 모델 동일)</p>
+        <p><strong>3단계 - 평가 기준 설정:</strong> 정성(명확성·창의성)과 정량(단어수·구조도)을 함께 평가합니다.</p>
+
+        <div class="tip-example">
+          <div class="tip-example-label">💬 실제 A/B 테스트 예시</div>
+          <code>【 테스트 주제 】
+마케팅 카피 작성 프롬프트
+
+【 변수 】
+"톤앤매너": A는 캐주얼, B는 전문적
+
+【 A 프롬프트 - 캐주얼 톤 】
+당신은 밈문화를 이해하는
+음료 마케터야. 우리 에너지
+음료 신제품을 "밈처럼 공유되는"
+인스타 카피 5개를 만들어줘.
+너무 진지하지 말고, 요즘
+20대가 웃을 만한 표현으로.
+
+【 B 프롬프트 - 전문적 톤 】
+당신은 음료업계 마케팅 전문가입니다.
+신제품 에너지 음료의 핵심 가치
+(에너지 지속성, 천연성분)를
+강조하는 프리미엄 카피 5개를 작성하세요.
+B2C 플랫폼(인스타그램)에 최적화된
+전문적이고 신뢰감 있는 톤으로.
+
+【 평가 지표 】
+✓ 클릭율 예상도(정성)
+✓ 브랜드 이미지 부합도(정성)
+✓ 단어수 효율성(정량)
+✓ 콜투액션 명확도(정성)
+
+결과: B가 신뢰도는 높지만
+공유도는 A가 40% 높음
+→ 하이브리드: 전문적 구조 +
+밈 요소 1-2개 조합</code>
+        </div>
+
+        <p><strong>💡 팁:</strong> 프롬프트 A/B 테스트는 초기 1-2주 집중 후, 좋은 버전을 "템플릿화"하면 향후 같은 업무는 재사용만 하면 됩니다. 이 과정을 반복하면 당신만의 <strong>"프롬프트 라이브러리"</strong>가 완성됩니다.</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>PHASE 2의 핵심은 <strong>"개인화"</strong>입니다. 일반적인 프롬프트 팁이 아니라, <strong>당신의 업종·직무·상황에 맞춘 프롬프트</strong>를 설계하고 지속적으로 개선하는 것입니다. 이 과정에서 A/B 테스트는 단순한 선택지가 아니라 <strong>프롬프트 문화</strong>입니다. 좋은 결과가 어디서 나왔는지 알면, 다음번엔 더 빨리 만들 수 있습니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">베스트 프랙티스</div>
+      <div class="glossary-en">Best Practice</div>
+      <div class="glossary-def">특정 분야나 업무에서 반복적으로 검증된 가장 효율적인 방법론이나 패턴을 말합니다. 프롬프트 맥락에선 업종별로 가장 좋은 성과를 낸 구조와 표현 방식을 의미합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">프롬프트 A/B 테스트</div>
+      <div class="glossary-en">Prompt A/B Testing</div>
+      <div class="glossary-def">두 개 이상의 프롬프트 버전을 동일한 조건에서 실행하여 어느 것이 더 나은 결과를 내는지 객관적으로 비교하는 방법론입니다. 한 가지 변수만 바꾼 뒤 여러 번 반복 실행해 평균을 내어 판단합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
