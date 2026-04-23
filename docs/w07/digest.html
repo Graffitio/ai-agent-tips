@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W07 · 실전 클리닉과 비즈니스 글쓰기 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#8B5CF6;--tue:#3B82F6;--wed:#10B981;--thu:#FBBF24;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .daily-topics{margin-top:28px;margin-bottom:28px}
+  .topic-day{margin-bottom:20px;padding:18px;background:var(--surface);border-left:4px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .topic-day.mon{border-left-color:var(--mon)}
+  .topic-day.tue{border-left-color:var(--tue)}
+  .topic-day.wed{border-left-color:var(--wed)}
+  .topic-day.thu{border-left-color:var(--thu)}
+  .topic-day.fri{border-left-color:var(--fri)}
+  .day-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .day-label.mon{color:var(--mon)}
+  .day-label.tue{color:var(--tue)}
+  .day-label.wed{color:var(--wed)}
+  .day-label.thu{color:var(--thu)}
+  .day-label.fri{color:var(--fri)}
+  .day-main{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:10px;line-height:1.5}
+  .day-tips{font-size:13px;color:var(--text-secondary);line-height:1.7}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;position:relative}
+  .tip-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--navy-deep)}
+  .tip-card.mon::before{background:var(--mon)}
+  .tip-card.tue::before{background:var(--tue)}
+  .tip-card.wed::before{background:var(--wed)}
+  .tip-card.thu::before{background:var(--thu)}
+  .tip-card.fri::before{background:var(--fri)}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W07 · MON–FRI</div>
+      <h1 class="header-title">실전 클리닉과<br>비즈니스 글쓰기</h1>
+      <p class="header-sub">프롬프트를 업무에 맞게 조정하고, 실제 일에 쓰는 방법</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.07~11 MON–FRI<br>☕ 25 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>지금까지 배운 프롬프트 기본기(Phase 1)는 <strong>AI를 이해하는 단계</strong>였습니다. 이번 주부터 시작하는 Phase 2는 <strong>AI를 일에 쓰는 단계</strong>입니다. 기본기를 자신의 업무 특성에 맞게 <strong>변형하고, 조정하고, 워크플로우로 엮어내는</strong> 방법을 배웁니다. 이번 주는 비즈니스 문서 작성의 다섯 가지 실전 시나리오를 다룹니다.</p>
+  </div>
+
+  <div class="daily-topics">
+    <div class="section-label">📅 주간 주제 미리보기</div>
+    
+    <div class="topic-day mon">
+      <div class="day-label mon">📌 MON · 프롬프트 개선</div>
+      <div class="day-main">Before/After로 보는 프롬프트 개선</div>
+      <div class="day-tips">
+        <strong>#061</strong> Before/After로 보는 프롬프트 개선(입문)<br>
+        <strong>#062</strong> 흔한 프롬프트 실수 Top 10(중급)
+      </div>
+    </div>
+
+    <div class="topic-day tue">
+      <div class="day-label tue">📌 TUE · 업종별 최적화</div>
+      <div class="day-main">업종별 프롬프트 베스트 프랙티스와 A/B 테스트</div>
+      <div class="day-tips">
+        <strong>#063</strong> 업종별 프롬프트 베스트 프랙티스(중급)<br>
+        <strong>#064</strong> 프롬프트 A/B 테스트 방법론(고급)
+      </div>
+    </div>
+
+    <div class="topic-day wed">
+      <div class="day-label wed">📌 WED · 워크플로우 구축</div>
+      <div class="day-main">프롬프트에서 워크플로로 전환하기, 이메일 자동화</div>
+      <div class="day-tips">
+        <strong>#065</strong> 프롬프트에서 워크플로로 전환하기(고급)<br>
+        <strong>#066</strong> 이메일: 상황별 톤 자동 조절(입문)
+      </div>
+    </div>
+
+    <div class="topic-day thu">
+      <div class="day-label thu">📌 THU · 비즈니스 문서</div>
+      <div class="day-main">보고서 스토리화, 제안서 설득 구조</div>
+      <div class="day-tips">
+        <strong>#067</strong> 보고서: 데이터를 스토리로 변환(중급)<br>
+        <strong>#068</strong> 제안서: 설득 구조 자동 설계(중급)
+      </div>
+    </div>
+
+    <div class="topic-day fri">
+      <div class="day-label fri">📌 FRI · 고급 문서 작성</div>
+      <div class="day-main">법률 문서 초안 보조, 다국어 동시 생성</div>
+      <div class="day-tips">
+        <strong>#069</strong> 계약서·법률 문서 초안 보조(고급)<br>
+        <strong>#070</strong> 다국어 비즈니스 문서 동시 생성(고급)
+      </div>
+    </div>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 10선</div>
+    
+    <article class="tip-card mon" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#061</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">프롬프트 개선</span>
+        </div>
+        <h2 class="tip-title">Before/After로 보는 프롬프트 개선</h2>
+      </div>
+      <div class="tip-body">
+        <p>같은 작업이라도 프롬프트를 어떻게 쓰느냐에 따라 결과가 180도 달라집니다. 핵심은 <strong>AI에게 "무엇을 해야 하는가"뿐만 아니라 "어떻게 생각해서 그렇게 해야 하는가"까지</strong> 알려주는 것입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Before / After</div>
+          <code>❌ Before:
+"고객 만족도 이메일 작성해줘"
+
+✅ After:
+"우리 고객이 제품을 샀지만 아직
+완전히 만족하지 못한 상태라고 가정해.
+이메일의 목표는 불안감을 없애고
+제품 가치를 다시 보여주는 것이야.
+톤은 따뜻하지만 비즈니스스럽게.
+3문단, 각 150자 이내로 작성해줘."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card mon" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#062</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">실수 패턴</span>
+        </div>
+        <h2 class="tip-title">흔한 프롬프트 실수 Top 10</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>1. 방향성 없는 질문</strong> ("좋은 콘텐츠 아이디어 줘" ❌)<br>
+<strong>2. 너무 긴 문맥</strong> (AI가 초점을 잃음)<br>
+<strong>3. 모호한 기준</strong> ("자연스럽게" vs "SEO 최적화" 명시 필요)<br>
+<strong>4. 역할 정의 부족</strong> ("마케터처럼" 같은 페르소나 부재)<br>
+<strong>5. 제약 조건 생략</strong> (글자 수, 형식, 타겟 미지정)<br>
+<strong>6. 예시 없음</strong> (원하는 스타일을 직접 보여주지 않음)<br>
+<strong>7. 한 번에 여러 작업</strong> (분석+추천+실행까지 한 프롬프트)<br>
+<strong>8. 결과만 원함</strong> (과정과 근거 요청 없음)<br>
+<strong>9. 테스트 없이 대량 사용</strong> (한 번 검증 후 스케일)<br>
+<strong>10. 피드백 미반영</strong> (한 번의 답변으로 끝냄)</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tue" id="tip-3">
+      <div class="tip-header" onclick="toggleTip('tip-3')">
+        <div class="tip-meta">
+          <span class="tip-num">#063</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">업종별 최적화</span>
+        </div>
+        <h2 class="tip-title">업종별 프롬프트 베스트 프랙티스</h2>
+      </div>
+      <div class="tip-body">
+        <p>각 업종은 고유한 프롬프트 패턴을 가집니다.</p>
+        <p><strong>🏪 이커머스</strong>: 상품 특성 + 구매자 페인포인트 + 객관적 수치<br>
+<strong>📱 SaaS</strong>: 문제 정의 + 솔루션 + 메트릭<br>
+<strong>📰 미디어</strong>: 타겟 이해도 + 논거 + 출처 명시<br>
+<strong>🏢 B2B 영업</strong>: 구매자 이해 + 이해관계 + 예산 규모<br>
+<strong>👤 HR/교육</strong>: 학습 목표 + 수준 + 결과물 용도</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tue" id="tip-4">
+      <div class="tip-header" onclick="toggleTip('tip-4')">
+        <div class="tip-meta">
+          <span class="tip-num">#064</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">테스트 방법론</span>
+        </div>
+        <h2 class="tip-title">프롬프트 A/B 테스트 방법론</h2>
+      </div>
+      <div class="tip-body">
+        <p>대량 작업에 프롬프트를 쓸 때는 먼저 작은 샘플(5~10개)로 A/B 테스트를 합니다. <strong>변수 하나만 바꾸고</strong> 결과를 비교한 뒤, 더 나은 버전으로 확대하세요.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 A/B 테스트 프레임</div>
+          <code>Step 1: 베이스 프롬프트 고정
+(상황 + 역할 + 목표)
+
+Step 2: 변수 선택 (1가지만)
+- A버전: 구체성 높음
+- B버전: 창의성 높음
+
+Step 3: 샘플 5개로 각각 실행
+
+Step 4: 검증 기준 정의
+(길이, 톤, 정확도, 실용성 등)
+
+Step 5: 승자 선택 → 확대 적용</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card wed" id="tip-5">
+      <div class="tip-header" onclick="toggleTip('tip-5')">
+        <div class="tip-meta">
+          <span class="tip-num">#065</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">워크플로우</span>
+        </div>
+        <h2 class="tip-title">프롬프트에서 워크플로로 전환하기</h2>
+      </div>
+      <div class="tip-body">
+        <p>"프롬프트"는 한 번의 질문이고, "워크플로"는 여러 단계의 작업 흐름입니다. 같은 일을 반복할 때는 워크플로로 만들어서 <strong>1) 입력 → 2) 처리 → 3) 검증 → 4) 출력</strong> 단계를 자동화하세요.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 워크플로 구성 예</div>
+          <code>🔄 뉴스레터 콘텐츠 자동화
+
+1️⃣ 입력: CSV 파일로 주제 5개 제공
+2️⃣ 처리: 
+   - 각 주제별 AI가 개요 작성
+   - 검토자 피드백 수집
+   - 최종 버전 작성
+3️⃣ 검증: 길이/톤/링크 자동 체크
+4️⃣ 출력: HTML로 변환 후 메일링 시스템 연동</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card wed" id="tip-6">
+      <div class="tip-header" onclick="toggleTip('tip-6')">
+        <div class="tip-meta">
+          <span class="tip-num">#066</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">이메일 자동화</span>
+        </div>
+        <h2 class="tip-title">이메일: 상황별 톤 자동 조절</h2>
+      </div>
+      <div class="tip-body">
+        <p>같은 메시지도 <strong>누구에게, 어느 상황에서 보내는지에 따라</strong> 톤이 달라져야 합니다. 프롬프트에 "상황 변수"를 추가하면 AI가 자동으로 톤을 조절합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 상황별 톤 조절 프롬프트</div>
+          <code>기본 정보:
+- 수신자: [이름]
+- 상황: [구매 후 1주일/구매 의도 미정/이탈 고객]
+- 목표: [구매 독려/불안감 해소/재관심 유도]
+
+내용: "우리 [제품명]을 [상황]에 있는
+분께 [목표]를 위해 이메일을 쓰겠습니다.
+톤은 [친근함/전문성/아쉬움] 중 어느 쪽인가요?"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card thu" id="tip-7">
+      <div class="tip-header" onclick="toggleTip('tip-7')">
+        <div class="tip-meta">
+          <span class="tip-num">#067</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">보고서 작성</span>
+        </div>
+        <h2 class="tip-title">보고서: 데이터를 스토리로 변환</h2>
+      </div>
+      <div class="tip-body">
+        <p>숫자만 나열하는 보고서는 읽지 않습니다. <strong>데이터 뒤에 "왜" 그런 결과가 나왔는지 스토리를</strong> 담아야 합니다. AI에게 "분석 → 인사이트 → 액션"의 3단계로 나누어 요청하세요.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 보고서 구조 프롬프트</div>
+          <code>1️⃣ 분석: 데이터만 제시
+   "3월 신규 고객 유입 25% 증가"
+
+2️⃣ 인사이트: 원인 찾기
+   "인스타그램 리타게팅 광고의 효과"
+
+3️⃣ 액션: 다음 단계
+   "4월에도 같은 채널에 예산 25% 증액,
+   다른 콘텐츠 3가지 A/B 테스트"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card thu" id="tip-8">
+      <div class="tip-header" onclick="toggleTip('tip-8')">
+        <div class="tip-meta">
+          <span class="tip-num">#068</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">제안서 작성</span>
+        </div>
+        <h2 class="tip-title">제안서: 설득 구조 자동 설계</h2>
+      </div>
+      <div class="tip-body">
+        <p>제안서를 쓸 때는 <strong>"상황 → 문제 → 우리 솔루션 → 결과 → CTA"의</strong> 5단계 설득 구조를 따릅니다. AI가 이 구조를 이해하도록 명확히 지시하면, 각 섹션이 논리적으로 연결됩니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 제안서 5단계 프롬프트</div>
+          <code>1️⃣ 상황: "귀사는 마케팅팀 규모가 3명인데..."
+2️⃣ 문제: "따라서 감당할 수 없는 작업량으로..."
+3️⃣ 솔루션: "우리의 AI 콘텐츠 플랫폼은..."
+4️⃣ 결과: "이를 통해 월 30시간 절감,"
+5️⃣ CTA: "다음 주 데모를 신청하시면..."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card fri" id="tip-9">
+      <div class="tip-header" onclick="toggleTip('tip-9')">
+        <div class="tip-meta">
+          <span class="tip-num">#069</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">법률 문서</span>
+        </div>
+        <h2 class="tip-title">계약서·법률 문서 초안 보조</h2>
+      </div>
+      <div class="tip-body">
+        <p>AI로 법률 문서를 완성할 수는 없지만, <strong>초안을 빠르게 만들고 변호사의 리뷰 시간을 줄일 수는</strong> 있습니다. 핵심은 "계약 조건을 명확히 입력"하고, 생성된 문서를 반드시 전문가 검토를 거치는 것입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 법률 문서 입력 템플릿</div>
+          <code>- 계약 주체: [회사 A] ↔ [회사 B]
+- 계약 기간: [2026년 4월 1일 ~ 2027년 3월 31일]
+- 주요 의무:
+  * A의 의무: [서비스 제공 및 SLA 99.9%]
+  * B의 의무: [월 100만원 지급]
+- 특수 조건: [경쟁금지 1년, 비밀유지]
+- 종료 조건: [상호 동의 또는 90일 전 통보]
+
+"위 조건을 반영한 서비스 이용 약관 초안을
+한국 법 기준으로 작성해줘.
+변호사 리뷰 전 체크리스트도 함께."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card fri" id="tip-10">
+      <div class="tip-header" onclick="toggleTip('tip-10')">
+        <div class="tip-meta">
+          <span class="tip-num">#070</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">다국어 문서</span>
+        </div>
+        <h2 class="tip-title">다국어 비즈니스 문서 동시 생성</h2>
+      </div>
+      <div class="tip-body">
+        <p>한 번의 프롬프트로 여러 언어의 문서를 동시에 생성하되, <strong>단순 번역이 아니라 "각 언어권의 비즈니스 관례"를</strong> 반영하도록 지시하세요.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💡 다국어 생성 프롬프트</div>
+          <code>다음 제안서를 한국어, 영어, 일본어로
+동시에 작성해줘. 단, 각 버전은:
+
+한국어: 존댓글, 존경-겸손한 톤
+영어(US): 직설적, 가치 중심
+영어(UK): 정중한, 상세한 설명
+일본어: 존경어 사용, 상호 이익 강조
+
+각 버전의 마지막에 "문화적 고려사항"을
+3줄씩 덧붙여줘.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 이번 주의 핵심</div>
+    <p><strong>Phase 2는 "일에 맞추는" 단계입니다.</strong> 기본 프롬프트를 알았으니, 이제는 그것을 <strong>자신의 업종, 팀 문화, 문서 유형에 맞게 변형하고 반복하고 시스템화</strong>하는 방법을 배웁니다. 이번 주 10가지 팁을 모두 실습하면, 당신은 더 이상 "AI 사용자"가 아니라 <strong>"AI를 일의 도구로 자유자재하게 다루는 사람"</strong>이 됩니다.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">다음 주는 Phase 2의 두 번째 주 — 더 깊은 응용 사례들 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
