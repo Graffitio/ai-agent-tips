@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W08 TUE — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3569B8;stop-opacity:1" /><stop offset="100%" style="stop-color:#1B1464;stop-opacity:1" /></linearGradient></defs><rect width="200" height="200" rx="40" fill="url(#logo-grad)"/><text x="100" y="130" font-family="JetBrains Mono,monospace" font-size="80" font-weight="900" text-anchor="middle" fill="white" letter-spacing="-2">4L</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W08 · TUE</div>
+      <h1 class="header-title">소셜 미디어 캘린더 자동 생성과<br>뉴스레터 시리즈 기획과 작성</h1>
+      <p class="header-sub">채널별 톤·형식·빈도 설계 · 독자 여정 기반 콘텐츠 설계</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.28 TUE<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>콘텐츠 마케팅의 핵심은 <strong>"일관성"</strong>입니다. 일관된 톤으로, 정해진 시간에, 정확한 메시지를 전달할 때 독자의 신뢰가 쌓입니다. 오늘은 AI와 함께 <strong>채널별 콘텐츠 전략을 설계</strong>하고 <strong>자동화된 편집 프로세스</strong>를 만드는 방법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#073</span>
+          <span class="tip-tag tag-intermediate">📘 중급</span>
+          <span class="tip-category">SNS 캘린더</span>
+        </div>
+        <h2 class="tip-title">소셜 미디어 캘린더 자동 생성</h2>
+      </div>
+      <div class="tip-body">
+        <p>매주 수작업으로 SNS 콘텐츠를 기획하는 것은 비효율적입니다. <strong>AI에게 채널별 가이드라인을 먼저 학습</strong>시킨 후, 반복되는 요청 패턴을 자동화하면 4주 분량의 콘텐츠를 하루 만에 생성할 수 있습니다.</p><p>핵심은 <strong>[브랜드 톤] + [채널 특성] + [타겟 여정]</strong>의 3가지 기준을 명확히 정의하는 것입니다. 일단 이것이 정해지면, AI는 매번 이 기준에 맞춰 콘텐츠를 자동으로 생성합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 구조</div>
+          <code>당신은 [브랜드명] 소셜 미디어 에디터야.
+
+## 브랜드 톤
+- 커뮤니케이션 스타일: [예: 친근하고 유머러스, 단어는 쉽고 짧게]
+- 핵심 메시지: [예: '일상 속 작은 변화가 모여 큰 차이를 만든다']
+
+## 채널별 포스팅 규칙
+- 인스타그램: 시각 중심, 해시태그 15-20개, 길이 150자 이내
+- 링크드인: 프로페셔널, 인사이트 강조, 200-300자
+- 틱톡: 짧고 임팩트 있게, 음악·자막 활용, 100자 이내
+
+## 타겟 여정 기반 주제 분배
+- 인지 단계(40%): 교육성 콘텐츠, 트렌드 해석
+- 관심 단계(35%): 사용 팁, 고객 사례
+- 결심 단계(25%): 프로모션, 세일, 리뷰
+
+이 조건 하에서 [주제]에 대해 4주 분량의 SNS 포스트(3채널)를 월별 캘린더 형식으로 생성해줘.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#074</span>
+          <span class="tip-tag tag-advanced">🔥 고급</span>
+          <span class="tip-category">뉴스레터 기획</span>
+        </div>
+        <h2 class="tip-title">뉴스레터 시리즈 기획과 작성</h2>
+      </div>
+      <div class="tip-body">
+        <p>한 번의 뉴스레터는 읽혀도, <strong>지속적으로 구독받으려면 시리즈 전략</strong>이 필요합니다. 독자의 여정을 고려해 4주, 8주, 12주 단위로 콘텐츠를 설계하면, 각 편이 이전 편을 강화하고 다음 편을 준비하는 효과가 생깁니다.</p><p><strong>독자 여정 기반 설계</strong>란 "첫 구독자가 어디서 시작하든, 8주 뒤에는 우리의 핵심 가치를 완전히 이해"하도록 구조화하는 것입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 8주 시리즈 구조</div>
+          <code>## 뉴스레터 시리즈: "AI 프롬프트 마스터" (8주)
+
+Week 1: 기초 개념 (왜 AI를 배워야 하는가)
+Week 2: 기본 스킬 (좋은 질문의 3가지 원칙)
+Week 3: 첫 적용 (내 업무에 AI 적용하기)
+Week 4: 심화 개념 (프롬프트의 구조)
+Week 5: 사례 연구 (성공한 사람들의 방법)
+Week 6: 도구 활용 (ChatGPT vs Claude vs Gemini)
+Week 7: 실전 프로젝트 (한 달 동안 해볼 미션)
+Week 8: 마스터 클래스 (Q&A + 커뮤니티 연결)
+
+## 각 편별 구성
+- 오프닝 (구독자의 감정 포착)
+- 핵심 개념 (2-3가지)
+- 실제 사례 (스크린샷, 결과값)
+- 액션 아이템 (이번 주 해볼 것)
+- 다음 주 티저 (계속 읽고 싶게)</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>콘텐츠 마케팅에서 AI의 최대 강점은 <strong>"규칙의 일관된 적용"</strong>입니다. 사람은 매번 새로운 기준으로 판단하지만, AI는 정해진 규칙을 완벽하게 지킵니다. 이 특성을 활용해 <strong>브랜드 가이드라인을 한 번 설정한 뒤, 수백 개의 콘텐츠를 일관되게 생성</strong>할 수 있습니다. 수고는 줄고, 일관성은 높이는 것 — 이것이 PHASE 2의 목표입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">채널별 톤 앤 매너</div>
+      <div class="glossary-en">Channel-Specific Tone & Manner</div>
+      <div class="glossary-def">각 플랫폼(인스타그램, 링크드인, 틱톡 등)의 사용자 특성에 맞춰 브랜드의 목소리를 조정하는 것. 같은 메시지도 채널에 따라 다른 톤과 형식으로 전달합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">독자 여정 맵핑</div>
+      <div class="glossary-en">Reader Journey Mapping</div>
+      <div class="glossary-def">구독자가 "모름 → 관심 → 신뢰 → 구매/행동"으로 나아가는 과정을 시간과 콘텐츠로 설계하는 작업. 각 단계에서 필요한 정보와 감정을 미리 파악하고 콘텐츠 시리즈를 구성합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
