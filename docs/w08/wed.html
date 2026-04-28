@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W08 WED — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMUIxNDY0Ii8+Cjwvc3ZnPg==" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W08 · WED</div>
+      <h1 class="header-title">콘텐츠 리퍼포징:<br>1 소스 N 채널</h1>
+      <p class="header-sub">하나의 원고를 여러 형식으로 · 헤드라인·슬로건·CTA 작성</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.29 WED<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>마케팅 팀이 가장 자주 하는 실수 중 하나는 <strong>"채널마다 새로운 콘텐츠를 만든다"</strong>는 것입니다. 하지만 프로들은 알고 있습니다. <strong>하나의 원고를 여러 형식으로 변환하는 것</strong>이 시간도 절약하고, 메시지 일관성도 높이고, 효율도 극대화한다는 것을 말이죠. 오늘은 1개의 소스가 N개의 채널로 변신하는 마법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#075</span>
+          <span class="tip-tag tag-advanced">⭐ 고급</span>
+          <span class="tip-category">콘텐츠 리퍼포징</span>
+        </div>
+        <h2 class="tip-title">고급 리퍼포징: 1 소스 N 채널</h2>
+      </div>
+      <div class="tip-body">
+        <p>블로그에서 쓴 1000자 글 하나를 가지고, 인스타 캡션, 트위터 스레드, 유튜브 썸네일 텍스트, 뉴스레터 헤더 등으로 <strong>동일한 메시지를 다양한 형식으로 변환</strong>할 수 있습니다. 핵심은 <strong>핵심 메시지는 유지하되, 각 채널의 특성에 맞춰 길이와 톤을 조정</strong>하는 것입니다.</p><p><strong>리퍼포징 체계</strong>: 원본(Block) → 기둥기사(Pillar) → 채널별 최적화(Distribution). 이 3단계를 거치면 하나의 아이디어가 10개 이상의 콘텐츠로 확대됩니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📌 1개 블로그 글 → 5가지 채널</div>
+          <code>원본: "AI 시대, 카피라이팅의 핵심은
+          감정 vs 논리의 밸런스다"
+
+🔵 인스타그램 캡션 (150자):
+"감정만으로는 오래 가지 않고,
+논리만으로는 마음이 안 움직인다.
+AI와의 협업에서는 둘의 밸런스가
+가장 중요한 스킬이다. 🎯
+자세한 내용은 프로필 링크에서!"
+
+🐦 트위터 스레드 (280자 × 3):
+"1/ AI 카피라이팅의 함정:
+AI는 논리적으로 완벽한 글을 쓴다.
+하지만 읽는 사람의 '마음'은
+꼿꼿한 논리로는 움직이지 않는다.
+
+2/ 감정과 논리, 둘 다 필요하다는
+걸 알면서도 대부분은
+AI 기본 출력물에 만족한다.
+여기가 바로 차별화의 지점이다.
+
+3/ 우리가 해야 할 일:
+AI가 만든 논리의 뼈대에
+인간만이 만들 수 있는 감정을
+덧입히는 것. 그게 진짜 AI 시대의
+카피라이팅이다."
+
+📺 유튜브 썸네일 텍스트:
+"AI 카피 | 감정 vs 논리 밸런스"
+
+📧 뉴스레터 헤더:
+"감정 없는 카피는 죽은 글.
+논리 없는 감정은 흐릿한 글.
+AI 시대의 진짜 스킬은?"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#076</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">카피라이팅</span>
+        </div>
+        <h2 class="tip-title">입문 카피라이팅: 한 줄의 힘</h2>
+      </div>
+      <div class="tip-body">
+        <p>카피라이팅은 어렵지 않습니다. <strong>헤드라인, 슬로건, CTA(Call-to-Action)</strong>이라는 3가지 요소만 제대로 쓸 수 있으면 됩니다. 이 3가지는 마치 영화의 포스터, 영화의 메시지, 영화를 보게 만드는 버튼과 같습니다.</p><p><strong>헤드라인</strong>: 관심을 끈다 / <strong>슬로건</strong>: 메시지를 전달한다 / <strong>CTA</strong>: 행동을 유도한다. 이 순서대로 AI에게 요청하면, 촘촘하고 설득력 있는 카피가 나옵니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">✍️ 헤드라인·슬로건·CTA 작성 흐름</div>
+          <code>📍 상품: 피로개선 비타민 음료 (20대 직장인 타겟)
+
+1️⃣ 헤드라인 (관심 유도)
+"밤샘 근무 후에도 피곤하지 않은
+이유, 알고 싶나요?"
+→ 직장인의 pain point를 질문 형태로 제시
+
+2️⃣ 슬로건 (핵심 메시지)
+"5시간의 수면으로 8시간의 활력을"
+→ benefit을 명확히 표현. 수식어 최소화
+
+3️⃣ CTA (행동 유도)
+"지금 구독하고, 첫 주문 30% 할인 받기"
+→ 구체적인 행동 + 인센티브의 조합
+
+═══════════════════════════════
+
+📍 같은 로직, 다양한 톤:
+
+🎯 이성적 톤:
+헤드라인: "과학이 증명한 피로 회복 성분"
+슬로건: "비타민 B복합체 + 홍삼 + 프로폴리스"
+CTA: "성분표 확인하고 주문하기"
+
+😊 감정적 톤:
+헤드라인: "일하다 말고, 나를 위한 2분"
+슬로건: "내 몸이 아는 회복의 기술"
+CTA: "피곤한 나에게 선물하기"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>콘텐츠 마케팅의 미래는 "다작(多作)"이 아니라 "영활(靈活)"입니다.</strong> 많은 콘텐츠보다는 <strong>하나의 좋은 원본을 여러 채널에 최적화해서 배포하는 것</strong>이 ROI를 높입니다. 블로그 하나를 쓸 때 "이걸 어떻게 10개로 변신시킬까?"를 먼저 생각하는 습관이 들면, 업무 효율은 물론 메시지 일관성도 한 단계 올라갑니다. AI는 이 변신을 놀라울 정도로 빠르고 정확하게 해냅니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">콘텐츠 리퍼포징</div>
+      <div class="glossary-en">Content Repurposing</div>
+      <div class="glossary-def">하나의 원본 콘텐츠(기사, 영상, 팟캐스트 등)를 다양한 형식과 채널에 맞춰 재가공하고 재배포하는 전략. 콘텐츠의 수명을 연장하고 도달 범위를 확대하는 효율적인 마케팅 기법입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">카피라이팅</div>
+      <div class="glossary-en">Copywriting</div>
+      <div class="glossary-def">독자의 행동을 유도하기 위해 설계된 광고 문구나 마케팅 텍스트를 작성하는 기술. 헤드라인, 슬로건, CTA, 제품 설명 등이 모두 카피라이팅의 영역입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
