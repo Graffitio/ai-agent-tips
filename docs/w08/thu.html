@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W08 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="32" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#1B1464">4lynx</text>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W08 · THU</div>
+      <h1 class="header-title">스토리텔링 프레임워크<br>활용과 브랜드 보이스</h1>
+      <p class="header-sub">영웅의 여정·STAR 프레임 적용 · 톤 가이드를 프롬프트에 녹이기</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.30 THU<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>콘텐츠는 정보가 아닙니다. 좋은 콘텐츠는 <strong>감정을 움직이는 이야기</strong>입니다. 오늘은 AI를 활용해 일관된 브랜드 톤을 유지하면서도 <strong>구조화된 스토리텔링</strong>을 만드는 두 가지 프레임을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#077</span>
+          <span class="tip-tag tag-intermediate">📘 중급</span>
+          <span class="tip-category">스토리텔링</span>
+        </div>
+        <h2 class="tip-title">스토리텔링 프레임워크 활용</h2>
+      </div>
+      <div class="tip-body">
+        <p>모든 좋은 이야기는 <strong>패턴</strong>을 따릅니다. 가장 검증된 두 가지가 <strong>영웅의 여정(Hero's Journey)</strong>과 <strong>STAR 프레임</strong>입니다. 전자는 감정 호소, 후자는 비즈니스 커뮤니케이션에 탁월합니다.</p>
+        <p><strong>영웅의 여정:</strong> 평범한 주인공 → 도전의 소환 → 조력자 출현 → 시련과 성장 → 귀환과 변화. 이 구조는 고객 사례, 브랜드 스토리에 완벽합니다.</p>
+        <p><strong>STAR 프레임:</strong> Situation(상황) → Task(과제) → Action(행동) → Result(결과). 면접 답변처럼 명확한 구조로, AI에게 정확히 지시하면 일관성 있는 결과물이 나옵니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>너는 마케팅 카피라이터야.
+다음 고객 사례를 STAR 프레임으로 정리해줘.
+
+[고객 정보]
+- 회사: 작은 규모 카페 체인
+- 문제: 신규 매장 오픈 후 고객 유입 부족
+- 우리 솔루션: SNS 마케팅 컨설팅
+
+[STAR 프레임으로 작성]
+S(상황): 매월 예상 목표 방문객 대비 40% 부족...
+T(과제): 한정된 광고 예산으로 타겟층 확보...
+A(행동): 우리가 제시한 3가지 액션...
+R(결과): 3개월 후 월 방문객 2.5배 증가...
+
+톤: 자신감 있으면서도 따뜻하고, 과장 없이 실제 수치 중심</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#078</span>
+          <span class="tip-tag tag-intermediate">📘 중급</span>
+          <span class="tip-category">브랜드 보이스</span>
+        </div>
+        <h2 class="tip-title">브랜드 보이스 일관성 유지</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>톤 가이드(Tone Guide)</strong>는 브랜드가 어떻게 말하는지를 정의합니다. AI에게 일관된 결과물을 만들게 하려면 이 가이드를 <strong>프롬프트에 명시적으로 녹여야</strong> 합니다.</p>
+        <p>톤 가이드는 다음 4가지로 구성됩니다: <strong>Voice(목소리, 브랜드 정체성)</strong> → <strong>Personality(성격, 어떤 사람인가)</strong> → <strong>Tone(톤, 상황별 목소리 변화)</strong> → <strong>Do's & Don'ts(해야 할 것, 금지)</strong></p>
+        <p>이를 프롬프트에 넣으면 첫 번째 요청부터 AI가 당신의 "말투"로 생각하고 출력합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 톤 가이드 프롬프트 작성</div>
+          <code>[브랜드 톤 가이드 선언]
+우리 브랜드는 '신뢰할 수 있는 친한 선배'입니다.
+
+Voice: 전문성을 갖되, 어렵지 않게 설명한다.
+Personality: 겸손하고, 도움이 되길 바라고, 약간의 유머가 있다.
+
+상황별 톤:
+- 뉘우스 공지: 명확하고 신뢰감 있게
+- 고객 응답: 따뜻하고 신속하게
+- 교육 콘텐츠: 친절하고 흥미롭게
+
+DO:
+✓ "~해요" 존댓글 사용
+✓ 구체적인 사례와 수치 포함
+✓ 과정보다 결과와 혜택 강조
+
+DON'T:
+✗ 경직된 기업 어조
+✗ 과장되거나 자극적인 표현
+✗ 고객을 가르치려는 톤</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>스토리텔링 프레임과 톤 가이드는 <strong>일회성 콘텐츠 하나</strong>가 아니라 <strong>브랜드 커뮤니케이션의 자산</strong>입니다. 한 번 정의해 두면, 팀 전체가 AI와 협업할 때 같은 목소리로 말할 수 있습니다. 특히 <strong>SNS 콘텐츠, 뉴스레터, 고객 응답</strong> 등 다양한 채널에서 일관성을 유지하는 것이 핵심입니다. 오늘부터 당신의 브랜드 "말투"를 명확히 정의하고, 모든 AI 프롬프트에 그것을 포함시키세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">스토리텔링 프레임</div>
+      <div class="glossary-en">Storytelling Framework</div>
+      <div class="glossary-def">이야기를 구조화하기 위한 틀. 영웅의 여정, STAR 프레임, 3막 구조 등이 있으며, 일관되게 적용하면 감정 호소력이 높아집니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">브랜드 톤 가이드</div>
+      <div class="glossary-en">Brand Tone Guide</div>
+      <div class="glossary-def">브랜드의 목소리, 성격, 상황별 톤을 명시한 문서. AI에게 이를 제공하면 일관된 브랜드 음성의 결과물을 기대할 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
