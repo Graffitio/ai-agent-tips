@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W08 · 콘텐츠 마케팅과 크리에이티브 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#7C3AED;--tue:#3B82F6;--wed:#10B981;--thu:#F59E0B;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .day-group{margin-bottom:26px}
+  .day-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--navy-deep);padding:0 2px}
+  .day-label::before{content:'';display:inline-block;width:6px;height:24px;border-radius:2px}
+  .day-label.monday::before{background:var(--mon)}
+  .day-label.tuesday::before{background:var(--tue)}
+  .day-label.wednesday::before{background:var(--wed)}
+  .day-label.thursday::before{background:var(--thu)}
+  .day-label.friday::before{background:var(--fri)}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:16px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--navy-deep);display:block;white-space:pre-wrap;word-break:break-word}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W08 · 월~금</div>
+      <h1 class="header-title">콘텐츠 마케팅과<br>크리에이티브</h1>
+      <p class="header-sub">아이디어부터 배포까지 — 콘텐츠를 만드는 전 과정을 AI와 함께</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.02.24~02.28<br>☕ 3~5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>좋은 콘텐츠는 아이디어와 실행력의 합작입니다. 이번 주는 <strong>블로그부터 소셜, 뉴스레터, 그리고 AI와의 협업까지</strong> — 현대적 콘텐츠 마케팅의 전 스펙트럼을 다룹니다. 각 채널의 특성을 이해하고, 콘텐츠를 똑똑하게 재활용하며, AI를 편집자로 활용하는 방법을 배워보세요.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 이번 주의 팁</div>
+
+    <div class="day-group">
+      <div class="day-label monday">MON · 블로그 포스트</div>
+      <article class="tip-card" id="tip-071">
+        <div class="tip-header" onclick="toggleTip('tip-071')">
+          <div class="tip-meta">
+            <span class="tip-num">#071</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">콘텐츠 기획</span>
+          </div>
+          <h2 class="tip-title">블로그 포스트 아이디어 브레인스토밍</h2>
+        </div>
+        <div class="tip-body">
+          <p>블로그는 여전히 가장 강력한 콘텐츠 자산입니다. 하지만 "무엇을 쓸까"에서 막힌다면, AI의 브레인스토밍 능력을 활용하세요.</p>
+          <p>핵심: <strong>당신의 고객이 자주 묻는 질문 3~5개를 먼저 수집</strong>하고, 그것을 AI에게 "이 질문들을 다루는 블로그 포스트 12개의 주제 목록을 만들어줘"라고 전달하면, AI는 SEO를 고려한 구조화된 콘텐츠 로드맵을 만들어냅니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"우리는 반려동물 건강식 판매 업체야.
+고객들이 가장 자주 묻는 질문:
+1. 개와 고양이의 영양 필요 차이?
+2. 수제식은 안전한가?
+3. 전환할 때 주의할 점?
+
+이 3가지를 기반으로,
+12주차 블로그 콘텐츠 달력을
+SEO 키워드와 함께 만들어줄래?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-071')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card" id="tip-072">
+        <div class="tip-header" onclick="toggleTip('tip-072')">
+          <div class="tip-meta">
+            <span class="tip-num">#072</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">콘텐츠 제작</span>
+          </div>
+          <h2 class="tip-title">SEO 최적화 콘텐츠 작성</h2>
+        </div>
+        <div class="tip-body">
+          <p>AI는 SEO 기본 원칙을 알고 있지만, <strong>당신의 경쟁 환경</strong>은 모릅니다. 따라서 "SEO 좋은 글"을 쓸 때는 구체적인 맥락을 제공해야 합니다.</p>
+          <p>프롬프트에 포함시켜야 할 것: (1) 메인 키워드, (2) 타겟 고객의 검색 의도, (3) 현재 상위 3개 페이지의 공통 구조, (4) 당신의 차별점. 이 4가지를 입력하면 AI가 생성하는 콘텐츠는 단순히 "설명만 좋은" 글이 아닌 "검색에서 이기는" 글이 됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"SEO 블로그 글을 쓸 거야.
+키워드: '스트레스 관리법'
+타겟: 30대 직장인
+의도: 현장에서 바로 쓸 수 있는 실행형
+
+상위 3개 페이지의 구조:
+- 스트레스의 정의와 영향
+- 5가지 방법론
+- 각 방법의 과학적 근거
+
+우리의 차별점:
+- 5분 이내에 실행 가능
+- 사무실에서 도구 불필요
+
+이걸 고려해서 1,800단어의
+SEO 블로그 글 구성안을 먼저
+만들어줄 수 있어?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-072')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-group">
+      <div class="day-label tuesday">TUE · 소셜 & 뉴스레터</div>
+      <article class="tip-card" id="tip-073">
+        <div class="tip-header" onclick="toggleTip('tip-073')">
+          <div class="tip-meta">
+            <span class="tip-num">#073</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">채널 관리</span>
+          </div>
+          <h2 class="tip-title">소셜 미디어 캘린더 자동 생성</h2>
+        </div>
+        <div class="tip-body">
+          <p>소셜 미디어 운영의 가장 큰 병목은 "매일 뭘 올릴지"입니다. AI를 캘린더 자동 생성기로 활용하면, <strong>한 번에 4주치 콘텐츠 아이디어와 일정을 만들 수 있습니다.</strong></p>
+          <p>방법: (1) 브랜드의 월간 테마 3~4개 정하기, (2) 각 테마당 콘텐츠 타입 지정 (교육/영감/프로모션), (3) AI에게 "이 테마들을 토대로 인스타그램 4주 캘린더 만들어줘. 월수금 피크시간 포스팅 기준"이라고 요청. 결과물은 날짜, 주제, 콘텐츠 포맷, 해시태그까지 포함될 겁니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"인스타그램 4주 콘텐츠 캘린더
+[브랜드: 요가 스튜디오]
+
+월간 테마:
+- 주 1-2주: 초보자 가이드
+- 주 3-4주: 학생 수강후기
+- 요일별: 월(팁), 수(영상), 금(라이프스타일)
+
+포스팅 시간: 평일 오전 9시
+포맷: 캐러셀/릴스/정적 이미지
+
+4주를 일단위로 풀어서 정리해줄래?
+각각 주제, 포맷, 콘셉트, 해시태그 포함해서."</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-073')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card" id="tip-074">
+        <div class="tip-header" onclick="toggleTip('tip-074')">
+          <div class="tip-meta">
+            <span class="tip-num">#074</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">콘텐츠 전략</span>
+          </div>
+          <h2 class="tip-title">뉴스레터 시리즈 기획과 작성</h2>
+        </div>
+        <div class="tip-body">
+          <p>뉴스레터는 가장 높은 ROI를 가진 채널입니다. 그런데 "일관된 시리즈물"로 운영하지 않으면 구독자는 떨어집니다.</p>
+          <p>뉴스레터를 성공시키려면: (1) 8주 단위의 콘텐츠 아크 설계, (2) 매 호마다 반복되는 섹션 구조, (3) 독자와의 상호작용 메커니즘 (질문, 투표). AI는 이 세 가지를 체계적으로 연결해줄 수 있습니다. "8주 뉴스레터 시리즈를 설계해줄래. 주제별 에스컬레이션 있게, 매회 구조는 같게, 독자 참여 포인트는 여기에"라고 하면 됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"8주 뉴스레터 시리즈 기획
+[주제: 마케팅 펀다멘탈]
+
+구조:
+1. 오프닝: 실제 사례
+2. 개념 설명
+3. 실전 적용법
+4. 독자 질문 코너
+
+주제 진행:
+주 1-2: 세그먼테이션
+주 3-4: 메시징
+주 5-6: 채널 선택
+주 7-8: 성과 측정
+
+각 주차의 섹션별 내용 개요와
+'이주의 질문' 주제 제안까지
+해줄 수 있어?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-074')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-group">
+      <div class="day-label wednesday">WED · 리퍼포징 & 카피</div>
+      <article class="tip-card" id="tip-075">
+        <div class="tip-header" onclick="toggleTip('tip-075')">
+          <div class="tip-meta">
+            <span class="tip-num">#075</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">멀티채널 전략</span>
+          </div>
+          <h2 class="tip-title">콘텐츠 리퍼포징: 1 소스 N 채널</h2>
+        </div>
+        <div class="tip-body">
+          <p>한 번 만든 콘텐츠를 여러 채널에 맞게 변형하는 것은 효율의 극대화입니다. 블로그 글 하나를 소셜 캐러셀, 유튜브 스크립트, 팟캐스트 개요, 이메일로 변환할 수 있습니다.</p>
+          <p>하지만 단순히 "짧게 요약"하는 게 아니라, <strong>각 채널의 특성에 맞는 톤, 포맷, 길이로 재구성</strong>해야 합니다. AI는 이 변환을 정확하게 해줍니다. 블로그 원문과 함께 "이 글을 인스타 릴스 스크립트(30초), 링크드인 카드(150글자), 유튜브 썸네일 텍스트로 변환해줄래?"라고 하면, 각각에 최적화된 버전을 얻을 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"블로그 글 리퍼포징:
+
+원문: [5000단어 블로그 글 붙여넣기]
+
+이 글을 다음 4가지로 변환해줘:
+1) 인스타그램 릴스 스크립트
+   → 30초, 자막용, 액션 중심
+2) 링크드인 포스트
+   → 150글자, 전문적 톤, CTA 포함
+3) 이메일 뉘스레터
+   → 300글자, 이야기체, 링크로 유도
+4) TikTok 스크립트
+   → 15초, 캐주얼한 톤, 트렌디함
+
+각각을 명확히 분리해서 작성해줄래?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-075')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card" id="tip-076">
+        <div class="tip-header" onclick="toggleTip('tip-076')">
+          <div class="tip-meta">
+            <span class="tip-num">#076</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">문체 기법</span>
+          </div>
+          <h2 class="tip-title">카피라이팅: 한 줄의 힘</h2>
+        </div>
+        <div class="tip-body">
+          <p>좋은 카피는 긴 설명을 대체합니다. 제목, 광고 헤드라인, CTA 버튼 텍스트 한 줄이 클릭을 결정합니다.</p>
+          <p>효과적인 한 줄 카피의 공식: <strong>["감정/호기심" + "이득" + "행동 동사"]</strong>. AI를 활용할 때는 (1) 목표 액션 명시, (2) 타겟 고객의 현재 상태, (3) 제공하는 변화를 구체적으로 전달하세요. 예: "바쁜 직장인이 '내 자산을 더 잘 관리하고 싶은데 시간이 없다'는 문제를 해결하는 자산 관리 앱의 헤드라인 5개를 만들어줄래?" 그럼 AI는 각각 다른 앵글의 강력한 한 줄을 만들어냅니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"광고 헤드라인 작성
+
+상품: 자산 관리 앱
+타겟: 30대 직장인 (바쁨)
+문제: 자산 관리는 해야 하는데 시간 없음
+솔루션: AI가 자동 관리
+
+5가지 앵글로 헤드라인 만들어줄래:
+1) 호기심형 (의외성)
+2) 이득형 (수치)
+3) 두려움 회피형
+4) 사회증명형
+5) 긴급성형
+
+각각 10~15글자 내외"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-076')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-group">
+      <div class="day-label thursday">THU · 스토리텔링 & 브랜드</div>
+      <article class="tip-card" id="tip-077">
+        <div class="tip-header" onclick="toggleTip('tip-077')">
+          <div class="tip-meta">
+            <span class="tip-num">#077</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">스토리 구조</span>
+          </div>
+          <h2 class="tip-title">스토리텔링 프레임워크 활용</h2>
+        </div>
+        <div class="tip-body">
+          <p>좋은 콘텐츠는 정보가 아닌 <strong>이야기</strong>입니다. 하지만 "좋은 이야기를 쓰라"는 추상적이죠. 프레임워크를 사용하면 AI도, 당신도 일관된 스토리를 만들 수 있습니다.</p>
+          <p>가장 실용적인 프레임: <strong>상황(Before) → 문제 → 전환점 → 해결(After) → 배운 점</strong>. 당신의 고객 사례, 제품 사용 사례, 개인 경험을 이 5단계로 AI에게 설명하면, AI는 그것을 감정적으로 호소력 있는 이야기로 재구성해줍니다. "우리 고객 OOO가 이런 상황에서 우리 제품을 썼더니 이렇게 변했어. 이걸 5단계 스토리로 정리해줄래?"라고 하면 됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"고객 성공 사례를 스토리로
+
+상황: 소매 상인, 월 100만원 매출
+문제: 재고 관리가 수작업, 실수 많음
+솔루션: 우리 POS 시스템 도입
+결과: 3개월 후 월 250만원 매출, 
+      실수 30% 감소
+
+이 사례를 다음 구조로 변환해줄래:
+1) Before 그려내기 (고통점)
+2) 터닝포인트 (우리 제품)
+3) After 변화 (구체적 수치)
+4) 배운 교훈 (다른 사업가를 위한)
+
+블로그 사례 글로 쓸 수 있게"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-077')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card" id="tip-078">
+        <div class="tip-header" onclick="toggleTip('tip-078')">
+          <div class="tip-meta">
+            <span class="tip-num">#078</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">브랜드 전략</span>
+          </div>
+          <h2 class="tip-title">브랜드 보이스 일관성 유지</h2>
+        </div>
+        <div class="tip-body">
+          <p>당신의 브랜드에는 특정한 "말투"가 있어야 합니다. 블로그, 소셜, 이메일 모두에서 일관된 톤을 유지하면 신뢰도가 올라갑니다.</p>
+          <p>AI가 당신의 브랜드 보이스를 학습하게 하는 방법: (1) "우리 브랜드 톤은 이렇다"를 명문화 (친근함/전문성/유머 수준을 0~10으로), (2) 기존에 잘 쓴 콘텐츠 예시 2~3개를 AI에게 보이기, (3) 새로운 콘텐츠를 쓸 때 "우리 브랜드 톤으로 이걸 다시 써줄 수 있어?"라고 요청. AI는 학습된 보이스를 적용해서 일관된 결과물을 만들어냅니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"우리 브랜드 톤 가이드:
+[기업명: 피자 배달 앱]
+
+톤 프로필:
+- 친근함: 8/10 (편한 존댓말)
+- 유머: 7/10 (밈, 재미있는 표현)
+- 전문성: 5/10 (캐주얼)
+- 지식성: 4/10 (깊이 없음, 가벼움)
+
+보이스 예시 (기존 글):
+[성공한 SNS 글 2개 붙여넣기]
+
+이제 이 제목의 소셜 포스트를
+우리 브랜드 톤으로 써줄래:
+'새로운 배달 추적 기능 출시'"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-078')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-group">
+      <div class="day-label friday">FRI · AI 협업 워크플로</div>
+      <article class="tip-card" id="tip-079">
+        <div class="tip-header" onclick="toggleTip('tip-079')">
+          <div class="tip-meta">
+            <span class="tip-num">#079</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">제작 프로세스</span>
+          </div>
+          <h2 class="tip-title">AI와 협업하는 창작 워크플로</h2>
+        </div>
+        <div class="tip-body">
+          <p>AI를 "자동 필기사"로 생각하면 안 됩니다. AI를 <strong>협업자</strong>로 대하면 결과물의 질이 확연히 달라집니다.</p>
+          <p>효과적인 워크플로: (1) 당신의 아이디어/경험을 거친 형태로 AI에게 설명, (2) AI가 생성한 초안 검토 및 피드백 (어떤 부분이 당신의 의도와 맞지 않는지), (3) AI에게 피드백을 반영해 재작성 요청, (4) 최종 손질(당신이 직접). 이 과정에서 중요한 건 "AI는 빠른 아웃풋을 제공하는 파트너"라는 마인드. 처음부터 완벽한 결과물을 기대하지 말고, 반복적 개선에 집중하세요.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 워크플로 예시</div>
+            <code>1단계 - 아이디어 전달 (당신)
+"우리 고객 OOO의 성공 사례를 
+영상 스크립트로 만들고 싶어.
+핵심은 그의 인내와 작은 시작이 
+결과를 만들었다는 거야."
+
+2단계 - 초안 생성 (AI)
+[AI가 스크립트 생성]
+
+3단계 - 피드백 (당신)
+"좋지만, 초반부가 너무 길어.
+그 부분을 20초로 줄이고,
+더 감정적으로 만들어줄래?"
+
+4단계 - 재작성 (AI)
+[수정 버전 제공]
+
+5단계 - 최종 손질 (당신)
+실제 영상에 맞춰 타이밍 조정,
+자막 추가, 톤 미세 조정</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-079')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card" id="tip-080">
+        <div class="tip-header" onclick="toggleTip('tip-080')">
+          <div class="tip-meta">
+            <span class="tip-num">#080</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">편집 전략</span>
+          </div>
+          <h2 class="tip-title">편집자로서의 AI 활용</h2>
+        </div>
+        <div class="tip-body">
+          <p>AI는 좋은 콘텐츠 에디터가 될 수 있습니다. 당신이 쓴 글을 AI에게 보여주고, 특정 관점에서 피드백을 받을 수 있습니다.</p>
+          <p>활용 방법: (1) "이 글을 읽은 초보자가 이해할 수 있을까? 너무 어려운 부분이 있으면 표시해줄래?" → 명확성 점검, (2) "이 문장들이 중복된 개념인가? 너무 길면 더 짧게 할 수 있는 방법이 있을까?" → 간결성 점검, (3) "이 글에서 가장 임팩트 있는 문장 3개는?" → 하이라이트 추출, (4) "SEO 관점에서 이 제목은 어떨까? 더 나은 버전은?" → SEO 최적화. 즉, 에디터 역할을 AI에게 위임하면 당신은 창작에만 집중할 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>"편집자 모드로 작동해줄래.
+내가 쓴 글을 평가해주고
+개선 제안을 해줘.
+
+[당신의 글 붙여넣기]
+
+다음 기준으로 평가해줄래:
+1) 명확성: 초보자도 이해할까?
+   → 너무 어려운 부분 표시
+2) 간결성: 불필요한 중복은?
+   → 압축 가능한 문장 표시
+3) 임팩트: 가장 강한 문장 3개?
+4) 제목: SEO 관점에서 개선안?
+
+각 항목별로 피드백해줄래?"</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-080')">▼ 자세히 보기</div>
+      </article>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 빅 픽처 · 이번 주의 교훈</div>
+    <p>이번 주를 통틀어 하나의 진리가 드러납니다: <strong>좋은 콘텐츠는 "한 번의 창작"이 아니라 "여러 번의 반복"</strong>이라는 것입니다. 블로그에서 시작한 아이디어가 소셜에서 소비되고, 뉴스레터로 심화되고, 비디오로 재해석됩니다. 각 채널에서 일관된 메시지를 유지하면서도 각 채널의 특성에 맞게 변형됩니다. AI는 이 모든 과정을 <strong>빠르게, 일관되게</strong> 해줍니다. 가장 중요한 것은 당신이 "처음 아이디어"를 만드는 것. 그 이후의 배포, 변형, 최적화는 AI와 함께 하세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이번 주의 핵심 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">콘텐츠 리퍼포징</div>
+      <div class="glossary-en">Content Repurposing</div>
+      <div class="glossary-def">하나의 콘텐츠(예: 블로그 글)를 여러 채널과 포맷(소셜, 비디오, 팟캐스트 등)에 맞게 변형하여 재사용하는 전략. 제작 비용 대비 도달 범위를 극대화합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">브랜드 보이스</div>
+      <div class="glossary-en">Brand Voice</div>
+      <div class="glossary-def">브랜드의 고유한 의사소통 스타일. 톤, 어조, 단어 선택, 유머 수준, 전문성 정도 등의 일관된 특징. 모든 채널에서 유지되어야 신뢰성이 높아집니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">CAC (Customer Acquisition Cost)</div>
+      <div class="glossary-en">Customer Acquisition Cost</div>
+      <div class="glossary-def">새로운 고객 한 명을 획득하는 데 드는 비용. 콘텐츠 마케팅은 이 비용을 낮추는 가장 효율적인 방법입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내주는 개인 브랜딩과 포트폴리오 전략입니다 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
