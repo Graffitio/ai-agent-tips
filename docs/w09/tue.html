@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W09 TUE — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI2IiBmaWxsPSIjMzU2OUI4Ii8+PHBhdGggZD0iTTEwIDEwSDIySzEwIDE0SDIyTTEwIDIySDE2TTEwIDE4SDIwIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W09 · TUE</div>
+      <h1 class="header-title">사내 위키·FAQ 자동 정리와<br>릴리스 노트 자동 생성 파이프라인</h1>
+      <p class="header-sub">흩어진 정보를 구조화 · 커밋 로그→사용자 친화적 노트</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.05 TUE<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>팀이 커질수록 <strong>문서는 흩어지고, 정보는 중복된다</strong>는 문제에 직면합니다. 오늘은 AI를 활용해 <strong>흩어진 정보를 자동으로 구조화</strong>하고, <strong>개발 로그를 사용자 친화적인 노트로 변환</strong>하는 두 가지 실무 기법을 배웁니다. 이 두 가지만 제대로 자동화해도 <strong>팀의 문서 운영 비용이 70% 절감</strong>된다는 통계가 있습니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#083</span>
+          <span class="tip-tag tag-intermediate">📚 중급</span>
+          <span class="tip-category">지식 관리</span>
+        </div>
+        <h2 class="tip-title">사내 위키·FAQ 자동 정리 — 흩어진 정보를 구조화</h2>
+      </div>
+      <div class="tip-body">
+        <p>Slack 채널, Notion 페이지, 이메일, 공유드라이브 등 곳곳에 산재한 Q&A와 가이드들. 이런 정보들을 <strong>AI가 자동으로 수집·분류·정제</strong>해서 하나의 구조화된 Wiki로 만들 수 있습니다.</p>
+        <p><strong>작동 원리:</strong> (1) 여러 소스에서 텍스트 추출 → (2) AI로 핵심 내용 요약 및 카테고리 분류 → (3) 중복 탐지 및 통합 → (4) 일관된 템플릿으로 정리 → (5) 월 1회 자동 갱신</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 구체적인 파이프라인</div>
+          <code>입력: 여러 소스의 원문
+"Slack #general: 결제 연동 어떻게 하는데?"
+"Notion: 결제 문서 (3개월 전, 부분적)"
+"이메일 스레드: 결제 오류 처리 방법들"
+
+AI 프롬프트:
+"위 3가지 소스의 정보를 바탕으로,
+'결제 시스템' 주제의 FAQ를 만들어줘.
+구성: 개념·절차·자주 묻는 오류·해결법
+형식: 마크다운"
+
+출력: 구조화된 FAQ
+## 결제 시스템
+### 개념
+[핵심 설명]
+### 시작하기
+[단계별 절차]
+### 자주 묻는 오류
+[Q&A 5개]
+### 문제 해결
+[트러블슈팅]</code>
+        </div>
+        <p style="margin-top:12px;"><strong>추천 도구:</strong> Zapier + ChatGPT API (자동 연동), 또는 Python 스크립트 + Claude (더 복잡한 분류 필요 시)</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#084</span>
+          <span class="tip-tag tag-advanced">🔧 고급</span>
+          <span class="tip-category">문서 자동화</span>
+        </div>
+        <h2 class="tip-title">릴리스 노트 자동 생성 파이프라인 — 커밋 로그→사용자 친화적 노트</h2>
+      </div>
+      <div class="tip-body">
+        <p>개발팀의 커밋 로그는 기술 용어로 가득하지만, 사용자가 읽을 릴리스 노트는 <strong>변화와 이점을 쉬운 말로</strong> 설명해야 합니다. 이 변환을 AI가 자동으로 처리할 수 있습니다.</p>
+        <p><strong>작동 원리:</strong> (1) Git 저장소에서 최신 N개 커밋 추출 → (2) 커밋 메시지와 파일 변경사항 분석 → (3) 기능·버그픽스·성능개선 카테고리로 자동 분류 → (4) 사용자 입장에서 재작성 → (5) 모든 변경사항에 영향도 설명 추가</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 자동 변환 예시</div>
+          <code>입력: Git 커밋 로그
+commit a3f8c2: "feat: implement debounce in search"
+commit b7d1e9: "fix: memory leak in async handler"
+commit c2k4p5: "perf: optimize image loading via lazy"
+commit d9m6r3: "chore: update dependencies"
+
+AI 프롬프트:
+"아래 커밋들을 보고, 일반 사용자가 이해할
+릴리스 노트를 작성해줘. 각 항목별로:
+- 사용자 관점의 개선 설명
+- 예상되는 긍정적 영향
+- 주의사항 (있으면)
+
+마크다운 형식, 이모지 포함"
+
+출력: 사용자 친화적 릴리스 노트
+## v2.3.0 릴리스 노트
+✨ **검색이 더 빨라졌어요**
+입력할 때마다 즉시 반응하는 개선된
+검색 경험. 불필요한 요청을 줄여
+더 빠른 결과를 받을 수 있습니다.
+
+🐛 **메모리 누수 문제 해결**
+장시간 앱을 사용할 때 느려지는 문제를
+수정했습니다. 이제 더 안정적으로
+사용할 수 있습니다.
+
+⚡ **이미지 로딩 성능 개선**
+사진이 많은 페이지에서 로딩 속도가
+대폭 향상되었습니다. (평균 40% 빨라짐)</code>
+        </div>
+        <p style="margin-top:12px;"><strong>구현 팁:</strong> GitHub Actions + ChatGPT API로 릴리스 태그 생성 시 자동 실행. 또는 Jenkins/GitLab CI에 통합 가능. 템플릿을 정해두면 스타일이 일관됨.</p>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>이 두 기법의 핵심은 <strong>"정보의 source of truth를 하나로"</strong>라는 원칙입니다. 위키와 릴리스 노트는 수동으로 관리할수록 점점 구시대가 되지만, AI의 자동화를 통해 <strong>항상 최신 상태</strong>를 유지할 수 있습니다. 더 중요한 것은, 팀의 시간을 <strong>단순 문서 작성에서 전략적 의사결정으로 해방</strong>시킨다는 점입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">릴리스 노트</div>
+      <div class="glossary-en">Release Notes</div>
+      <div class="glossary-def">새 버전 출시 시 사용자에게 알리는 문서. 새로운 기능, 개선사항, 버그 수정, 주의사항 등을 포함합니다. 기술적이지 않으면서도 정확해야 합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">커밋 로그</div>
+      <div class="glossary-en">Commit Log</div>
+      <div class="glossary-def">Git에서 관리되는 코드 변경 이력. 개발자가 작성한 커밋 메시지와 변경된 파일 목록으로 구성되며, 보통 기술 용어로 기술됩니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
