@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W09 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --color-mon:#9333EA;--color-tue:#3B82F6;--color-wed:#10B981;--color-thu:#FBBF24;--color-fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;display:flex;border-left:4px solid var(--border)}
+  .tip-card.mon{border-left-color:var(--color-mon)}
+  .tip-card.tue{border-left-color:var(--color-tue)}
+  .tip-card.wed{border-left-color:var(--color-wed)}
+  .tip-card.thu{border-left-color:var(--color-thu)}
+  .tip-card.fri{border-left-color:var(--color-fri)}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-content{flex:1}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W09 · MON-FRI</div>
+      <h1 class="header-title">기술 문서와<br>데이터 분석 기초</h1>
+      <p class="header-sub">AI가 복잡한 자료를 정리하고 인사이트를 뽑아내는 방법</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.09—13 MON-FRI<br>☕ 15 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p><strong>복잡한 정보는 AI에게 맡기고, 의사결정은 인간이 한다</strong> — 이것이 실무 효율화의 핵심입니다. 9주차는 기술 문서의 자동화부터 엑셀 데이터 분석, 통계 해석까지 <strong>문서와 데이터를 AI에게 "일 시키는" 방법</strong>을 배웁니다. 구체적인 프롬프트와 워크플로우로 당신의 업무를 3배 빠르게 만들어보세요.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 10선</div>
+    
+    <!-- MON -->
+    <article class="tip-card mon" id="tip-1">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-1')">
+          <div class="tip-meta">
+            <span class="tip-num">#081</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">기술 문서</span>
+          </div>
+          <h2 class="tip-title">기술 문서를 쉬운 말로 바꾸기</h2>
+        </div>
+        <div class="tip-body">
+          <p>개발자들이 쓴 API 문서나 기술 스펙은 낯설고 딱딱합니다. <strong>이 문서를 비개발자도 이해할 수 있는 언어로 번역하는 것</strong>이 첫 번째 실무 활용입니다.</p><p>핵심: "<strong>다음 기술 문서를 [대상 직군]도 이해할 수 있게 쉽게 설명해줘. 예시도 넣고, 도표로 정리해줄 수 있으면 더 좋아.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"다음 REST API 문서를 마케팅팀도 
+이해할 수 있게 다시 써줘. 각 엔드포인트가
+실제로 뭘 하는지, 어디서 쓰이는지 
+예시와 함께 설명해줘.
+
+[API 문서 원문 붙여넣기]"
+
+📊 Output:
+- 각 API의 역할을 마케팅 용어로 설명
+- 실제 마케팅 캠페인에서 쓰는 사례
+- 일반인도 알 수 있는 다이어그램</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card mon" id="tip-2">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-2')">
+          <div class="tip-meta">
+            <span class="tip-num">#082</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">문서 자동화</span>
+          </div>
+          <h2 class="tip-title">API 문서·가이드 자동 생성</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>API 코드만으로도 완성도 높은 API 문서를 자동 생성</strong>할 수 있습니다. AI가 코드를 읽고 사용법, 에러 처리, 예제까지 정리하는 것이죠.</p><p>개발자: <strong>"이 코드의 API 문서를 OpenAPI/Swagger 형식으로 생성해줘. 각 엔드포인트마다 사용 예시, 에러 코드, 권한 요구사항을 포함해서."</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"다음은 우리 백엔드 코드야. 
+이를 바탕으로 완전한 API 문서를
+OpenAPI 3.0 형식으로 만들어줘.
+
+1. 모든 엔드포인트 나열
+2. 요청/응답 스키마
+3. 실제 cURL 사용 예시
+4. 각 HTTP 상태 코드별 에러 설명
+
+[Python/Node.js 코드 붙여넣기]"
+
+📊 Output:
+- OpenAPI YAML 파일 생성
+- 각 엔드포인트별 사용 가이드
+- 클라이언트가 바로 쓸 수 있는 예제</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <!-- TUE -->
+    <article class="tip-card tue" id="tip-3">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-3')">
+          <div class="tip-meta">
+            <span class="tip-num">#083</span>
+            <span class="tip-tag tag-intermediate">⚡ 중급</span>
+            <span class="tip-category">지식 관리</span>
+          </div>
+          <h2 class="tip-title">사내 위키·FAQ 자동 정리</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>흩어진 문서들을 하나의 체계적인 위키로 통합</strong>하고, 자주 묻는 질문을 자동으로 추출해 FAQ를 만듭니다.</p><p>프롬프트: "<strong>다음 사내 문서들을 읽고, 핵심 정보를 주제별로 분류해서 위키 형식으로 정리해줘. 그리고 자주 나올 법한 질문 Top 10을 뽑아줄 수 있어?</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"우리 팀의 온보딩 가이드, 프로젝트 
+문서, Slack 메시지들이 여기 있어.
+이걸 다음 형식으로 정리해줄 수 있어?
+
+1. 주제별 분류 위키 (마크다운)
+2. 신입도 물어볼 법한 FAQ 20개
+3. 각 문서의 최신성 체크리스트
+
+[여러 문서 붙여넣기]"
+
+📊 Output:
+- 카테고리별 정리된 위키 문서
+- 검색 가능한 FAQ 데이터베이스
+- 업데이트 필요한 항목 플래그</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-4">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-4')">
+          <div class="tip-meta">
+            <span class="tip-num">#084</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">자동화</span>
+          </div>
+          <h2 class="tip-title">릴리스 노트 자동 생성 파이프라인</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>Git 커밋, GitHub Issues, 코드 변경사항을 자동으로 수집해서 전문가적인 릴리스 노트를 생성</strong>합니다. 여러 단계를 연결한 실전 워크플로우죠.</p><p>프롬프트 연쇄: ① 커밋 로그 요약 → ② 기능/버그 분류 → ③ 사용자 입장의 릴리스 노트 작성 → ④ 마케팅팀용 간략본 생성</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>🔄 4단계 파이프라인:
+
+1️⃣ (AI에게 커밋 로그 분석 요청)
+"v3.2.0 릴리스를 위한 지난 2주 커밋을
+요약해줄 수 있어? 각 커밋의 의도와
+영향 범위를 정리해줘."
+
+2️⃣ (분류)
+"그 커밋들을 Feature(새기능), 
+Bugfix(버그), Perf(성능)로 분류하고,
+사용자가 알아야 할 항목만 골라줘."
+
+3️⃣ (릴리스 노트 작성)
+"2️⃣ 결과를 바탕으로 개발자용 
+릴리스 노트를 마크다운으로 작성해줘.
+마이그레이션 가이드도 포함해."
+
+4️⃣ (마케팅 버전)
+"3️⃣ 릴리스 노트를 마케팅팀이 
+블로그에 쓸 수 있게 평이한 말로 
+다시 써줄 수 있어?"
+
+📊 최종 Output:
+- 개발자용 상세 릴리스 노트
+- 마케팅용 블로그 포스트
+- 고객 공지용 요약본</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <!-- WED -->
+    <article class="tip-card wed" id="tip-5">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-5')">
+          <div class="tip-meta">
+            <span class="tip-num">#085</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">지식 시스템</span>
+          </div>
+          <h2 class="tip-title">지식 그래프 기반 문서 연결</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>산재된 문서들 사이의 관계를 AI가 자동으로 발견</strong>해서 "이 문서도 읽으면 도움이 될 거야"라고 추천합니다. 지식 네트워크를 구축하는 고급 기법이에요.</p><p>프롬프트: "<strong>다음 문서들을 읽고, 문서 간 연관성을 분석해줄 수 있어? 각 문서가 어떤 개념을 다루고, 어느 문서와 연결되는지 JSON 그래프 형식으로 만들어줘.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"우리 팀 위키의 이 50개 문서를 읽고
+문서 간 연결 관계를 분석해줄 수 있어?
+
+Output 형식:
+{
+  "nodes": [
+    {"id": "문서명", "category": "분류"}
+  ],
+  "links": [
+    {
+      "source": "문서A",
+      "target": "문서B",
+      "relation": "관련개념/선행학습/심화내용"
+    }
+  ]
+}
+
+[50개 문서 텍스트]"
+
+📊 Output:
+- 문서 간 연관성 JSON 그래프
+- 각 문서의 '다음 추천 읽을거리' 자동 생성
+- 학습 경로 자동 제안</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-6">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-6')">
+          <div class="tip-meta">
+            <span class="tip-num">#086</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">데이터 분석</span>
+          </div>
+          <h2 class="tip-title">엑셀 데이터를 AI에게 분석시키기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>엑셀 데이터를 AI에게 넣으면 추세, 이상치, 패턴을 자동으로 발견</strong>합니다. 통계 지식이 없어도 AI가 해석해줘요.</p><p>프롬프트: "<strong>다음 데이터를 분석해줄 수 있어? 어떤 추세가 보이고, 뭐가 이상한지, 어떤 인사이트가 숨어 있는지 알려줘.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"월별 판매량, 고객수, 환불율 데이터가
+여기 있어. 이를 분석해서 다음을 
+알려줄 수 있어?
+
+1. 3개월 추세 (증가/감소/정체)
+2. 이상한 달이 있는지
+3. 변수들 간의 상관관계
+4. 다음 분기 예상
+
+[엑셀 데이터 또는 CSV 붙여넣기]"
+
+📊 Output:
+- 각 변수별 트렌드 분석
+- 이상 구간 플래그
+- 원인 가설 제시
+- 간단한 예측치</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <!-- THU -->
+    <article class="tip-card thu" id="tip-7">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-7')">
+          <div class="tip-meta">
+            <span class="tip-num">#087</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">시각화</span>
+          </div>
+          <h2 class="tip-title">자연어로 차트 만들기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>"이 데이터를 이렇게 보고 싶어"라고 말하면, AI가 Python/R/JavaScript 차트 코드를 생성</strong>합니다. 엑셀 차트 수준을 벗어나는 것이 가능해요.</p><p>프롬프트: "<strong>이 데이터로 [차트 유형] 차트를 만들어줄 수 있어? [도구] 코드로 부탁해. 대시보드에 쓸 거라서 보기 좋게 스타일링도 해줄 수 있으면 좋겠어.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"월별 매출, 비용, 이윤 데이터가 있어.
+
+1. 세 개를 한 차트에 보여줄 수 있을까?
+   (매출/비용은 막대, 이윤율은 선)
+2. Python plotly 코드로 부탁해
+3. 대시보드 느낌으로 색상도 해줘
+
+[CSV 데이터]"
+
+📊 Output:
+- 완성도 높은 Plotly Python 코드
+- 대시보드 스타일 적용
+- 대화형 차트 (마우스 호버 등)</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-8">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-8')">
+          <div class="tip-meta">
+            <span class="tip-num">#088</span>
+            <span class="tip-tag tag-intermediate">⚡ 중급</span>
+            <span class="tip-category">분석</span>
+          </div>
+          <h2 class="tip-title">피벗 테이블 없이 크로스탭 분석</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>엑셀의 피벗 테이블 없이, AI가 자동으로 데이터를 다차원으로 집계하고 분석</strong>합니다. "고객 나이별, 상품 카테고리별 매출"처럼 복합 분석도 한 번에요.</p><p>프롬프트: "<strong>이 데이터를 [행], [열] 기준으로 [값] 을 집계해줄 수 있어? 피벗 테이블 형식으로 정리하고, 각 셀의 의미도 설명해줘.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"고객 데이터가 있어:
+- 나이대 (20s, 30s, 40s+)
+- 성별 (M/F)
+- 매출
+- 반복 구매율
+
+이 데이터를 나이대(행) x 성별(열)로
+매출을 합산한 크로스탭으로 만들어줄 수 있어?
+그 다음 반복 구매율도 같은 방식으로.
+
+[고객 데이터 CSV]"
+
+📊 Output:
+- 나이대×성별 매출 크로스탭
+- 나이대×성별 반복 구매율 크로스탭
+- 각 행/열의 합계 및 증감률</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <!-- FRI -->
+    <article class="tip-card fri" id="tip-9">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-9')">
+          <div class="tip-meta">
+            <span class="tip-num">#089</span>
+            <span class="tip-tag tag-intermediate">⚡ 중급</span>
+            <span class="tip-category">데이터 정제</span>
+          </div>
+          <h2 class="tip-title">이상치 탐지와 데이터 클리닝</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>AI가 데이터의 오류, 이상치, 누락을 자동으로 찾아내고, 정제 방법을 제안</strong>합니다. 분석 전 데이터 품질을 확보하는 것이 핵심이에요.</p><p>프롬프트: "<strong>이 데이터에서 이상치나 오류가 있는지 찾아줄 수 있어? 각 항목별로 문제점과 해결 방안도 제시해줄 수 있으면 좋겠어.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"2년치 거래 데이터가 여기 있어.
+데이터 품질을 체크해줄 수 있어?
+
+1. 누락된 값이 몇 개?
+2. 말이 안 되는 값들
+   (예: 가격이 음수, 나이가 200살)
+3. 형식 오류 (날짜 형식 불일치 등)
+4. 각 문제별 정제 방법 제시
+
+[CSV 데이터]"
+
+📊 Output:
+- 이상치 목록 (행 번호 포함)
+- 누락 패턴 분석
+- 정제 전/후 비교
+- 정제된 CSV</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-10">
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-10')">
+          <div class="tip-meta">
+            <span class="tip-num">#090</span>
+            <span class="tip-tag tag-advanced">🔥 고급</span>
+            <span class="tip-category">통계</span>
+          </div>
+          <h2 class="tip-title">통계 분석 해석을 AI에게 맡기기</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>p-값, 신뢰도, 회귀 계수 같은 통계 용어를 AI가 평이하게 해석</strong>해줍니다. 통계 지식이 없는 의사결정자도 결과를 이해할 수 있어요.</p><p>프롬프트: "<strong>[통계 분석 결과]를 비통계 전공자도 이해할 수 있게 해석해줄 수 있어? 핵심 결론과 의사결정에 미치는 영향도 알려줄 수 있으면 좋겠어.</strong>"</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 활용 예시</div>
+            <code>📝 Prompt:
+"다음은 A/B 테스트 결과야:
+
+Control: 평균 전환율 3.2% (n=50000)
+Test: 평균 전환율 3.8% (n=50000)
+p-value: 0.032
+신뢰도: 95%
+
+이게 뭘 의미하는 거야? 
+이 테스트 결과가 실제로 의미 있는 건가?
+어떻게 의사결정해야 해?"
+
+📊 Output:
+- p-value 0.032의 의미 (평이한 설명)
+- 실제 비즈니스 임팩트 (누가 더 이득?)
+- 의사결정 권고사항
+- 주의사항 (표본 크기 등)</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트 · 큰 그림</div>
+    <p><strong>W09는 "AI를 문서화와 데이터 분석의 파트너로 쓰는" 주간입니다.</strong> MON-TUE는 기술 문서 자동화(쉬운 말 번역, API 문서, 위키 통합, 릴리스 노트), WED는 지식 그래프와 데이터 분석의 입문, THU-FRI는 실제 엑셀 데이터를 분석하고 시각화하고 정제하는 <strong>전체 데이터 파이프라인</strong>을 배웁니다.</p>
+    <p style="margin-top:12px;"><strong>가장 중요한 깨달음:</strong> 당신이 통계나 프로그래밍을 몰라도 괜찮습니다. AI에게 <strong>"이 데이터 뭔가 이상한데?"</strong>, <strong>"이 기술 문서 평이하게 설명해줄 수 있어?"</strong>라고 물으면, AI가 전문가처럼 답합니다. 당신은 <strong>그 결과를 이해하고 의사결정하기만 하면 됩니다.</strong></p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 주간 핵심 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">OpenAPI / Swagger</div>
+      <div class="glossary-en">OpenAPI Specification</div>
+      <div class="glossary-def">REST API의 구조를 표준화된 형식으로 정의하는 방식. 이 형식으로 작성하면 자동으로 API 문서와 클라이언트 코드까지 생성할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">지식 그래프</div>
+      <div class="glossary-en">Knowledge Graph</div>
+      <div class="glossary-def">개념(노드)과 그 관계(엣지)를 네트워크로 표현한 구조. "문서 A는 문서 B의 선행 학습이다" 같은 관계를 자동으로 발견할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">크로스탭 / 피벗 테이블</div>
+      <div class="glossary-en">Crosstab / Pivot Table</div>
+      <div class="glossary-def">두 개 이상의 변수를 행과 열로 정리해서 다차원 데이터를 한눈에 보는 표. 예: 나이대별, 성별별 매출액을 한 표에 정렬.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">p-value (유의확률)</div>
+      <div class="glossary-en">p-value</div>
+      <div class="glossary-def">어떤 차이가 순전히 운(무작위)으로 일어날 확률. 0.05 이하면 "통계적으로 유의미하다"고 표현. 작을수록 그 차이가 진짜라고 확신할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">이상치</div>
+      <div class="glossary-en">Outlier</div>
+      <div class="glossary-def">데이터의 일반적인 패턴에서 크게 벗어난 값. 예: 판매량이 보통 100개인데 갑자기 1개인 달. 오류일 수도 있고, 중요한 신호일 수도 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
