@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W10 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2C7.373 2 2 7.373 2 14s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S4 19.523 4 14 8.477 4 14 4zm0 2.5c-4.142 0-7.5 3.358-7.5 7.5S9.858 21.5 14 21.5s7.5-3.358 7.5-7.5-3.358-7.5-7.5-7.5z" fill="#3569B8"/><path d="M46 8h12v2.5h-9.5V14h8v2.5h-8v5.5H46V8zm22 0h3l7.5 12h-3.25l-1.5-2.5h-7.5l-1.5 2.5h-3.25L68 8zm2.75 6.5l-2.5-4-2.5 4h5zm20-6.5h2.75v12h-2.75V8zm12 0h2.75v12h-2.75V8z" fill="#1B1464"/></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W10 · MON</div>
+      <h1 class="header-title">KPI 대시보드 설계와 경쟁사 분석 자동화</h1>
+      <p class="header-sub">핵심 지표 선정과 시각화 전략 · 공개 데이터로 경쟁 환경 파악</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.11 MON<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>비즈니스 의사결정의 속도는 <strong>데이터를 얼마나 빨리 보느냐</strong>에서 비롯됩니다. KPI 대시보드는 숫자의 나열이 아니라, 경영진의 눈과 손이 되어주는 도구입니다. 오늘은 <strong>핵심 지표를 선정</strong>하는 법과 <strong>경쟁사 분석을 자동화</strong>하는 실전 기법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#091</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">KPI 설계</span>
+        </div>
+        <h2 class="tip-title">KPI 대시보드 설계 도우미</h2>
+      </div>
+      <div class="tip-body">
+        <p>좋은 KPI 대시보드는 <strong>"한눈에 비즈니스 상태를 파악할 수 있게"</strong> 설계됩니다. 하지만 많은 조직이 수십 개의 지표를 나열하는 데 그칩니다. AI를 활용하면 <strong>비즈니스 목표와 실제 의사결정에 필요한 3-5개의 핵심 지표</strong>를 빠르게 추출할 수 있습니다.</p><p>프롬프트에 <strong>① 사업 목표 ② 주요 고객 세그먼트 ③ 현재 매출 구조</strong>를 입력하면, AI는 이들을 연결하는 KPI 계층도(KPI Tree)를 자동으로 만들어줍니다. 여기서 <strong>시각화 유형(막대그래프, 게이지, 스파크라인)</strong>까지 추천받으면 대시보드 청사진이 완성됩니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>우리는 D2C 코스메틱 브랜드고, 
+월 매출 5억원, 고객 기반 2만명이야.
+주요 채널은 인스타그램(60%)과 
+자체 쇼핑몰(40%)이야.
+
+올해 목표는 월 매출 8억원 달성이고,
+신규 고객 확보와 기존 고객 재구매
+두 가지를 균형있게 관리하려고 해.
+
+이 상황에서 설정해야 할 핵심 KPI
+5개를 추천해줘. 각각:
+- 지표명
+- 측정 주기
+- 목표치
+- 시각화 유형
+을 포함해서.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#092</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">경쟁 분석</span>
+        </div>
+        <h2 class="tip-title">경쟁사 분석 자동화</h2>
+      </div>
+      <div class="tip-body">
+        <p>경쟁사 분석에 가장 오래 걸리는 부분은 <strong>"공개 정보 수집과 구조화"</strong>입니다. AI는 경쟁사의 웹사이트, SNS, 뉴스, 공시 정보로부터 <strong>마케팅 메시지, 가격대, 주요 상품군, 최근 뉴스</strong>를 자동으로 추출할 수 있습니다.</p><p>더 강력한 활용법은 <strong>경쟁사 분석 틀(Competitive Matrix)</strong> 생성입니다. 가격-품질, 기능-감성, 신제품-기존제품 등의 축에 경쟁사들을 자동으로 매핑하면, <strong>우리의 포지셔닝 기회를 한눈에 볼 수 있습니다.</strong></p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>우리 경쟁사는 A, B, C 3개 브랜드야.
+(각각 웹사이트 URL/인스타그램 계정)
+
+이들의:
+1) 주력 상품 3가지
+2) 가격대 범위
+3) 마케팅 메시지 (한 문장)
+4) 최근 3개월 소식/신제품
+을 정리해줘.
+
+그리고 "가격대 vs 프리미엄도"의
+2x2 매트릭스에 우리와 경쟁사 3개를
+배치해줘. 우리의 포지셔닝 공백도
+코멘트해.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>KPI 대시보드와 경쟁 분석은 <strong>"한 번 만들고 끝"이 아니라 "주기적으로 갱신하는 자산"</strong>입니다. AI를 활용할 때의 진짜 가치는 <strong>초기 설계</strong>뿐 아니라 <strong>매주/매월 업데이트 자동화</strong>에 있습니다. 경쟁사 뉴스 모니터링, 시장 데이터 수집, 대시보드 리포트 생성까지 모두 자동화할 수 있다면, 당신의 팀은 <strong>데이터 정리가 아닌 전략 수립에만 집중</strong>할 수 있게 됩니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">KPI 트리</div>
+      <div class="glossary-en">KPI Tree / Hierarchy</div>
+      <div class="glossary-def">전사 목표에서 출발해 부서별, 팀별 목표로 계층화된 지표 체계. 최상위 목표(예: 연간 매출 100억)를 여러 세부 KPI(매출 증가율, 신규 고객 수, 재구매율 등)로 분해하는 구조입니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">경쟁 매트릭스</div>
+      <div class="glossary-en">Competitive Matrix / Positioning Map</div>
+      <div class="glossary-def">2개의 축(예: 가격 vs 품질)을 설정한 후 경쟁사들을 좌표로 표시하는 분석 도구. 시장 내 각 플레이어의 상대적 위치와 포지셔닝 공백을 시각화합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
