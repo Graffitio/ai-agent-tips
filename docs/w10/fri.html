@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W10 FRI — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTQ0IDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNDQiIGhlaWdodD0iNDAiIGZpbGw9IiNGNEY3RkIiLz48dGV4dCB4PSI3MiIgeT0iMjYiIGZvbnQtZmFtaWx5PSJKZXRCcmFpbnMgTW9ubyIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzFCMTQ2NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+NGx5bng8L3RleHQ+PC9zdmc+" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W10 · FRI</div>
+      <h1 class="header-title">멀티소스 리서치 종합 보고서와 리서치 에이전트 워크플로 설계</h1>
+      <p class="header-sub">여러 출처를 하나의 보고서로 · 검색→수집→분석→보고 자동화</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.15 FRI<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>리서치 에이전트는 <strong>여러 출처의 정보를 자동으로 수집하고, 분석하고, 하나의 일관된 보고서로 만드는</strong> AI의 최고 활용 사례입니다. 검색부터 보고까지 전체 워크플로를 자동화하면, 하루 걸리던 리서치가 분 단위로 완료됩니다. 오늘은 <strong>멀티소스 정보 통합</strong>과 <strong>자동화 워크플로 설계</strong>의 두 가지 고급 기법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#099</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">종합 분석</span>
+        </div>
+        <h2 class="tip-title">멀티소스 리서치 종합 보고서</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>멀티소스 리서치란</strong> 구글, 업계 매체, SNS, 경쟁사 웹사이트 등 여러 채널의 정보를 동시에 수집하고, 이를 하나의 일관된 보고서로 통합하는 기법입니다. AI 에이전트를 사용하면 이 과정 전체를 자동화할 수 있습니다.</p><p><strong>핵심 설계 원칙:</strong> 1) 검색 쿼리 최적화 2) 정보 추출 및 정제 3) 크로스 검증 4) 통합 보고서 작성. 각 단계에서 AI가 수행할 작업을 명확히 정의하면, 결과물의 신뢰도와 일관성이 크게 높아집니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 멀티소스 리서치 프롬프트 예시</div>
+          <code>프롬프트 Step 1 (검색):
+"반려동물 시장의 2026년 주요 트렌드를
+다음 5가지 출처에서 검색해줘:
+- 구글 트렌드 & 비즈니스 뉴스
+- 업계 리포트(Statista, IBMsb)
+- 커뮤니티(Reddit 펫 커뮤니티)
+- SNS(인스타그램, TikTok 해시태그)
+- 경쟁사 웹사이트(Chewy, Petco)
+
+각 출처별 핵심 인사이트 3-5개를
+구조화된 표로 정리해줘."
+
+프롬프트 Step 2 (통합):
+"위의 정보들을 바탕으로, 반려동물
+시장의 2026년 트렌드를 다음
+구조로 통합 보고서를 작성해줘:
+1. Executive Summary
+2. 주요 트렌드 (중요도순)
+3. 시장 기회 분석
+4. 리스크 & 제약사항
+5. 실무 액션 아이템"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#100</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">워크플로 설계</span>
+        </div>
+        <h2 class="tip-title">리서치 에이전트 워크플로 설계</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>리서치 에이전트 워크플로</strong>는 AI가 자동으로 검색→수집→분석→보고의 모든 단계를 수행하는 자동화 파이프라인입니다. 각 단계 간 명확한 입출력(Input/Output)을 정의하고, 단계 간 데이터 전달 방식을 설계하는 것이 핵심입니다.</p><p><strong>4단계 워크플로 설계:</strong> ① 검색 에이전트 (여러 쿼리로 정보 수집) → ② 추출 에이전트 (핵심 정보만 분류) → ③ 분석 에이전트 (패턴과 통찰 도출) → ④ 보고 에이전트 (최종 보고서 작성). 각 단계의 결과를 검증하는 "체크포인트"도 중요합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 워크플로 프롬프트 구조</div>
+          <code>Agent Workflow Template:
+
+[Stage 1] 검색 에이전트
+Input: 리서치 주제 + 검색 채널 리스트
+Task: 각 채널별로 3-5개 쿼리 생성 후
+     정보 수집
+Output: [채널별 원본 정보 리스트]
+
+[Stage 2] 추출 에이전트
+Input: Stage 1의 원본 정보
+Task: 각 정보에서 "핵심 인사이트"만 추출
+      (평가 기준: 실무 연관성, 신뢰도)
+Output: [정제된 인사이트 표]
+
+[Stage 3] 분석 에이전트
+Input: Stage 2의 정제 정보
+Task: 패턴 인식, 트렌드 분류, 
+      우선순위 평가
+Output: [분석된 트렌드 + 중요도]
+
+[Stage 4] 보고 에이전트
+Input: Stage 3의 분석 결과
+Task: 경영진 요약, 실무 액션, 
+      리스크 정리
+Output: [최종 보고서]</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>멀티소스 리서치와 에이전트 워크플로는 <strong>"정보 과부하 시대의 필수 기술"</strong>입니다. 인터넷에는 정보가 넘쳐나지만, 대부분의 팀은 이를 효율적으로 정리할 수 없습니다. AI 에이전트를 잘 설계하면, <strong>매일 최신 정보를 자동으로 수집하고 요약하는 "개인 리서치팀"</strong>을 만들 수 있습니다. 실무 적용 포인트: 먼저 수동으로 리서치하는 과정을 모두 기록한 뒤, 각 단계를 에이전트 태스크로 변환하세요. 자동화의 첫 단계입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">멀티소스 리서치</div>
+      <div class="glossary-en">Multi-Source Research</div>
+      <div class="glossary-def">여러 채널(웹, SNS, 뉴스, 경쟁사 등)의 정보를 동시에 수집하여 통합하는 리서치 방법. AI 에이전트를 활용하면 이 과정을 전체 자동화할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">에이전트 워크플로</div>
+      <div class="glossary-en">Agent Workflow</div>
+      <div class="glossary-def">여러 AI 에이전트가 순차적으로 작업을 수행하는 자동화 파이프라인. 각 에이전트는 이전 에이전트의 결과물을 입력받아 다음 단계를 수행합니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>

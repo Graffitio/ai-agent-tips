@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W10 · BI·리서치 자동화 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --color-mon:#7C3AED;--color-tue:#3B82F6;--color-wed:#10B981;
+    --color-thu:#FBBF24;--color-fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;display:flex}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-day-bar{width:6px;flex-shrink:0}
+  .tip-card.mon .tip-day-bar{background:var(--color-mon)}
+  .tip-card.tue .tip-day-bar{background:var(--color-tue)}
+  .tip-card.wed .tip-day-bar{background:var(--color-wed)}
+  .tip-card.thu .tip-day-bar{background:var(--color-thu)}
+  .tip-card.fri .tip-day-bar{background:var(--color-fri)}
+  .tip-content{flex:1;overflow:hidden}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap;word-break:break-word}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W10 · MON-FRI</div>
+      <h1 class="header-title">BI·리서치<br>자동화의 실전</h1>
+      <p class="header-sub">데이터를 질문하고, 시장을 읽고, 인사이트를 도출하는 방법</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.09 ~ 3.13<br>☕ 25 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>데이터는 거짓말을 하지 않지만, <strong>어떤 질문을 던지느냐에 따라 완전히 다른 이야기</strong>를 들려줍니다. 이번 주는 AI와 함께 <strong>KPI 대시보드 설계부터 시장 조사, 멀티소스 리서치 종합 보고서</strong>까지 — 데이터가 전략이 되는 과정을 다룹니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 10선</div>
+    
+    <article class="tip-card mon" id="tip-1">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-1')">
+          <div class="tip-meta">
+            <span class="tip-num">#091</span>
+            <span class="tip-tag tag-intermediate">📊 중급</span>
+            <span class="tip-category">BI 설계</span>
+          </div>
+          <h2 class="tip-title">KPI 대시보드 설계 도우미</h2>
+        </div>
+        <div class="tip-body">
+          <p>비즈니스의 맥박을 재는 것이 KPI입니다. 하지만 무엇을 측정할지, 어떤 기준으로 성공을 정의할지는 회사마다 다릅니다. AI는 당신의 비즈니스 모델을 묻고, 최적의 KPI 조합을 제안할 수 있습니다.</p>
+          <p><strong>핵심: "우리는 어떤 비즈니스이고, 이 분기의 목표는 무엇인가?"</strong> 이 질문에 답하면, AI는 선행지표(Leading)와 후행지표(Lagging)를 함께 제시합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>우리는 SaaS B2B 결제 솔루션 스타트업이야.
+분기 목표는:
+- 신규 고객 확보 (목표: 150건)
+- 고객 체류율 (목표: 95% 이상)
+- ARR 성장 (목표: +40%)
+
+이 목표를 추적하는 KPI 대시보드를
+구성해줘. 각 KPI별 측정 방법과
+목표치까지 포함해서.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card mon" id="tip-2">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-2')">
+          <div class="tip-meta">
+            <span class="tip-num">#092</span>
+            <span class="tip-tag tag-intermediate">📊 중급</span>
+            <span class="tip-category">경쟁 분석</span>
+          </div>
+          <h2 class="tip-title">경쟁사 분석 자동화</h2>
+        </div>
+        <div class="tip-body">
+          <p>경쟁사 분석은 주먹구구식이 아니라 <strong>프레임워크 기반</strong>이어야 합니다. AI에게 경쟁사 정보를 주고, 일관된 분석 틀로 정리하게 하면 비교와 인사이트가 쉬워집니다.</p>
+          <p><strong>활용법: 경쟁사 이름 3~5개 + 분석 기준 제시</strong> → AI가 일관된 형식으로 분석표 작성.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>경쟁사 분석: 당근마켓, 숨고, 당신의 시간
+분석 기준:
+- 핵심 서비스 (정의 + 차별점)
+- 수익 모델
+- 주요 사용자층
+- 최근 투자/뉴스
+- 약점
+
+이 3개 서비스를 비교 표로 정리해줘.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-3">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-3')">
+          <div class="tip-meta">
+            <span class="tip-num">#093</span>
+            <span class="tip-tag tag-intermediate">📊 중급</span>
+            <span class="tip-category">고객 분석</span>
+          </div>
+          <h2 class="tip-title">고객 세그멘테이션 분석</h2>
+        </div>
+        <div class="tip-body">
+          <p>모든 고객은 같지 않습니다. 나이, 구매력, 행동 패턴, 니즈에 따라 완전히 다른 사람들입니다. AI는 고객 데이터를 받으면 <strong>자동으로 의미 있는 세그먼트를 찾아내고 각 그룹의 특성을 정의</strong>합니다.</p>
+          <p><strong>핵심: CSV 데이터 또는 고객 리스트 → AI가 세그먼트 도출 + 각 세그먼트별 마케팅 전략까지</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>우리 고객 데이터(500명):
+- 나이대
+- 월 구매액
+- 재구매 빈도
+- 선호 상품 카테고리
+
+이 데이터를 바탕으로 의미 있는
+고객 세그먼트 3~4개를 도출해줘.
+각 세그먼트의 특성과 마케팅
+메시지를 작성해줄래?
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card tue" id="tip-4">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-4')">
+          <div class="tip-meta">
+            <span class="tip-num">#094</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">시나리오 분석</span>
+          </div>
+          <h2 class="tip-title">시나리오 분석: 최악·기본·최선</h2>
+        </div>
+        <div class="tip-body">
+          <p>경영진은 항상 묻습니다: "최악의 경우는? 최선의 경우는?" AI를 쓰면 이런 시나리오를 <strong>데이터 기반으로 빠르게 시뮬레이션</strong>할 수 있습니다.</p>
+          <p><strong>핵심: 현재 지표 + 변수 설정 → AI가 3가지 시나리오별 예측값과 액션 아이템까지 제시</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>우리의 현재 상황:
+- 월 활성 사용자: 50,000
+- 월 전환율: 8%
+- 평균 주문액: 45,000원
+
+3가지 시나리오를 분석해줘:
+1. 최악: 광고 비용 50% 감소, 경쟁사 공격
+2. 기본: 지금 같은 투자 수준 유지
+3. 최선: 마케팅 투자 30% 증가
+
+각 시나리오별 3개월 후 예상
+전환율, 수익, 액션 플랜까지.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-5">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-5')">
+          <div class="tip-meta">
+            <span class="tip-num">#095</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">데이터 쿼리</span>
+          </div>
+          <h2 class="tip-title">자연어 → SQL 쿼리 변환</h2>
+        </div>
+        <div class="tip-body">
+          <p>SQL을 몰라도 상관없습니다. AI는 "지난 3개월간 30대 여성이 구매한 상품 중 반품율이 높은 카테고리는?"이라는 자연어를 <strong>정확한 쿼리로 변환</strong>합니다.</p>
+          <p><strong>활용법: 데이터베이스 스키마 설명 + 질문 → SQL 쿼리 생성 → 엔지니어가 실행</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>DB 테이블 구조:
+- users (user_id, age, gender, created_at)
+- orders (order_id, user_id, category, amount, created_at)
+- returns (return_id, order_id, returned_at)
+
+질문: "지난 3개월간 30대 여성이
+구매한 상품 중 반품율이 가장
+높은 카테고리 3개는?"
+
+이 질문을 SQL로 작성해줘.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card wed" id="tip-6">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-6')">
+          <div class="tip-meta">
+            <span class="tip-num">#096</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">시장 조사</span>
+          </div>
+          <h2 class="tip-title">시장 조사를 AI로 시작하기</h2>
+        </div>
+        <div class="tip-body">
+          <p>시장 조사는 비용이 많이 드는 일이었습니다. 하지만 AI는 <strong>공개된 정보를 종합해서 초기 시장 리포트를 빠르게 만들 수 있습니다</strong>. 물론 이후 검증이 필요하지만, 방향성을 잡을 수는 있습니다.</p>
+          <p><strong>핵심: "X 시장의 규모, 성장률, 주요 플레이어, 트렌드"를 물으면 AI가 종합 리포트 초안을 제시</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>AI 기반 커스터머 서비스 시장
+(한국, 2024~2025)의 리포트를
+작성해줘.
+
+포함 항목:
+- 시장 규모 및 성장률
+- 주요 솔루션 (가격대별)
+- 경쟁사 현황
+- 고객 타입별 채택 현황
+- 향후 2년 전망
+
+초안이니까 출처도 표시해줘.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-7">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-7')">
+          <div class="tip-meta">
+            <span class="tip-num">#097</span>
+            <span class="tip-tag tag-intermediate">📊 중급</span>
+            <span class="tip-category">학술 분석</span>
+          </div>
+          <h2 class="tip-title">학술 논문 요약과 비교 분석</h2>
+        </div>
+        <div class="tip-body">
+          <p>관련 논문 3~5개를 읽고 비교하는 데 며칠 걸린다면, AI를 써보세요. <strong>논문 전문 또는 초록을 주면, AI가 핵심을 뽑고 입장을 비교</strong>합니다. 이를 통해 학계의 합의와 의견 차이를 빠르게 파악할 수 있습니다.</p>
+          <p><strong>활용법: 논문 PDF 텍스트 + "이 논문들의 핵심 발견과 한계를 비교해줘"</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>논문 3개:
+1. "고객 이탈 예측 모델"
+2. "구독 경제의 장기 유지율 연구"
+3. "SaaS 고객 성공 전략"
+
+이 논문들의:
+- 주요 발견(Main Finding)
+- 측정 방법론
+- 제안하는 솔루션
+- 한계
+
+를 비교표로 정리해줘.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card thu" id="tip-8">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-8')">
+          <div class="tip-meta">
+            <span class="tip-num">#098</span>
+            <span class="tip-tag tag-intermediate">📊 중급</span>
+            <span class="tip-category">설문 분석</span>
+          </div>
+          <h2 class="tip-title">설문 결과 분석과 인사이트 도출</h2>
+        </div>
+        <div class="tip-body">
+          <p>설문을 보냈지만, 결과를 어떻게 분석할지 모르겠다면? AI에게 설문 데이터(응답 목록)를 주고 <strong>"어떤 패턴이 보이고, 어떤 액션을 취해야 할까?"</strong>를 묻으세요. AI는 정량·정성 모두 분석합니다.</p>
+          <p><strong>핵심: 설문 데이터 (CSV 또는 텍스트) → AI가 주요 결과, 패턴, 액션 아이템까지 도출</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>고객 만족도 설문 (N=145):
+1. 서비스 사용 용이성 (5점 척도)
+2. 기능 충분성 (5점 척도)
+3. 가격 만족도 (5점 척도)
+4. 개선 사항 (자유 응답)
+
+[설문 데이터 첨부]
+
+이 결과에서:
+- 가장 만족도 높은 항목
+- 가장 개선이 필요한 항목
+- 개선 사항 자유 응답의 키워드
+- 우선 액션 3개
+
+를 정리해줘.
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-9">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-9')">
+          <div class="tip-meta">
+            <span class="tip-num">#099</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">리서치 종합</span>
+          </div>
+          <h2 class="tip-title">멀티소스 리서치 종합 보고서</h2>
+        </div>
+        <div class="tip-body">
+          <p><strong>최고의 인사이트는 여러 출처를 엮을 때 나옵니다.</strong> 경쟁사 분석 + 고객 세그먼트 분석 + 설문 결과 + 시장 조사를 하나의 보고서로 종합하면, 전략이 명확해집니다.</p>
+          <p><strong>활용법: 각 분석 결과를 AI에게 주고 "이들을 하나의 전략 보고서로 종합해줘"라고 요청</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>다음 4개 리서치 결과를 바탕으로
+통합 전략 보고서를 작성해줘:
+
+1. 경쟁사 분석 (당근마켓, 숨고, ...)
+2. 고객 세그먼트 분석 (주부, 직장인, ...)
+3. 고객 설문 결과 (만족도 분석)
+4. 시장 조사 (시장 규모, 성장률)
+
+보고서 구조:
+- 시장 현황
+- 경쟁 환경
+- 우리의 위치
+- 고객 요구
+- 권장 전략 3개
+- 실행 계획
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+      </div>
+    </article>
+
+    <article class="tip-card fri" id="tip-10">
+      <div class="tip-day-bar"></div>
+      <div class="tip-content">
+        <div class="tip-header" onclick="toggleTip('tip-10')">
+          <div class="tip-meta">
+            <span class="tip-num">#100</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">리서치 워크플로</span>
+          </div>
+          <h2 class="tip-title">리서치 에이전트 워크플로 설계</h2>
+        </div>
+        <div class="tip-body">
+          <p>리서치를 한 번이 아니라 <strong>반복적인 프로세스</strong>로 만들면? AI를 체계적으로 활용하는 "리서치 에이전트 워크플로"를 설계할 수 있습니다. 한 번의 프롬프트로 여러 분석을 연쇄적으로 실행하는 것입니다.</p>
+          <p><strong>핵심: 질문 → 분석 → 검증 → 개선의 사이클을 자동화</strong></p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>리서치 에이전트 워크플로 설계:
+
+목표: "우리의 신규 세그먼트 전략이
+실행 가능한가?"
+
+Step 1: 시장 규모 조사
+Step 2: 경쟁 상황 분석
+Step 3: 우리 역량 평가
+Step 4: 리스크 분석
+Step 5: 실행 로드맵 제시
+
+각 Step마다 AI가 질문을 던지고,
+이전 Step의 답변을 바탕으로
+다음 질문을 개선하는 방식으로.
+
+이 워크플로의 프롬프트를
+설계해줄래?
+            </code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 이주의 인사이트</div>
+    <p>데이터 시대에 <strong>가장 중요한 것은 수치가 아니라 질문</strong>입니다. "우리의 성과는?"이라는 막연한 질문과 "MAU 대비 활성 사용자 비율이 지난 분기 대비 몇 % 변했고, 어떤 세그먼트에서 그런가?"는 완전히 다른 인사이트를 만듭니다. 이번 주 배운 10가지 팁을 정리하면, 결국 <strong>"더 나은 질문을 던지는 것"</strong>입니다. AI는 당신의 질문을 답변의 형태로 돌려줄 뿐입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">KPI</div>
+      <div class="glossary-en">Key Performance Indicator</div>
+      <div class="glossary-def">비즈니스 성과를 측정하는 핵심 지표. 회사 목표와 직결되어 있으며, 보통 분기 또는 월 단위로 추적합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">세그멘테이션</div>
+      <div class="glossary-en">Segmentation</div>
+      <div class="glossary-def">고객, 시장, 데이터를 특정 기준으로 나누어 분석하는 방법. 각 그룹의 특성이 다르므로 맞춤형 전략을 수립할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">시나리오 분석</div>
+      <div class="glossary-en">Scenario Analysis</div>
+      <div class="glossary-def">최악, 기본, 최선 등 여러 가정 하에서 미래를 예측하고 대비하는 방법. 불확실성을 관리하는 전략 도구입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
