@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W11 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1"/><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1"/></linearGradient></defs><text x="10" y="28" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="url(#logo-grad)">4LYNX</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W11 · THU</div>
+      <h1 class="header-title">이메일 분류·우선순위 자동화<br>& 정기 보고서 자동 생성</h1>
+      <p class="header-sub">수신함 정리를 AI에게 · 데이터→분석→문서 일괄 처리</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.21 THU<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>AI 자동화의 진정한 가치는 <strong>반복적인 단순 작업</strong>에 있습니다. 매일 수십 개의 이메일을 분류하고, 매주 데이터를 정리해 보고서를 만드는 업무 — 이것들이 자동화되면 당신의 시간은 <strong>전략과 의사결정</strong>에 집중할 수 있게 됩니다. 오늘은 실무에서 가장 많이 쓰이는 두 가지 자동화를 다룹니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#107</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">이메일 자동화</span>
+        </div>
+        <h2 class="tip-title">이메일 분류·우선순위 자동화</h2>
+      </div>
+      <div class="tip-body">
+        <p>수신함에 도착하는 이메일 100개 중 정작 읽어야 할 것은 20개. 나머지는 자동으로 분류하고 우선순위를 매겨야 합니다. <strong>AI는 이 작업을 3초면 끝냅니다.</strong></p><p>핵심: 이메일 제목과 발신자 정보를 AI에게 보내면, AI가 <strong>"긴급"/"검토 필요"/"참고"/"자동 보관"</strong> 네 가지로 분류하고 각각에 우선도를 매깁니다. 정규표현식이나 복잡한 필터링 규칙 없이 자연언어 기반으로 작동하므로, <strong>새로운 이메일 패턴도 자동으로 학습</strong>합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 실제 활용 플로우</div>
+          <code>입력 데이터:
+- 제목: "Q2 실적 검토 및 승인 요청"
+  발신자: CFO Park
+- 제목: "점심 생각해요~"
+  발신자: 동료 Jone
+- 제목: "[공지] 2026 정책 변경안"
+  발신자: HR
+
+AI 분류 결과:
+✅ 긴급 (P0) → "Q2 실적 검토 및 승인"
+   - 이유: 실적+승인 = CFO 발신 = 의사결정 필요
+📌 자동 보관 (P3) → "점심 생각해요"
+   - 이유: 비업무+동료 캐주얼톤
+📋 참고 (P2) → "[공지] 2026 정책 변경안"
+   - 이유: 공사적 공지이나 즉시 대응 불필요</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#108</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">보고서 자동화</span>
+        </div>
+        <h2 class="tip-title">정기 보고서 자동 생성 파이프라인</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>데이터 → 분석 → 문서</strong> 일괄 처리 프로세스로 보고서 작성 시간을 80% 단축할 수 있습니다. 매주 또는 매월 반복되는 보고서야말로 자동화의 최고 대상입니다.</p><p>플로우: 1) CSV/엑셀 데이터를 AI에게 넘기기 2) AI가 핵심 지표와 트렌드 분석 3) Markdown 형식의 보고서 자동 생성 4) 필요하면 PDF 또는 Word로 변환. <strong>각 단계가 이전 단계의 결과를 받아서 처리</strong>하므로, 중간에 에러가 없으면 처음부터 끝까지 사람의 개입이 0입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 자동화 파이프라인 예시</div>
+          <code>📊 Step 1: 데이터 입력
+CSV 데이터 (월별 매출, 고객 수, 환수율)
+
+🔄 Step 2: AI 분석
+- 전월 대비 +12% 성장
+- 신규 고객 acquisition cost ↑ 8%
+- 환수율 유지 (95%)
+- 위험 신호: CAC 증가 vs 성장률
+
+📝 Step 3: 자동 보고서 생성
+## 5월 판매 현황
+### 주요 성과
+- 총 매출: 45M (MoM +12%)
+- 신규 고객: 1,200명 (+18%)
+- 환수율: 95% (±0%)
+
+### 위험 신호 & 액션
+- CAC 상승 추이 분석 필요
+- 마케팅 효율성 점검 권고
+
+📄 Step 4: 문서 생성
+최종 Word/PDF 보고서 자동 출력</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>"자동화는 업무 시간 단축이 아니라, 역할의 전환입니다."</strong> 이메일 분류와 보고서 작성이 자동화되면, 당신은 더 이상 <strong>"정보 수집자"</strong>가 아닙니다. <strong>"의사결정자"</strong>가 되는 것입니다. 자동화된 시스템이 중요한 것들을 골라주고, 분석이 된 데이터를 보여주면, 당신의 역할은 "그 분석이 맞나?"를 검증하고 "그럼 우리는 어떻게 할까?"를 고민하는 것이 됩니다. 이것이 진정한 자동화의 가치입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">자동화 파이프라인</div>
+      <div class="glossary-en">Automation Pipeline</div>
+      <div class="glossary-def">여러 단계의 작업을 순차적으로 연결하여 처음부터 끝까지 자동으로 처리하는 시스템. 각 단계의 출력이 다음 단계의 입력이 되므로 중간 개입이 최소화됩니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">CAC (고객 획득 비용)</div>
+      <div class="glossary-en">Customer Acquisition Cost</div>
+      <div class="glossary-def">신규 고객 한 명을 획득하기 위해 마케팅에 사용된 비용의 평균값. 매출 증가율 대비 CAC 증가 추이는 마케팅 효율성의 핵심 지표입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
