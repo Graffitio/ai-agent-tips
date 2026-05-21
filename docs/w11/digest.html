@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W11 · 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#8B5CF6;--tue:#3B82F6;--wed:#10B981;--thu:#F59E0B;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;border-left:4px solid #ccc}
+  .tip-card.mon{border-left-color:var(--mon)}
+  .tip-card.tue{border-left-color:var(--tue)}
+  .tip-card.wed{border-left-color:var(--wed)}
+  .tip-card.thu{border-left-color:var(--thu)}
+  .tip-card.fri{border-left-color:var(--fri)}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-day{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.08em}
+  .tip-day.mon{color:var(--mon)}
+  .tip-day.tue{color:var(--tue)}
+  .tip-day.wed{color:var(--wed)}
+  .tip-day.thu{color:var(--thu)}
+  .tip-day.fri{color:var(--fri)}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap;word-break:break-word}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W11 · 주간 다이제스트</div>
+      <h1 class="header-title">재무와 자동화,<br>AI에게 맡기자</h1>
+      <p class="header-sub">재무 분석부터 업무 자동화까지 — 실무 중심 가이드</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.16 MON<br>☕ 15 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p><strong>재무 분석과 업무 자동화</strong>는 AI의 진가가 드러나는 분야입니다. 이번 주는 복잡한 수치 해석, 예측 모델링, 그리고 일상적인 작업 반복에서 생산성을 2배 이상 끌어올리는 5가지 기법을 배웁니다. 엑셀 시트부터 이메일 자동 분류까지 — 월요일부터 금요일까지 실무 밀착형 팁으로 준비했습니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 10선</div>
+    
+    <article class="tip-card mon" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-day mon">MON</span>
+          <span class="tip-num">#101</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+        </div>
+        <h2 class="tip-title">재무제표 읽기 도우미</h2>
+      </div>
+      <div class="tip-body">
+        <p>손익계산서, 대차대조표, 현금흐름표 — 세 가지 재무제표를 읽는 것은 재무 분석의 첫 단계입니다. AI에게 제표의 각 항목과 의미를 설명하도록 하면, 재무 개념 학습이 훨씬 빨라집니다.</p>
+        <p><strong>활용 시점:</strong> 분기 또는 연간 재무 보고 시작 전, 제표 항목이 불명확할 때</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>"이 손익계산서에서
+매출액: 150억
+영업비용: 80억
+영업이익: 70억
+라는 수치가 나왔어.
+각 항목이 의미하는 바와
+우리 회사 상황을 해석해줄래?"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card mon" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-day mon">MON</span>
+          <span class="tip-num">#102</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+        </div>
+        <h2 class="tip-title">예산 대비 실적 차이 분석</h2>
+      </div>
+      <div class="tip-body">
+        <p>매월 실적이 나오면 예산과 비교하고 편차를 분석합니다. AI에게 두 수치와 배경을 알려주면 정량적·정성적 원인 분석을 동시에 받을 수 있습니다.</p>
+        <p><strong>효과:</strong> 보고서 작성 시간 70% 단축, 누락되는 분석 포인트 거의 제로</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>"3월 마케팅 예산 분석
+- 상반기 예산: 5000만원
+- 3월 집행: 4200만원 (84%)
+- 3월 성과(신규고객): 목표 150명 vs 실제 98명 (65%)
+
+광고 채널별로는
+페이스북: 목표 달성 120%
+구글: 목표 50%
+인스타: 목표 30%
+
+이 편차를 분석하고 4월 전략을 제안해줘."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tue" id="tip-3">
+      <div class="tip-header" onclick="toggleTip('tip-3')">
+        <div class="tip-meta">
+          <span class="tip-day tue">TUE</span>
+          <span class="tip-num">#103</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+        </div>
+        <h2 class="tip-title">현금흐름 예측 모델링</h2>
+      </div>
+      <div class="tip-body">
+        <p>과거 6개월 현금흐름 데이터를 바탕으로 향후 3개월, 6개월을 예측합니다. AI는 계절성, 추세, 예외 요인을 감지하고 신뢰도 높은 모델을 제시합니다.</p>
+        <p><strong>중요:</strong> 정량 데이터만으로는 부족 — 특수 요인(신규 계약, 대량 출금 계획)을 함께 알려야 정확도가 올라갑니다</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>"과거 6개월 일평균 현금 유입:
+1월: 500만원
+2월: 520만원
+3월: 480만원
+4월: 550만원
+5월: 600만원
+6월: 580만원
+
+향후 예정:
+- 7월: 신규 계약로 500만원 추가 예상
+- 8~9월: 여름 성수기로 15% 증가 예상
+
+다음 3개월 일평균 유입액을 예측하고,
+최악의 경우 최소 유입액도 제시해줘."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tue" id="tip-4">
+      <div class="tip-header" onclick="toggleTip('tip-4')">
+        <div class="tip-meta">
+          <span class="tip-day tue">TUE</span>
+          <span class="tip-num">#104</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+        </div>
+        <h2 class="tip-title">투자 포트폴리오 분석 보조</h2>
+      </div>
+      <div class="tip-body">
+        <p>보유 자산 구성, 각 자산의 기대수익률, 리스크를 AI에게 입력하면 포트폴리오의 강점과 약점, 리밸런싱 방안을 제시받을 수 있습니다.</p>
+        <p><strong>주의:</strong> AI의 분석은 참고만 하고, 최종 투자 결정은 재무 전문가와 상담 후 진행할 것</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>"내 포트폴리오:
+- 주식(국내): 3000만원 (40%)
+- 주식(해외): 1500만원 (20%)
+- 채권: 1500만원 (20%)
+- 현금: 1000만원 (13%)
+- 부동산: 3000만원 (40%) [별도]
+
+나이: 35세, 위험 성향: 중상
+향후 5년 목표: 자산 1억 달성
+
+리스크 분산과 기대수익률 관점에서
+포트폴리오 재조정 방안을 제안해줘."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card wed" id="tip-5">
+      <div class="tip-header" onclick="toggleTip('tip-5')">
+        <div class="tip-meta">
+          <span class="tip-day wed">WED</span>
+          <span class="tip-num">#105</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+        </div>
+        <h2 class="tip-title">재무 모델링에서 AI의 역할과 한계</h2>
+      </div>
+      <div class="tip-body">
+        <p>복합 시나리오 분석, 민감도 분석(Sensitivity Analysis), 몬테카를로 시뮬레이션 — AI는 이런 고급 모델링을 빠르게 구성할 수 있습니다. 하지만 가정(Assumption) 설정은 여전히 인간의 몫입니다.</p>
+        <p><strong>핵심:</strong> AI는 "만약~라면 결과는?"에 빠르게 답하는 도구. 가정의 타당성은 자신의 비즈니스 지식이 결정합니다</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 AI의 강점 vs 한계</div>
+          <code>✅ AI가 잘하는 것:
+- 복잡한 수식 자동 계산
+- 여러 시나리오 동시 분석
+- 데이터 시각화 코드 생성
+- 과거 패턴 기반 추론
+
+❌ AI가 못하는 것:
+- 산업 특수성 반영
+- 정책 변화 예측
+- 경쟁사 전략 추측
+- 최종 의사결정</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card wed" id="tip-6">
+      <div class="tip-header" onclick="toggleTip('tip-6')">
+        <div class="tip-meta">
+          <span class="tip-day wed">WED</span>
+          <span class="tip-num">#106</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+        </div>
+        <h2 class="tip-title">매일 하는 일 중 AI에 맡길 것 찾기</h2>
+      </div>
+      <div class="tip-body">
+        <p>자동화의 첫걸음은 "내가 자주 반복하는 작업"을 인식하는 것입니다. 주간 일정을 돌아보고 3회 이상 반복되는 작업을 리스트업하면 자동화 대상이 명확해집니다.</p>
+        <p><strong>체크리스트:</strong> 같은 포맷의 이메일 작성? 데이터 정제? 정리? 보고서 템플릿? 이런 작업들이 자동화의 황금 광맥입니다</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 자동화 대상 예시</div>
+          <code>🎯 자동화하기 좋은 작업:
+1. "월별 실적 보고서 작성"
+   → 데이터만 바뀌고 양식은 같음
+2. "고객 문의 분류"
+   → 패턴 인식으로 자동 처리 가능
+3. "지출 영수증 정리"
+   → 이미지/텍스트 추출로 자동화 가능
+4. "일일 뉴스레터 정리"
+   → 뉴스 수집→요약→배포 전 자동화
+
+❌ 자동화하기 어려운 작업:
+- 창의적 콘텐츠 제작
+- 고도의 판단이 필요한 의사결정
+- 일회성 특수 업무</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card thu" id="tip-7">
+      <div class="tip-header" onclick="toggleTip('tip-7')">
+        <div class="tip-meta">
+          <span class="tip-day thu">THU</span>
+          <span class="tip-num">#107</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+        </div>
+        <h2 class="tip-title">이메일 분류·우선순위 자동화</h2>
+      </div>
+      <div class="tip-body">
+        <p>매일 100통 이상의 이메일 속에서 중요한 것만 빠르게 찾는 것은 쉽지 않습니다. AI에게 분류 규칙을 정해주면 자동으로 받는 이메일을 태깅하고 우선순위를 매깁니다.</p>
+        <p><strong>효과:</strong> 이메일 처리 시간 60% 단축, 놓치는 중요 이메일 거의 제로</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 분류 규칙 예시</div>
+          <code>"다음 규칙으로 이메일을 자동 분류해줘:
+[긴급] 태그: CEO, CFO, 이사진 발신, '긴급' 포함
+[고객] 태그: 고객사 발신, 문의/클레임 포함
+[내부] 태그: 회사 이메일, HR/IT 발신
+[마케팅] 태그: 뉴스레터, 광고성 메일
+[읽음] 태그: 자동 이메일, 알림성
+
+우선순위:
+[긴급] 1순위
+[고객] 2순위
+[내부] 3순위
+[마케팅] 4순위
+
+이 규칙을 Zapier에 연결해서 자동 실행하는 설정을 코드로 제시해줘."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card thu" id="tip-8">
+      <div class="tip-header" onclick="toggleTip('tip-8')">
+        <div class="tip-meta">
+          <span class="tip-day thu">THU</span>
+          <span class="tip-num">#108</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+        </div>
+        <h2 class="tip-title">정기 보고서 자동 생성 파이프라인</h2>
+      </div>
+      <div class="tip-body">
+        <p>월간/주간 보고서는 데이터만 바뀌고 구조는 거의 같습니다. 데이터 수집→정제→분석→보고서 생성의 전체 파이프라인을 자동화하면 담당자는 최종 검수만 하면 됩니다.</p>
+        <p><strong>준비물:</strong> Google Sheets(또는 Airtable) + Zapier + ChatGPT API</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 자동화 흐름</div>
+          <code>단계별 자동화 흐름:
+
+1️⃣ 데이터 자동 수집
+   - 매월 1일 00:00 Google Analytics → Google Sheets 자동 입력
+
+2️⃣ AI 분석
+   - ChatGPT API: 수치 데이터 → 인사이트 텍스트로 변환
+
+3️⃣ 보고서 생성
+   - 구글 문서 템플릿 + Zapier로 분석 결과 자동 삽입
+
+4️⃣ 배포
+   - 완성된 PDF를 스택 채널/이메일로 자동 발송
+
+결과: 6시간 → 30분</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card fri" id="tip-9">
+      <div class="tip-header" onclick="toggleTip('tip-9')">
+        <div class="tip-meta">
+          <span class="tip-day fri">FRI</span>
+          <span class="tip-num">#109</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+        </div>
+        <h2 class="tip-title">회의 전후 워크플로 자동화</h2>
+      </div>
+      <div class="tip-body">
+        <p>회의 전 안건 정리, 회의 중 기록, 회의 후 액션 아이템 추출 — 이 일련의 과정을 자동화하면 회의 효율이 크게 높아집니다.</p>
+        <p><strong>도구 조합:</strong> Google Calendar + Transcribe.me + ChatGPT + Slack</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 자동화 워크플로</div>
+          <code>📅 회의 전: 자동 안건 생성
+- 구글 캘린더에 회의 등록
+- AI가 참석자 정보 + 이전 회의록 분석
+- 예상 안건 및 준비 자료 리스트 자동 생성
+
+🎤 회의 중: 자동 기록
+- Transcribe.me로 음성 → 텍스트 변환
+- 실시간 요약
+
+📝 회의 후: 자동 정리
+- AI가 결정사항 vs 액션 아이템 자동 분류
+- 담당자별 액션 아이템 슬랙으로 자동 할당
+
+⏱️ 절감 시간: 주당 4시간</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card fri" id="tip-10">
+      <div class="tip-header" onclick="toggleTip('tip-10')">
+        <div class="tip-meta">
+          <span class="tip-day fri">FRI</span>
+          <span class="tip-num">#110</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+        </div>
+        <h2 class="tip-title">Zapier·Make와 AI 연동 기초</h2>
+      </div>
+      <div class="tip-body">
+        <p>Zapier와 Make(구 Integromat)는 코딩 없이 앱들을 연결하는 노코드 플랫폼입니다. ChatGPT API와 연결하면 복잡한 자동화 파이프라인을 구성할 수 있습니다.</p>
+        <p><strong>강점:</strong> 비개발자도 사용 가능, 연동할 수 있는 앱이 매우 많음, 커뮤니티 템플릿 풍부</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 실제 세팅 예시</div>
+          <code>Zapier에서 ChatGPT 연동 기본 구조:
+
+1️⃣ 트리거 설정 (Trigger)
+   예: Gmail에 새로운 메일 도착
+
+2️⃣액션 설정 (Action)
+   a) 이메일 내용 추출
+   b) ChatGPT API 호출 (이메일 분류)
+   c) 분류 결과에 따라 라벨 붙이기
+   d) 스택/이메일로 알림
+
+3️⃣ 테스트 & 배포
+   - 실 데이터로 테스트
+   - 원활하면 자동화 활성화
+
+💡 Tip: Make는 조금 더 복잡하지만
+   더 세밀한 제어가 가능합니다</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 이주의 큰 그림</div>
+    <p>재무와 자동화는 <strong>"반복되는 일을 AI에게, 판단이 필요한 일을 인간에게"</strong>라는 원칙이 가장 명확하게 드러나는 영역입니다. 특히 <strong>재무 모델링</strong>은 AI의 계산 능력을 최대한 활용하되, 최종 가정과 의사결정은 인간이 책임지는 '하이브리드 방식'이 정석입니다. 그리고 <strong>업무 자동화</strong>는 오늘부터 시작 가능합니다. 당신이 일주일 중 3시간 이상 쓰는 작업을 하나만 선택해서 Zapier나 Make로 자동화해 보세요. 그 경험이 향후 더 복잡한 자동화로 나아가는 첫걸음이 될 것입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이주의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">현금흐름 (Cash Flow)</div>
+      <div class="glossary-en">Cash Flow</div>
+      <div class="glossary-def">일정 기간 동안 현금과 현금 등가물이 들어오고 나가는 흐름. 손익계산서의 이익과 다르며, 기업의 실제 유동성을 나타내는 중요 지표입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">노코드 (No-Code)</div>
+      <div class="glossary-en">No-Code</div>
+      <div class="glossary-def">프로그래밍 언어를 사용하지 않고 시각적 인터페이스로 애플리케이션을 개발하는 방식. Zapier, Make, Bubble 등이 대표적입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">민감도 분석 (Sensitivity Analysis)</div>
+      <div class="glossary-en">Sensitivity Analysis</div>
+      <div class="glossary-def">한 변수가 변했을 때 결과에 미치는 영향을 분석하는 기법. 재무 모델링에서 "매출이 10% 늘면 순이익은 몇 %가 될까?"라는 질문에 답하는 데 사용됩니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">포트폴리오 (Portfolio)</div>
+      <div class="glossary-en">Portfolio</div>
+      <div class="glossary-def">여러 자산(주식, 채권, 부동산, 현금 등)을 조합하여 보유하는 자산 집합. 위험을 분산하고 기대수익을 최대화하려는 투자 전략입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · W11 WEEKLY DIGEST — by Ian Jung</div>
+    <div class="footer-note">다음 주도 새로운 주제로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
