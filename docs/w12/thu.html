@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W12 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="6" fill="#3569B8"/><text x="16" y="22" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">4L</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W12 · THU</div>
+      <h1 class="header-title">테스트 코드 자동 생성과<br>레거시 코드 리팩토링 전략</h1>
+      <p class="header-sub">유닛 테스트·엣지 케이스 커버 · 오래된 코드를 AI와 함께 개선</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.28 THU<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>개발 생산성을 좌우하는 두 가지 — <strong>테스트 커버리지</strong>와 <strong>레거시 개선</strong>. AI는 이 두 작업을 얼마나 빨리, 얼마나 정확하게 처리하느냐에 달려 있습니다. 오늘은 자동화된 테스트 생성부터 안전한 리팩토링까지, 실무 개발자가 바로 쓸 수 있는 두 가지 전략을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#117</span>
+          <span class="tip-tag tag-intermediate">⚙️ 중급</span>
+          <span class="tip-category">테스트 생성</span>
+        </div>
+        <h2 class="tip-title">테스트 코드 자동 생성</h2>
+      </div>
+      <div class="tip-body">
+        <p>AI에게 함수 로직을 던지면 <strong>유닛 테스트 케이스</strong>를 자동으로 만들 수 있습니다. 특히 <strong>엣지 케이스(경계값, 예외 상황)</strong>를 놓치기 쉬운데, AI는 이런 부분을 체계적으로 커버합니다. 핵심은 "함수의 역할"을 명확히 알려주고, "커버해야 할 시나리오"를 구체적으로 지시하는 것입니다.</p><p>프로세스: (1) 함수 코드 제공 → (2) 테스트 프레임워크 지정 → (3) 테스트해야 할 케이스 리스트 요청 → (4) 테스트 코드 생성 → (5) 엣지 케이스 추가</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Prompt 예시</div>
+          <code>다음 JavaScript 함수에 대해 Jest 테스트를 작성해줘.
+
+function calculateDiscount(price, userType, quantity) {
+  if (userType === 'vip') return price * quantity * 0.8;
+  if (quantity >= 10) return price * quantity * 0.9;
+  return price * quantity;
+}
+
+테스트해야 할 시나리오:
+1) VIP 사용자의 할인율 확인
+2) 대량 구매(10개 이상)의 할인율 확인
+3) 일반 사용자 기본 구매
+4) 엣지 케이스: price = 0, quantity = 0
+5) VIP와 대량 구매가 겹칠 때 (더 큰 할인 우선)
+
+각 테스트마다 3~4개의 assertion을 포함해줘.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#118</span>
+          <span class="tip-tag tag-intermediate">⚙️ 중급</span>
+          <span class="tip-category">리팩토링</span>
+        </div>
+        <h2 class="tip-title">레거시 코드 리팩토링 전략</h2>
+      </div>
+      <div class="tip-body">
+        <p>낡은 코드를 고칠 때 가장 위험한 것은 <strong>"동작을 깨뜨리는 것"</strong>입니다. AI로 안전하게 리팩토링하려면, 세 가지 원칙을 따르세요: (1) <strong>먼저 테스트를 확보</strong>한다 (없으면 AI에게 테스트를 만들게 함) (2) <strong>작은 단위로 변경</strong>한다 (전체 함수가 아니라 한 번에 한 가지 개선만) (3) <strong>변경 전후를 비교</strong>한다 (같은 입력에 같은 결과가 나오는가?)</p><p>기본 플로우: 원본 코드 → 테스트 + 요구사항 정리 → AI 리팩토링 제안 → 수동 검증 → 병합</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 Prompt 예시</div>
+          <code>다음 Python 함수를 리팩토링해줘. 단, 기능은 100% 동일해야 함.
+
+[원본 코드]
+def process_user_data(users):
+  result = []
+  for u in users:
+    if u['age'] > 18:
+      if u['status'] == 'active':
+        name = u['name'].upper()
+        email = u['email'].lower()
+        result.append({'name': name, 'email': email})
+  return result
+
+개선할 부분:
+- 가독성 (변수명, 함수 분리)
+- 성능 (list comprehension 사용 가능한가?)
+- 유지보수성 (매직 넘버 제거, 조건 추상화)
+- type hint 추가
+
+리팩토링 후 함수는:
+1) 정확히 같은 입력에 같은 결과를 반환해야 함
+2) 각 단계를 설명해줄 것
+3) 개선 전후 성능 비교도 언급할 것</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>AI가 코드를 만들 수 있다는 것은 알고 있었을 텐데, <strong>"안전하게"</strong> 만드는 것이 진짜 스킬입니다. 테스트 커버리지를 먼저 확보하고, 작은 단위로 변경하고, 수동으로 검증하는 이 세 가지는 AI 개발 속도를 2배 이상 높이면서도 버그 위험을 낮춘 최고의 조합입니다. 이 패턴을 체화하면, 코드 품질을 잃지 않으면서도 개발 속도를 극적으로 올릴 수 있습니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">엣지 케이스</div>
+      <div class="glossary-en">Edge Case</div>
+      <div class="glossary-def">함수나 프로그램이 처리해야 하는 경계 상황이나 예외 상황. 예: 0 입력, null 값, 음수, 최대값 등. 테스트 시 가장 자주 빠지는 부분이며, AI가 체계적으로 찾아내는 데 강하다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">리팩토링</div>
+      <div class="glossary-en">Refactoring</div>
+      <div class="glossary-def">코드의 기능을 바꾸지 않으면서 내부 구조를 개선하는 작업. 가독성 향상, 중복 제거, 성능 최적화 등이 목표. 레거시 코드 개선의 핵심이며, AI의 도움으로 안전하고 빠르게 진행할 수 있다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
