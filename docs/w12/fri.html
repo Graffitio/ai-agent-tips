@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W12 FRI — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 160 40" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3569B8;stop-opacity:1" /><stop offset="100%" style="stop-color:#1B1464;stop-opacity:1" /></linearGradient></linearGradient></defs><text x="8" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#grad1)">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W12 · FRI</div>
+      <h1 class="header-title">CI/CD 파이프라인에<br>AI 검증 추가</h1>
+      <p class="header-sub">PR 자동 리뷰·릴리스 노트 생성 · Cursor·Claude Code 실전 팁</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.05.29 FRI<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>배포 파이프라인이 길어질수록 검증 단계는 더 중요해집니다. <strong>AI를 검증 레이어로 추가하면</strong>, 버그는 줄이고 배포 속도는 높일 수 있습니다. 오늘은 실전에서 가장 많이 쓰는 <strong>PR 자동 리뷰</strong>와 <strong>릴리스 노트 생성</strong> 두 가지를 다룹니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#119</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">CI/CD 통합</span>
+        </div>
+        <h2 class="tip-title">고급 CI/CD 통합</h2>
+      </div>
+      <div class="tip-body">
+        <p>CI/CD 파이프라인에 AI 검증을 추가하는 것은 두 가지 관점에서 가치가 있습니다. 첫째, <strong>인적 리뷰 전에 기계적 검증을 거쳐</strong> 명백한 오류를 먼저 걸러냅니다. 둘째, <strong>반복되는 리뷰 항목들을 자동화</strong>해 팀의 시간을 절약합니다.</p>
+        <p><strong>PR 자동 리뷰</strong>의 핵심은 GitHub Actions + Claude API 조합입니다. PR이 생성되면 자동으로 코드 변경사항을 분석해 보안 취약점, 성능 이슈, 코딩 스타일 위반을 지적합니다. <strong>릴리스 노트 생성</strong>은 커밋 메시지와 PR 제목을 분석해 사용자 친화적인 변경사항 요약을 만들어냅니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💻 구현 흐름</div>
+          <code>1. PR 생성 트리거
+   ↓
+2. GitHub Actions 워크플로우 실행
+   ↓
+3. 변경된 파일 목록 + 코드 diff 추출
+   ↓
+4. Claude API에 코드 리뷰 요청
+   프롬프트: "보안·성능·스타일 기준으로 검토"
+   ↓
+5. 리뷰 결과를 PR 댓글로 자동 게시
+   ↓
+6. 심각도에 따라 자동 approve/request changes</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#120</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">코딩 에이전트</span>
+        </div>
+        <h2 class="tip-title">고급 코딩 에이전트</h2>
+      </div>
+      <div class="tip-body">
+        <p>Cursor와 Claude Code의 가장 강력한 기능은 <strong>"컨텍스트 유지 + 멀티턴 작업"</strong> 입니다. 단순 코드 생성을 넘어 <strong>전체 프로젝트 구조를 이해한 상태에서</strong> 리팩토링, 테스트 작성, 문서화를 한 번에 처리합니다.</p>
+        <p><strong>Cursor 실전 팁</strong>: '@' 심볼로 파일·폴더를 지정하면 AI가 현재 코드 맥락을 완벽히 파악합니다. <strong>Claude Code 실전 팁</strong>: "이전 대화의 구조를 유지하고 다음 단계를 실행해"라고 지시하면 롱폼 프로젝트를 차근차근 완성할 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🎯 실전 사용 예</div>
+          <code>Step 1. Cursor에서
+"@src/components 폴더의 구조를 보고,
+새 Form 컴포넌트를 만들어줘.
+기존 패턴을 따라서."
+
+Step 2. 그 다음
+"이 Form에 유효성 검사를 추가해.
+zod 스키마를 사용해."
+
+Step 3. 마지막으로
+"이 폼의 스토리북 파일도 만들어."
+→ 전체 컴포넌트 + 테스트 + 문서 완성</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>AI를 검증 레이어로 쓸 때 가장 중요한 점은 "자동화 vs 신뢰"의 균형</strong>입니다. 100% 자동화된 배포는 위험하지만, 반복되는 검증을 모두 수동으로 하는 것도 비효율입니다. 답은 <strong>"단계별 자동화"</strong> — PR 리뷰는 자동이지만 최종 승인은 사람이, 릴리스 노트는 AI가 초안을 만들지만 편집은 팀이 한다는 식으로. 이 방식이 팀의 생산성과 안정성을 동시에 높입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">GitHub Actions</div>
+      <div class="glossary-en">CI/CD Workflow Automation</div>
+      <div class="glossary-def">GitHub 저장소에서 발생하는 이벤트(PR 생성, 커밋 푸시 등)를 감지해 자동으로 작업을 실행하는 워크플로우 엔진입니다. 코드 테스트, 빌드, 배포 자동화의 중심입니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">릴리스 노트</div>
+      <div class="glossary-en">Release Notes</div>
+      <div class="glossary-def">새 버전 배포 시 사용자에게 알리는 변경사항 요약문서입니다. 새 기능, 버그 수정, 주의사항 등을 담으며, AI가 커밋 메시지에서 자동으로 생성할 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
