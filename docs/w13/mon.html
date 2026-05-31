@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W13 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1" /><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1" /></linearGradient></defs><text x="8" y="24" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#logoGradient)">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W13 · MON</div>
+      <h1 class="header-title">직무기술서(JD) 작성 도우미과 이력서 스크리닝 기준 설계</h1>
+      <p class="header-sub">매력적이고 정확한 JD 만들기 · 공정하고 일관된 평가 기준</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.01 MON<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>채용의 첫 단계는 채용공고(JD)에서 시작됩니다. <strong>명확하고 매력적인 JD</strong>는 좋은 인재를 끌어당기고, <strong>일관된 스크리닝 기준</strong>은 공정한 평가를 보장합니다. 오늘은 HR·PM이 함께 알아야 할 JD 작성과 이력서 평가의 실무 노하우를 다룹니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#121</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">JD 작성</span>
+        </div>
+        <h2 class="tip-title">직무기술서(JD) 작성 도우미 — 매력적이고 정확한 JD 만들기</h2>
+      </div>
+      <div class="tip-body">
+        <p>좋은 JD는 <strong>직무의 현실</strong>을 담아냅니다. 일반적인 설명이 아닌, 실제로 이 직원이 하루하루 맡을 일들이 무엇인지 구체적으로 써야 합니다. 지원자가 자신의 역량을 정확히 판단하고, 입사 후 갭을 줄일 수 있기 때문입니다.</p><p>핵심 항목: <strong>①주요 책임 ②필수 요구사항 ③우대사항 ④성공의 기준 ⑤팀 문화</strong>. 특히 "성공의 기준"은 지원자가 가장 알고 싶은 부분입니다. "첫 3개월 동안 이것을 이루면 성공"이라는 명확한 목표를 제시하세요.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 JD 체크리스트</div>
+          <code>✅ 필수 포함 요소:
+1. 직무 개요 (1-2문장)
+   → "고객 데이터 분석 기반 마케팅 전략 수립"
+
+2. 주요 책임 (5-7개, 구체적인 액션)
+   → "월간 캠페인 성과 분석 리포트 작성"
+   → "고객 세그먼트 분석 및 타겟팅 전략 제안"
+
+3. 필수 요구사항 (경력, 기술, 성향)
+   → "관련 경력 3년 이상"
+   → "SQL 또는 Python 실무 경험"
+   → "논리적 사고와 커뮤니케이션"
+
+4. 성공 지표 (3개월 후)
+   → "첫 캠페인 분석 리포트 완성"
+   → "팀원들로부터 신뢰 구축"
+
+5. 팀 문화 (3-4개 키워드)
+   → "데이터 기반 의사결정", "주인의식"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#122</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">스크리닝</span>
+        </div>
+        <h2 class="tip-title">이력서 스크리닝 기준 설계 — 공정하고 일관된 평가 기준</h2>
+      </div>
+      <div class="tip-body">
+        <p>이력서 스크리닝은 <strong>기준이 명확할수록 공정합니다</strong>. "감으로" 판단하면 지원자마다 다른 잣대를 적용하게 됩니다. 미리 <strong>"반드시 필요한 것" vs "있으면 좋은 것"</strong>을 정의하고, 각 항목마다 점수 기준을 세워야 합니다.</p><p><strong>세 단계 스크리닝 모델</strong>: ①K.O 기준(필수) → ②점수 평가(1-5점) → ③최종 면접 대상자 선정. 이렇게 하면 주관성이 줄어들고, 모든 평가자가 일관되게 평가합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 스크리닝 기준 템플릿</div>
+          <code>📋 마케팅 PM 채용 — 스크리닝 기준
+
+【 K.O 기준 (하나라도 NO면 탈락) 】
+□ 관련 경력 2년 이상? (필수)
+□ 데이터 분석 경험 있음? (필수)
+
+【 평가 항목 (1-5점) 】
+1. 경력의 관련성 (1점: 약간, 5점: 매우 높음)
+   - 5점: 마케팅 PM 직무 3년+
+   - 3점: 마케팅 직무 2-3년, 유사 경험
+   - 1점: 초급 경력 또는 관련성 낮음
+
+2. 성과 사례의 명확성 (1점: 모호함, 5점: 구체적)
+   - 5점: "캠페인 ROI 35% 개선" (수치화된 성과)
+   - 3점: "캠페인 개선 경험" (일반적)
+   - 1점: "마케팅 일함" (구체성 없음)
+
+3. 리더십/협업 사례 (1점: 없음, 5점: 우수)
+   - 5점: 팀 리드 또는 크로스펑셔널 프로젝트 주도
+   - 3점: 팀 협업 경험
+   - 1점: 개인 업무 중심
+
+【 합계 계산 】
+K.O 통과 후, 평가항목 점수 합계
+- 13점 이상: 1순위 (면접 진행)
+- 10-12점: 2순위 (필요시 면접)
+- 9점 이하: 불합격</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>좋은 채용은 투명성에서 시작됩니다.</strong> 명확한 JD는 지원자에게 "우리는 이런 사람을 찾고 있다"는 신호를 보내고, 일관된 스크리닝 기준은 "우리는 공정하게 평가한다"는 신뢰를 만듭니다. 결과적으로 지원자의 질도 높아지고, 입사 후 이탈도 줄어듭니다. 이번 주 피드백: 팀 내에서 스크리닝 기준을 함께 논의해 보세요. 기준을 만드는 과정 자체가 팀의 "이상적인 팀원상"을 재정의하는 기회가 됩니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">직무기술서(JD)</div>
+      <div class="glossary-en">Job Description</div>
+      <div class="glossary-def">특정 직무의 목적, 책임, 필요한 역량을 문서화한 것. 채용공고의 핵심 바탕이 되며, 입사 후 성과평가의 기준도 됩니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">K.O 기준</div>
+      <div class="glossary-en">Knock-Out Criteria</div>
+      <div class="glossary-def">하나라도 충족하지 못하면 즉시 탈락되는 기준. 스크리닝 단계에서 불필요한 검토를 줄이고 시간 효율성을 높입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
