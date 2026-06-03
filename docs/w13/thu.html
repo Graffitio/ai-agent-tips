@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W13 THU — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="55" fill="#3569B8" opacity="0.1"/>
+          <path d="M40 50 Q60 35 80 50 Q75 65 60 75 Q45 65 40 50" fill="#3569B8"/>
+          <text x="60" y="95" font-family="JetBrains Mono" font-size="14" font-weight="600" text-anchor="middle" fill="#1B1464">4LYNX</text>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W13 · THU</div>
+      <h1 class="header-title">리스크 레지스터 자동 업데이트와<br>스프린트 회고 분석·패턴 도출</h1>
+      <p class="header-sub">AI가 잠재 리스크를 선제 식별 · 반복되는 문제를 데이터로 발견</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.04 THU<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>프로젝트 관리와 팀 성과는 <strong>"예측"과 "학습"</strong>에서 나옵니다. 리스크는 조용히 증가하고, 반복되는 문제는 패턴 속에 숨어 있습니다. 오늘은 AI를 활용해 이 둘을 <strong>자동으로 감지하고 처방</strong>하는 방법을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#127</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">리스크 관리</span>
+        </div>
+        <h2 class="tip-title">리스크 레지스터 자동 업데이트<br>AI가 잠재 리스크를 선제 식별</h2>
+      </div>
+      <div class="tip-body">
+        <p>매주 리스크 레지스터를 손으로 업데이트하는 것은 비효율적입니다. 더 심각한 문제는 이미 발현 중인 리스크만 기록되고, <strong>잠재 위험은 놓친다</strong>는 점입니다. AI를 활용하면 프로젝트 기록, 이슈 로그, 회의록에서 <strong>숨겨진 리스크 신호를 자동으로 추출</strong>할 수 있습니다.</p><p><strong>핵심 활용법:</strong> 지난 2주간의 프로젝트 문서(이슈, 회의록, 진도 보고서)를 AI에 투입하고 "이 프로젝트에서 나타날 수 있는 리스크는 무엇인가? 근거는?"이라고 물어봅니다. AI는 문서 속 약한 신호들을 연결해 리스크를 도출하고, 각 리스크의 <strong>발현 확률·영향도·시간 축</strong>을 함께 제시합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>지난 2주 이슈 로그, 회의록, 스프린트 진도 보고서를 분석해.
+
+[첨부된 문서들]
+
+이 프로젝트에서 앞으로 2개월 내에 실현될 수 있는
+리스크를 찾아줘. 각 리스크에 대해:
+- 리스크 내용
+- 근거 (어디서 신호를 포착했는가)
+- 발현 확률 (High/Medium/Low)
+- 영향도 (High/Medium/Low)
+- 예상 발현 시점
+- 선제 대응 방안
+
+프로젝트 특성상 중요한 리스크부터
+순서대로 나열해줘.</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#128</span>
+          <span class="tip-tag tag-advanced">🎓 고급</span>
+          <span class="tip-category">회고 분석</span>
+        </div>
+        <h2 class="tip-title">스프린트 회고 분석·패턴 도출<br>반복되는 문제를 데이터로 발견</h2>
+      </div>
+      <div class="tip-body">
+        <p>팀은 회고에서 늘 같은 문제를 말합니다. "소통 부족", "일정 압박", "기술 부채". 하지만 <strong>언제 반복되는지, 어떤 조건에서 심화되는지</strong>는 명확하지 않습니다. 결과적으로 같은 실수가 스프린트마다 반복되죠. AI를 활용하면 <strong>지난 3~6개월 회고 기록에서 패턴을 자동 추출</strong>할 수 있습니다.</p><p><strong>활용 방법:</strong> 지난 10~15개 스프린트의 회고 기록을 모두 AI에 제공하고, "이 팀의 반복되는 문제가 무엇이며, 언제 악화되는가?"를 묻습니다. AI는 문제를 카테고리화하고, 발생 빈도, 시간대별 추이, 관련 요인을 함께 분석해줍니다. 이를 통해 근본 원인에 대한 <strong>데이터 기반 가설</strong>을 세울 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 분석 구조</div>
+          <code>지난 12개 스프린트(3개월)의 회고 기록을
+분석해줘.
+
+[스프린트별 회고 내용 입력]
+
+다음을 분석해줘:
+
+1️⃣ 반복되는 문제
+   - 각 문제가 언급된 횟수
+   - 첫 등장 시점과 최근 등장 시점
+   - 악화/개선 추이
+
+2️⃣ 패턴 발견
+   - 특정 스프린트(기간, 주기)에
+     집중되는 문제는?
+   - 특정 이슈와 연계된 문제는?
+
+3️⃣ 근본 원인 가설
+   - "A 문제"의 근본 원인으로 추정되는
+     것은? (3가지)
+
+4️⃣ 처방 우선순위
+   - 어떤 문제를 먼저 해결하면
+     연쇄 효과가 가장 클 것 같은가?</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>PM과 HR의 일에는 <strong>"보이는 문제"와 "숨은 신호"</strong>가 공존합니다. 리스크도 그렇고, 팀의 반복되는 문제도 그렇습니다. 손으로 관리해서는 신호를 놓치기 쉽지만, AI는 대량의 텍스트에서 패턴을 <strong>일관되게, 빠르게, 객관적으로</strong> 찾아냅니다. 중요한 것은 AI에 맡기고, 의사결정은 인간이 하세요. 그것이 진정한 AI 활용입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">리스크 레지스터</div>
+      <div class="glossary-en">Risk Register</div>
+      <div class="glossary-def">프로젝트에서 식별된 모든 리스크를 기록·관리하는 문서. 리스크 내용, 확률, 영향도, 대응 방안 등을 체계적으로 정리해 지속적으로 모니터링합니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">스프린트 회고</div>
+      <div class="glossary-en">Sprint Retrospective</div>
+      <div class="glossary-def">애자일 방식에서 스프린트 종료 후 팀이 함께 진행한 일, 잘한 점, 아쉬운 점, 개선할 점을 논의하는 회의. 팀의 지속적 성장을 위한 피드백 루프입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
