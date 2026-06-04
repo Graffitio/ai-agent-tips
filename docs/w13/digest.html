@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W13 · HR·PM과 실무 적용 총정리 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#8B5CF6;--tue:#3B82F6;--wed:#10B981;--thu:#FBBF24;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;border-left:5px solid #999}
+  .tip-card.mon{border-left-color:var(--mon)}
+  .tip-card.tue{border-left-color:var(--tue)}
+  .tip-card.wed{border-left-color:var(--wed)}
+  .tip-card.thu{border-left-color:var(--thu)}
+  .tip-card.fri{border-left-color:var(--fri)}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-day{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;color:#FFF}
+  .tip-day.mon{background:var(--mon)}
+  .tip-day.tue{background:var(--tue)}
+  .tip-day.wed{background:var(--wed)}
+  .tip-day.thu{background:var(--thu)}
+  .tip-day.fri{background:var(--fri)}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .day-section{margin-top:28px;padding-top:24px;border-top:1px solid var(--border-light)}
+  .day-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border-light)}
+  .day-badge{font-family:var(--mono);font-size:11px;font-weight:700;padding:6px 12px;border-radius:6px;text-transform:uppercase;color:#FFF;letter-spacing:0.08em}
+  .day-badge.mon{background:var(--mon)}
+  .day-badge.tue{background:var(--tue)}
+  .day-badge.wed{background:var(--wed)}
+  .day-badge.thu{background:var(--thu)}
+  .day-badge.fri{background:var(--fri)}
+  .day-title{font-size:18px;font-weight:700;color:var(--navy-deep)}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40'%3E%3Ctext x='10' y='32' font-size='28' font-weight='bold' fill='%231B1464'%3E4lynx%3C/text%3E%3C/svg%3E" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W13 · MON-FRI</div>
+      <h1 class="header-title">HR·PM과 실무 적용<br>총정리</h1>
+      <p class="header-sub">채용부터 운영까지 — 5일간의 완성도 높은 시스템</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.03.23~3.27<br>☕ 25 min read</div>
+      <div class="header-week-badge">PHASE 2 · 실무 적용</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>지난 12주 동안 배운 모든 기법들이 <strong>HR과 PM 영역에서 어떻게 실제로 작동하는지</strong> 이 주간에 집중적으로 경험합니다. 직무기술서 작성부터 스프린트 회고 분석까지 — <strong>조직과 프로젝트를 움직이는 AI 시스템</strong>을 손에 넣게 됩니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="day-section">
+      <div class="day-header">
+        <span class="day-badge mon">MON</span>
+        <span class="day-title">직무기술서(JD) 작성 도우미 · 이력서 스크리닝</span>
+      </div>
+      
+      <article class="tip-card mon" id="tip-1">
+        <div class="tip-header" onclick="toggleTip('tip-1')">
+          <div class="tip-meta">
+            <span class="tip-num">#121</span>
+            <span class="tip-day mon">MON</span>
+            <span class="tip-tag tag-beginner">🌱 입문</span>
+            <span class="tip-category">채용 시스템</span>
+          </div>
+          <h2 class="tip-title">직무기술서(JD) 작성 도우미</h2>
+        </div>
+        <div class="tip-body">
+          <p>AI는 단순한 JD 템플릿 제공자가 아닙니다. 귀사의 문화, 기술 스택, 기대 역할을 입력하면 <strong>그 조직에 딱 맞는 생생한 JD</strong>를 생성합니다. 모호한 직무 설명 대신, 지원자가 명확하게 이해할 수 있는 수준의 구체성이 가능합니다.</p>
+          <p>핵심: <strong>역할 배경, 핵심 책임 3~4개, 필수/우대 자격</strong> 이 세 가지를 제공하면 완성도 높은 JD가 나옵니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>우리는 D2C 팻테크 스타트업이고,
+마케팅팀에 수급담당자를 채용해.
+
+역할 배경:
+- 현재 팀: 마케팅 PM 2명, 그래픽 디자이너 1명
+- 우리의 기술 스택: 데이터 분석은 GA4, CRM은 Klaviyo
+- 성장 목표: 월 30% 유저 증가
+
+이 조건으로 "Product Marketing Manager (수급)" JD를 작성해줘.
+- 핵심 책임 4개
+- 필수 자격 5개
+- 우대 사항 3개</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card mon" id="tip-2">
+        <div class="tip-header" onclick="toggleTip('tip-2')">
+          <div class="tip-meta">
+            <span class="tip-num">#122</span>
+            <span class="tip-day mon">MON</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">채용 시스템</span>
+          </div>
+          <h2 class="tip-title">이력서 스크리닝 기준 설계</h2>
+        </div>
+        <div class="tip-body">
+          <p>JD만 있어서는 부족합니다. 그 JD에 <strong>정량적 스크리닝 기준</strong>을 AI와 함께 설계해야 합니다. "경험 많은" 사람을 찾는 것이 아니라, <strong>"우리 조직의 성장에 즉시 기여할 사람"</strong>을 찾는 기준입니다.</p>
+          <p>스크리닝 기준은 3 레이어로 구성: 필수(MUST), 강력 추천(STRONG), 우대(NICE)</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>위의 JD를 바탕으로, 이력서 스크리닝 매트릭스를 만들어줘.
+
+형식:
+- MUST HAVE (이 기준 불만족 = 탈락)
+- STRONG (이 기준 충족 = 우선 면접)
+- NICE TO HAVE (충족하면 가산점)
+
+각 기준마다 이력서에서 확인할 구체적인 증거를 제시해줘.
+예) "구글 애널리틱스 경험" → 이력서에서 찾을 증거: GA4 구현 프로젝트, 대시보드 설계 등</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header">
+        <span class="day-badge tue">TUE</span>
+        <span class="day-title">면접 질문 자동 설계 · 온보딩 콘텐츠 생성</span>
+      </div>
+
+      <article class="tip-card tue" id="tip-3">
+        <div class="tip-header" onclick="toggleTip('tip-3')">
+          <div class="tip-meta">
+            <span class="tip-num">#123</span>
+            <span class="tip-day tue">TUE</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">채용 면접</span>
+          </div>
+          <h2 class="tip-title">면접 질문 세트 자동 설계</h2>
+        </div>
+        <div class="tip-body">
+          <p>좋은 면접 질문은 후보자의 역량을 측정하는 <strong>정밀한 도구</strong>입니다. "강점이 뭐예요?"라는 일반적인 질문 대신, <strong>상황 기반(Behavioral) 질문을 AI가 자동으로 생성</strong>할 수 있습니다.</p>
+          <p>각 질문마다 원하는 답변의 핵심 요소와 평가 기준까지 함께 얻을 수 있습니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>위의 JD의 "Product Marketing Manager" 직급 면접을 준비해.
+
+아래 핵심 역량 각각에 대해:
+1) Behavioral 질문 1개
+2) 좋은 답변의 핵심 요소 3가지
+3) 평가 기준 (1~5점)
+
+역량:
+- 데이터 기반 의사결정 능력
+- 마케팅과 개발 간 협력 경험
+- 스타트업 환경에서의 속도감
+
+질문 형식은 "과거에 겪은 구체적인 상황 → 어떻게 했나 → 결과가 뭔가" 순으로</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card tue" id="tip-4">
+        <div class="tip-header" onclick="toggleTip('tip-4')">
+          <div class="tip-meta">
+            <span class="tip-num">#124</span>
+            <span class="tip-day tue">TUE</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">온보딩</span>
+          </div>
+          <h2 class="tip-title">온보딩 콘텐츠 자동 생성</h2>
+        </div>
+        <div class="tip-body">
+          <p>신입 입사자가 첫 주에 "조직과 시스템에 대해 빠르게 이해"하도록 돕는 일은 꽤 번거롭습니다. AI는 <strong>조직 구조, 기술 스택, 문화 요소를 입력받아 체계적인 온보딩 로드맵</strong>을 생성합니다.</p>
+          <p>Day 1부터 Day 30까지 구체적인 마일스톤과 학습 리소스가 담긴 문서가 즉시 생성됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>신입 Product Marketing Manager를 위한 30일 온보딩 플랜을 만들어줘.
+
+회사 정보:
+- 팀 규모: 마케팅 3명, 개발 5명, 디자인 1명
+- 기술 스택: React, Node.js, Klaviyo, GA4
+- 조직 특성: 빠른 의사결정, 월간 스프린트
+
+형식:
+- Week 1: 조직 이해 (팀 미팅, 문화 이해)
+- Week 2~3: 기술/도구 학습 (GA4, Klaviyo 심화)
+- Week 4: 첫 프로젝트 시작
+- 각 day마다 구체적인 액션 아이템과 담당자 표시</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header">
+        <span class="day-badge wed">WED</span>
+        <span class="day-title">성과 측정 프레임워크 · 프로젝트 킥오프 문서</span>
+      </div>
+
+      <article class="tip-card wed" id="tip-5">
+        <div class="tip-header" onclick="toggleTip('tip-5')">
+          <div class="tip-meta">
+            <span class="tip-num">#125</span>
+            <span class="tip-day wed">WED</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">성과 관리</span>
+          </div>
+          <h2 class="tip-title">실무 적용 성과 측정 프레임워크</h2>
+        </div>
+        <div class="tip-body">
+          <p>"이 프로젝트가 성공이었나?"를 판단하는 명확한 기준이 없으면, 조직은 뱅뱅 도돕니다. AI는 <strong>프로젝트의 목표, 제약, 타이밍을 입력받아 정량적 성공 지표(KPI)를 자동 설계</strong>합니다.</p>
+          <p>단순 숫자가 아닌, <strong>비즈니스 가치로 직결되는 지표</strong>를 생성합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>Q: 우리는 신규 고객을 위한 온보딩 이메일 시퀀스(5개) 프로젝트를 막 시작했어.
+
+프로젝트 정보:
+- 목표: 신규 고객의 Day 7 활성화율 25% → 40% 달성
+- 예상 비용: 마케팅 수급담당자 시간 80h
+- 런칭 타이밍: 2주 후
+- 런칭 후 측정 기간: 3개월
+
+성공 지표 프레임워크를 만들어줘.
+형식: Primary KPI(필수 달성), Secondary KPI(모니터링),
+Guardrail(피해야 할 것) 각각 3개씩
+
+각 지표마다 타겟값, 측정 방법, 영향 해석까지</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card wed" id="tip-6">
+        <div class="tip-header" onclick="toggleTip('tip-6')">
+          <div class="tip-meta">
+            <span class="tip-num">#126</span>
+            <span class="tip-day wed">WED</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">프로젝트 관리</span>
+          </div>
+          <h2 class="tip-title">프로젝트 킥오프 문서 자동 생성</h2>
+        </div>
+        <div class="tip-body">
+          <p>프로젝트 시작 전, 팀이 <strong>같은 페이지에 있는지 확인</strong>하는 것은 필수입니다. AI는 프로젝트 개요, 목표, 타임라인, 리스크를 포함한 <strong>완성도 높은 킥오프 문서</strong>를 자동으로 만들어냅니다.</p>
+          <p>문서 작성에 걸릴 시간을 줄이고, 실제 토론에 집중할 수 있게 합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>프로젝트 킥오프 문서를 작성해줘.
+
+프로젝트명: 신규 온보딩 이메일 시퀀스 구축
+주요 담당자:
+- PM: 김철수 (전체 조율)
+- 마케팅 수급담당자: 이영희 (콘텐츠 설계)
+- 개발자: 박민준 (자동화)
+
+목표: 신규 고객 Day 7 활성화율 25% → 40%
+예상 기간: 6주 (설계 2주, 개발 3주, QA 1주)
+예상 비용: 마케팅 수급담당자 80h, 개발 60h
+
+문서 구성:
+1. Executive Summary (1단락)
+2. 프로젝트 목표 및 배경
+3. 스코프 (포함/제외 항목)
+4. 타임라인 (주간별 마일스톤)
+5. 리스크 및 대응 방안
+6. 성공 기준
+7. 의존성 및 선행 조건</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header">
+        <span class="day-badge thu">THU</span>
+        <span class="day-title">리스크 관리 · 스프린트 회고 분석</span>
+      </div>
+
+      <article class="tip-card thu" id="tip-7">
+        <div class="tip-header" onclick="toggleTip('tip-7')">
+          <div class="tip-meta">
+            <span class="tip-num">#127</span>
+            <span class="tip-day thu">THU</span>
+            <span class="tip-tag tag-intermediate">📘 중급</span>
+            <span class="tip-category">리스크 관리</span>
+          </div>
+          <h2 class="tip-title">리스크 레지스터 자동 업데이트</h2>
+        </div>
+        <div class="tip-body">
+          <p>프로젝트 초기에 리스크를 예측하는 것은 중요하지만, <strong>진행 중 상황 변화를 반영하는 것이 더 중요</strong>합니다. AI는 주간 스프린트 결과를 입력받아 <strong>새로운 리스크 항목을 자동으로 제안</strong>하고 기존 리스크의 심각도를 업데이트합니다.</p>
+          <p>리스크를 식별하고 → 대응책을 설계하는 전체 사이클을 가속화합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>온보딩 이메일 프로젝트의 리스크 레지스터를 업데이트해줘.
+
+이번 주(Week 3) 스프린트 결과:
+- 계획: 이메일 템플릿 5개 완성
+- 실제: 템플릿 3개만 완성
+- 이유: 디자인 시스템 조정으로 재작업 필요
+- 추가 발견: Klaviyo 커스텀 필드에 대한 개발팀의 학습곡선 가팜
+
+현재 리스크 레지스터:
+- 데이터 품질 문제 (High)
+- 일정 지연 (Medium)
+- 스타트 데이터 부족 (Low)
+
+추가될 새로운 리스크들을 제안하고, 각 리스크마다:
+- 영향도, 확률, 현재 상태
+- 대응 전략 (Avoid/Mitigate/Transfer)
+- 담당자와 모니터링 방법</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card thu" id="tip-8">
+        <div class="tip-header" onclick="toggleTip('tip-8')">
+          <div class="tip-meta">
+            <span class="tip-num">#128</span>
+            <span class="tip-day thu">THU</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">팀 성장</span>
+          </div>
+          <h2 class="tip-title">스프린트 회고 분석·패턴 도출</h2>
+        </div>
+        <div class="tip-body">
+          <p>스프린트 회고(Retrospective)는 중요하지만 종종 피상적입니다. AI는 <strong>회고 논의 내용을 입력받아 패턴을 자동으로 도출</strong>합니다. "왜 계속 같은 문제가 반복되나?" 같은 근본적인 질문에 답하게 됩니다.</p>
+          <p>다음 스프린트의 개선 액션도 자동으로 제안됩니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>지난 4주간의 스프린트 회고 기록을 분석해줘.
+
+Week 1 회고:
+- 잘한 점: 일일 스탠드업이 효과적
+- 개선점: 개발-디자인 간 의사소통 부족
+- 액션: 매일 10:30 Quick Sync 추가
+
+Week 2 회고:
+- 잘한 점: 개발-디자인 Quick Sync 효과 있음
+- 개선점: PM이 요구사항을 너무 자주 바꿈
+- 액션: 요구사항은 스프린트 시작 전에만 수정
+
+Week 3 회고:
+- 잘한 점: 요구사항 안정화
+- 개선점: Klaviyo 문서 부족으로 개발 막힘
+- 액션: 외부 Klaviyo 전문가 상담 받기
+
+Week 4 회고:
+- 잘한 점: 전문가 상담 유용함
+- 개선점: QA 과정에서 많은 버그 발견
+- 액션: 개발 중간에 QA 리뷰 추가
+
+분석할 것:
+1) 패턴: 같은 주제가 반복되는가?
+2) 근본 원인: 이 패턴의 근본 원인은?
+3) 체계적 개선안: 다음 4주를 위한 구조적 개선</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+      </article>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header">
+        <span class="day-badge fri">FRI</span>
+        <span class="day-title">의사결정 매트릭스 · Phase 2 완성</span>
+      </div>
+
+      <article class="tip-card fri" id="tip-9">
+        <div class="tip-header" onclick="toggleTip('tip-9')">
+          <div class="tip-meta">
+            <span class="tip-num">#129</span>
+            <span class="tip-day fri">FRI</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">의사결정</span>
+          </div>
+          <h2 class="tip-title">의사결정 매트릭스 자동 생성</h2>
+        </div>
+        <div class="tip-body">
+          <p>좋은 조직은 <strong>의사결정 기준이 명확</strong>합니다. "어떤 기준으로 선택하나?"라는 질문에 즉시 답할 수 있어야 합니다. AI는 <strong>여러 선택지와 평가 기준을 입력받아 정량화된 의사결정 매트릭스</strong>를 생성합니다.</p>
+          <p>감정이 아닌 데이터 기반 의사결정이 가능해집니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 프롬프트 예시</div>
+            <code>다음 선택에 대한 의사결정 매트릭스를 만들어줘.
+
+상황:
+우리는 마케팅 자동화 플랫폼을 선택해야 해.
+현재 Klaviyo 사용 중이지만, 다른 옵션들도 평가 중.
+
+선택지:
+1) Klaviyo (현재) - $300/month
+2) ActiveCampaign - $200/month
+3) Brevo (구 Sendinblue) - $100/month
+4) HubSpot - $500/month
+
+평가 기준 (가중치):
+- 가격 (20%)
+- 기능 완성도 (30%)
+- 고객 지원 (15%)
+- 통합 가능성 (25%)
+- 학습 곡선 (10%)
+
+형식:
+각 기준별 1~5점 평가 + 가중치 계산 + 최종 스코어</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+      </article>
+
+      <article class="tip-card fri" id="tip-10">
+        <div class="tip-header" onclick="toggleTip('tip-10')">
+          <div class="tip-meta">
+            <span class="tip-num">#130</span>
+            <span class="tip-day fri">FRI</span>
+            <span class="tip-tag tag-advanced">🚀 고급</span>
+            <span class="tip-category">학습 종합</span>
+          </div>
+          <h2 class="tip-title">Phase 2 총정리: 실무 적용 마스터</h2>
+        </div>
+        <div class="tip-body">
+          <p>Phase 1에서 배운 프롬프트 기본기가 Phase 2에서 <strong>HR, PM, 운영 전체 영역에 어떻게 확산되는지</strong> 총정리합니다. 개별 팁들이 아닌, <strong>조직 시스템 전체에서 AI를 엮는 방법</strong>을 배웁니다.</p>
+          <p>다음 Phase 3(리더십·전략)의 진입을 위한 확실한 기반을 마련합니다.</p>
+          <div class="tip-example">
+            <div class="tip-example-label">💬 종합 점검 리스트</div>
+            <code>Phase 2를 마치며 점검할 것:
+
+✅ 채용 루프 (MON-TUE)
+  - JD 작성 → 스크리닝 기준 → 면접 질문 → 온보딩까지
+    한 번에 준비할 수 있는가?
+
+✅ 프로젝트 루프 (WED)
+  - 킥오프 문서 → 성공 기준 → 측정 프레임워크
+    세 가지를 한 패키지로 만들 수 있는가?
+
+✅ 운영 루프 (THU-FRI)
+  - 주간 스프린트 결과 → 리스크 업데이트 → 회고 분석
+    → 의사결정까지 순환하는가?
+
+이 세 루프가 조직 내에서 자동으로
+돌아가도록 설계하는 것이 Phase 2의 목표입니다.
+
+다음 Phase 3에서는:
+- 경영진 보고서 자동 작성
+- 전략 문서 생성
+- 조직 성과 관리 시스템 구축
+...을 배우게 됩니다.</code>
+          </div>
+        </div>
+        <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+      </article>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트: 큰 그림</div>
+    <p><strong>지난 3개월은 "도구"를 배웠습니다. 이번 주는 "시스템"을 경험합니다.</strong></p>
+    <p>개별 프롬프트들이 어떻게 조직 전체의 의사결정을 자동화하는지 봅시다. 직무기술서 하나를 만들 때 이미 채용 전체 프로세스가 설계됩니다. 프로젝트 킥오프할 때 이미 성공의 기준과 실패의 신호가 정해집니다. 스프린트 회고를 분석할 때 팀의 성장 경로가 보입니다.</p>
+    <p>이것이 <strong>AI를 "사용하는 것"에서 "시스템화하는 것"</strong>으로 나아가는 길입니다. Phase 3에서는 이 시스템을 조직 리더십 수준으로 확대합니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이번 주의 핵심 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">JD (Job Description)</div>
+      <div class="glossary-en">직무기술서</div>
+      <div class="glossary-def">직급, 역할, 책임, 필요 자격을 명확히 기술한 문서. AI와 함께 만들면 조직 특성이 담긴 구체적인 JD가 나옵니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Behavioral Interview</div>
+      <div class="glossary-en">행동 기반 면접</div>
+      <div class="glossary-def">"과거에 어떤 상황에서 어떻게 했나"를 묻는 면접 방식. 역량을 가장 정확하게 평가할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">KPI (Key Performance Indicator)</div>
+      <div class="glossary-en">핵심 성과 지표</div>
+      <div class="glossary-def">프로젝트나 팀의 성공을 측정하는 정량적 지표. 비즈니스 목표와 직결되어야 합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Risk Register</div>
+      <div class="glossary-en">리스크 레지스터</div>
+      <div class="glossary-def">프로젝트 진행 중 발생 가능한 리스크들을 기록하고, 영향도·확률·대응책을 관리하는 문서.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Sprint Retrospective</div>
+      <div class="glossary-en">스프린트 회고</div>
+      <div class="glossary-def">스프린트가 끝난 후 팀이 "뭐가 잘 됐는가, 뭐가 부족했는가"를 함께 논의하는 미팅.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY DIGEST — by Ian Jung</div>
+    <div class="footer-note">다음 주 월요일, Phase 3가 시작됩니다 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
