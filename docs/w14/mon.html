@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W14 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1"/><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1"/></linearGradient></defs><text x="4" y="24" font-family="JetBrains Mono" font-size="20" font-weight="700" fill="url(#logo-grad)">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W14 · MON</div>
+      <h1 class="header-title">AI 에이전트란 무엇인가<br>에이전트의 4대 구성요소</h1>
+      <p class="header-sub">챗봇 vs 에이전트의 차이 · 인지·계획·실행·기억</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.08 MON<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p><strong>챗봇은 질문에 답하고, 에이전트는 목표를 스스로 달성합니다.</strong> 같은 AI라 해도 완전히 다른 존재예요. 오늘은 AI 에이전트의 정확한 정의부터 그것을 움직이는 4가지 핵심 구성요소까지 — 이론에서 실전까지 단계별로 탐구합니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#131</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">에이전트 정의</span>
+        </div>
+        <h2 class="tip-title">AI 에이전트란 무엇인가<br>챗봇 vs 에이전트의 차이</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>AI 에이전트(Agent)</strong>는 주어진 목표를 달성하기 위해 <strong>스스로 계획을 세우고, 실행하고, 결과를 평가하며 반복</strong>하는 자율적인 AI 시스템입니다. 단순히 사용자의 질문에 답변하는 것을 넘어, 복잡한 작업을 여러 단계에 걸쳐 주도적으로 수행합니다.</p>
+        <p><strong>챗봇</strong>은 입력→처리→출력의 일방향 구조입니다. 사용자가 묻고, AI가 답합니다. 하지만 <strong>에이전트</strong>는 순환 구조로 작동합니다. 목표를 인지한 후, 필요한 도구를 선택하고, 실행하고, 그 결과를 평가해서 다음 단계를 결정합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 예시로 이해하기</div>
+          <code>📞 챗봇 vs 에이전트
+
+[챗봇의 방식]
+사용자: "내일 서울에서 부산 출장이야. 
+         뭘 챙겨야 해?"
+챗봇: "기차표, 숙소 예약, 날씨 확인,
+      출장용 서류 등을 챙기세요."
+→ 끝. 나머지는 사용자가 하나하나
+
+[에이전트의 방식]
+사용자: "내일 서울→부산 출장 준비해."
+에이전트:
+1️⃣ (인지) "서울→부산, 명일 출발이군"
+2️⃣ (계획) "기차 예약 → 숙소 확인 → 
+         날씨 체크 → 짐 리스트 작성"
+3️⃣ (실행) 
+  - 네이버에서 기차표 검색 후 예약
+  - 야놀자에서 숙소 확인 및 예약
+  - 기상청에서 내일 날씨 조회
+  - 출장 필수 짐 리스트 자동 생성
+4️⃣ (기억) 예약번호, 숙소주소, 날씨정보 저장
+   다음 질문에서 참고
+→ 사용자가 할 일 없음. 에이전트가 다 함</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#132</span>
+          <span class="tip-tag tag-intermediate">📚 중급</span>
+          <span class="tip-category">아키텍처 기초</span>
+        </div>
+        <h2 class="tip-title">에이전트의 4대 구성요소<br>인지·계획·실행·기억</h2>
+      </div>
+      <div class="tip-body">
+        <p>모든 에이전트는 네 가지 핵심 모듈로 이루어져 있습니다. 각 모듈이 유기적으로 연동되어야만 에이전트가 제대로 작동합니다.</p>
+        <p><strong>1. 인지(Perception)</strong><br>사용자의 요청과 환경 정보를 해석합니다. "뭘 해야 하는가"를 파악하는 단계입니다. 자연어 처리, 문맥 이해, 데이터 수집이 여기에 해당합니다.</p>
+        <p><strong>2. 계획(Planning)</strong><br>목표 달성을 위한 단계별 전략을 수립합니다. 어떤 도구를 사용할지, 어떤 순서로 진행할지를 결정합니다. 이를 "액션 플랜(Action Plan)"이라 부르기도 합니다.</p>
+        <p><strong>3. 실행(Action)</strong><br>계획에 따라 실제로 작업을 수행합니다. 외부 API 호출, 데이터베이스 접근, 파일 생성 등 구체적인 행동을 취합니다.</p>
+        <p><strong>4. 기억(Memory)</strong><br>과거 상호작용을 저장하고 학습합니다. 이전 대화의 맥락, 실행 결과, 사용자의 선호도를 기억하여 다음 요청에 더 정확하게 대응합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 4대 요소가 작동하는 구체적 흐름</div>
+          <code>시나리오: "이번 주 화요일 10시에 
+           팀장과 1:1 미팅 잡아줘"
+
+[1단계] 인지(Perception)
+입력: "이번 주 화요일 10시에 팀장과 
+      1:1 미팅 잡아줘"
+파싱: 날짜(화요일), 시간(10:00), 
+     대상(팀장), 작업(미팅 예약)
+
+[2단계] 계획(Planning)
+- 현재 캘린더 조회
+- 팀장의 캘린더 접근 권한 확인
+- 10시 시간대 충돌 체크
+- 필요 시 시간 재조정
+
+[3단계] 실행(Action)
+- Google Calendar API 호출
+- 미팅 일정 생성
+- 팀장에게 초대장 발송
+- Slack 알림 설정
+
+[4단계] 기억(Memory)
+저장할 정보:
+- 사용자는 팀장과 주 1회 미팅 선호
+- 보통 화요일 10시 고정 선호
+- 1:1 미팅 시간은 평균 30분
+→ 다음 요청 때 이 정보들을 
+  활용해서 더 빠르고 정확하게 대응</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>에이전트가 단순한 챗봇과 다른 이유는 <strong>"자율성"</strong>입니다. 챗봇은 대기하는 수동적 존재지만, 에이전트는 목표를 향해 능동적으로 움직입니다. 앞으로의 25주 과정에서 우리는 이 네 가지 요소를 각각 어떻게 설계하고, 최적화하며, 실전에서 조합하는지를 깊이 있게 배우게 됩니다. 오늘의 이 4가지 개념이 이후 모든 학습의 기초가 된다는 점을 명심하세요.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">에이전트</div>
+      <div class="glossary-en">Agent</div>
+      <div class="glossary-def">목표 달성을 위해 인지-계획-실행-기억 사이클을 반복하며 스스로 행동하는 자율적인 AI 시스템. 단순 질답을 넘어 복잡한 다단계 작업을 주도적으로 수행합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">액션 플랜</div>
+      <div class="glossary-en">Action Plan</div>
+      <div class="glossary-def">에이전트가 주어진 목표를 달성하기 위해 수립하는 단계별 실행 전략. 어떤 도구를 언제 어떤 순서로 사용할지를 명시한 상세 계획입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
