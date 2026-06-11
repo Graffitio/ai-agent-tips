@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W14 · PHASE 3 — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+    --mon:#7C3AED;--tue:#3B82F6;--wed:#10B981;--thu:#F59E0B;--fri:#EF4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s;display:flex}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-day-bar{width:4px;flex-shrink:0}
+  .tip-day-mon .tip-day-bar{background:var(--mon)}
+  .tip-day-tue .tip-day-bar{background:var(--tue)}
+  .tip-day-wed .tip-day-bar{background:var(--wed)}
+  .tip-day-thu .tip-day-bar{background:var(--thu)}
+  .tip-day-fri .tip-day-bar{background:var(--fri)}
+  .tip-header{padding:18px 22px;cursor:pointer;flex:1}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px;display:none}
+  .tip-card{flex-direction:column}
+  .tip-header{flex:initial;padding:18px 22px}
+  .tip-body{display:block;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap;word-break:break-word}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <img class="logo-img" src="assets/logo.png" alt="4lynx">
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W14 · MON–FRI</div>
+      <h1 class="header-title">에이전트의 모든 것<br>5일 완성 가이드</h1>
+      <p class="header-sub">개념부터 메모리·성능평가까지 — AI 에이전트 설계와 구축의 전체 여정</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.04.07~11 MON–FRI<br>☕ 25 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>지난 13주 동안 프롬프트와 기초 AI 개념을 배웠다면, 이제는 <strong>AI 에이전트의 세계로 한 발을 내딛을 때</strong>입니다. 에이전트란 단순히 "질문에 답하는 챗봇"이 아닙니다. <strong>스스로 목표를 이해하고, 도구를 사용하며, 실패를 극복하고, 경험에서 배우는 자율적 존재</strong>입니다. W14는 에이전트의 모든 것을 5일 만에 마스터하는 집중 학습 주간입니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 주간 팁 10선</div>
+    
+    <article class="tip-card tip-day-mon" id="tip-1">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#131</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">에이전트 기초</span>
+        </div>
+        <h2 class="tip-title">AI 에이전트란 무엇인가</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>에이전트(Agent)</strong>는 "주어진 목표를 달성하기 위해 환경과 상호작용하는 자율적 시스템"입니다. 단순 챗봇과의 가장 큰 차이는 <strong>생각하고 행동하는 루프</strong>를 반복한다는 점입니다.</p>
+        <p>예를 들어, "내 캘린더에서 다음 주 미팅 시간을 찾아 회의실을 예약해줘"라는 명령을 받으면:</p>
+        <p>1️⃣ <strong>목표 이해:</strong> "회의실 예약"이 진짜 목표인가? 아니면 그 안에 캘린더 확인, 참석자 통보 등이 있는가?<br>2️⃣ <strong>도구 선택:</strong> "캘린더 조회 도구" → "회의실 예약 도구" → "이메일 도구" 순서대로 사용<br>3️⃣ <strong>실행과 피드백:</strong> 각 단계의 결과를 확인하고, 문제가 나면 다시 계획 수정<br>4️⃣ <strong>최종 검증:</strong> "예약 완료했고, 참석자들에게 알림도 보냈습니다"라고 보고</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🔄 에이전트 vs 챗봇</div>
+          <code>챗봇:
+"캘린더를 확인하려면 Google Calendar API를
+연결해야 합니다. 다음은 연결 방법입니다..."
+(답만 함)
+
+에이전트:
+1. 캘린더 조회 도구 실행 → 회의 데이터 수집
+2. 빈 시간 분석 → "다음 주 화요일 2PM이 최적"
+3. 회의실 예약 도구 실행 → 예약 완료
+4. 이메일 발송 도구 실행 → 참석자 알림
+5. "모든 작업 완료. 다음 주 화요일 2PM, B-101호실"
+(직접 행동)</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-mon" id="tip-2">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#132</span>
+          <span class="tip-tag tag-intermediate">🔵 중급</span>
+          <span class="tip-category">에이전트 아키텍처</span>
+        </div>
+        <h2 class="tip-title">에이전트의 4대 구성요소</h2>
+      </div>
+      <div class="tip-body">
+        <p>모든 에이전트는 네 가지 핵심 요소로 이루어져 있습니다. 이것을 이해하면 어떤 에이전트든 설계할 수 있습니다:</p>
+        <p><strong>1. 뇌(LLM, Large Language Model)</strong><br>Claude, GPT-4 같은 거대 언어 모델. 상황을 분석하고 다음 행동을 결정합니다.</p>
+        <p><strong>2. 도구(Tools)</strong><br>에이전트가 실제 행동을 취할 수 있게 해주는 함수나 API. 예: 이메일 발송, 데이터베이스 조회, 웹 검색.</p>
+        <p><strong>3. 메모리(Memory)</strong><br>과거 상호작용과 학습 결과를 기억. 같은 실수를 반복하지 않고, 맥락을 유지합니다.</p>
+        <p><strong>4. 피드백 루프(Feedback Loop)</strong><br>행동 결과를 확인하고, 성공 여부를 판단한 뒤 다음 행동을 조정합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🏗️ 에이전트 아키텍처</div>
+          <code>┌─────────────────────────────────┐
+│  목표: "월드컵 경기 일정 알기" │
+└─────────────────┬───────────────┘
+                  │
+        ┌─────────▼─────────┐
+        │  뇌(Claude)       │
+        │ "웹 검색이 필요함" │
+        └─────────┬─────────┘
+                  │
+        ┌─────────▼──────────┐
+        │ 도구: 웹 검색      │
+        │ 결과: JSON 데이터 │
+        └─────────┬──────────┘
+                  │
+        ┌─────────▼──────────────┐
+        │ 피드백 루프: 데이터 검증 │
+        │ "정보 완성? Y/N"        │
+        └─────────┬──────────────┘
+                  │
+        ┌─────────▼──────────┐
+        │ 메모리: 저장       │
+        │ 다음 요청에 사용   │
+        └─────────┬──────────┘
+                  │
+        ┌─────────▼──────────┐
+        │ 최종 답변 반환     │
+        └────────────────────┘</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-tue" id="tip-3">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-3')">
+        <div class="tip-meta">
+          <span class="tip-num">#133</span>
+          <span class="tip-tag tag-intermediate">🔵 중급</span>
+          <span class="tip-category">도구 설계</span>
+        </div>
+        <h2 class="tip-title">도구 사용(Tool Use) 이해하기</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>Tool Use</strong>는 에이전트가 자신의 능력을 확장하는 방식입니다. 에이전트는 LLM일 뿐이므로 직접 실행할 수 없는 작업을 도구를 통해 수행합니다.</p>
+        <p>핵심은 <strong>LLM이 "이 일은 도구가 필요하다"를 판단하고, 올바른 도구와 인자를 선택</strong>하는 것입니다.</p>
+        <p><strong>Tool Use의 사이클:</strong><br>1️⃣ 사용자 요청 분석<br>2️⃣ 필요한 도구 결정<br>3️⃣ 도구에 전달할 인자 준비<br>4️⃣ 도구 실행<br>5️⃣ 결과 분석 및 다음 도구 판단<br>6️⃣ 결과 통합 및 최종 답변</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🛠️ Tool Use 예시</div>
+          <code>사용자: "런던의 오늘 날씨와 내일 
+날씨를 비교해서, 우산이 필요한지 알려줘"
+
+에이전트의 사고 과정:
+1. "날씨 정보가 필요하다" → 날씨 API 도구 선택
+2. 도구에 {"city":"London", "date":"today"} 전달
+3. 결과: {"temp":12°C, "condition":"rainy"}
+4. 다시 {"city":"London", "date":"tomorrow"} 전달
+5. 결과: {"temp":14°C, "condition":"sunny"}
+6. 분석: "오늘은 비, 내일은 맑음"
+7. 최종 답변: "오늘은 우산이 필수, 내일은 불필요"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-3')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-tue" id="tip-4">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-4')">
+        <div class="tip-meta">
+          <span class="tip-num">#134</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">에이전트 루프</span>
+        </div>
+        <h2 class="tip-title">에이전트 루프 설계 패턴</h2>
+      </div>
+      <div class="tip-body">
+        <p>에이전트의 핵심은 <strong>think → act → observe 루프</strong>를 반복하는 것입니다. 이 루프를 얼마나 잘 설계하느냐가 에이전트의 성공을 좌우합니다.</p>
+        <p><strong>세 가지 주요 루프 패턴:</strong></p>
+        <p><strong>패턴 1: ReAct (Reasoning + Acting)</strong><br>LLM이 추론과 행동을 번갈아가며 수행. 가장 기본이면서도 효과적.</p>
+        <p><strong>패턴 2: Plan-Then-Act</strong><br>먼저 전체 계획을 세우고, 그 다음 순차적으로 실행. 복잡한 다단계 작업에 유리.</p>
+        <p><strong>패턴 3: Hierarchical Loop</strong><br>상위 에이전트가 큰 그림을 결정하고, 하위 에이전트가 각 단계를 실행. 매우 복잡한 시스템에 사용.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🔄 ReAct 패턴 예시</div>
+          <code>Iteration 1 - THINK:
+"사용자가 'Q1 실적' 데이터를 요청했다.
+데이터베이스 조회 도구가 필요하다."
+
+Iteration 1 - ACT:
+query_db(sql="SELECT * FROM Q1_results")
+
+Iteration 1 - OBSERVE:
+{"revenue":1000000, "profit":250000, ...}
+
+Iteration 2 - THINK:
+"데이터를 받았다. 이제 분석이 필요하다.
+작년과 비교하려면 Q1_last_year도 필요하다."
+
+Iteration 2 - ACT:
+query_db(sql="SELECT * FROM Q1_results_2024")
+
+Iteration 2 - OBSERVE:
+{"revenue":900000, "profit":200000, ...}
+
+Iteration 3 - THINK:
+"두 데이터를 비교할 수 있다. 
+최종 답변을 구성하자."
+
+최종 답변:
+"Q1 매출: 1,000만원 (작년 대비 +11.1%)
+Q1 이익: 250만원 (작년 대비 +25%)"</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-4')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-wed" id="tip-5">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-5')">
+        <div class="tip-meta">
+          <span class="tip-num">#135</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">에이전트 안전성</span>
+        </div>
+        <h2 class="tip-title">에이전트의 실패 모드와 안전장치</h2>
+      </div>
+      <div class="tip-body">
+        <p>자율적인 에이전트일수록 <strong>통제 불가능한 행동의 위험</strong>이 커집니다. 무한 루프, 도구 오남용, 할루시네이션(거짓 정보 생성) 등이 주요 실패 모드입니다.</p>
+        <p><strong>주요 실패 모드 4가지:</strong></p>
+        <p>1️⃣ <strong>무한 루프(Infinite Loop):</strong> 에이전트가 같은 도구를 계속 호출해 진행이 안 됨.<br>→ 해결: 최대 반복 횟수 제한, 도구 호출 이력 추적</p>
+        <p>2️⃣ <strong>할루시네이션(Hallucination):</strong> 존재하지 않는 도구나 데이터를 사용한다고 주장.<br>→ 해결: 사용 가능한 도구를 명확히 명시, 결과 검증</p>
+        <p>3️⃣ <strong>잘못된 도구 선택:</strong> 이메일 도구로 데이터베이스를 쿼리하려 시도.<br>→ 해결: 도구 설명을 상세히, 테스트 케이스로 검증</p>
+        <p>4️⃣ <strong>권한 이상(Privilege Escalation):</strong> 본래 권한 이상으로 행동 수행.<br>→ 해결: 도구별 권한 체크, 감시 로깅</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🛡️ 안전장치 구현 예</div>
+          <code>MAX_ITERATIONS = 10  # 최대 10번 반복
+
+history = []  # 도구 호출 이력
+
+for iteration in range(MAX_ITERATIONS):
+    # 도구 호출
+    tool_result = call_tool(...)
+    history.append(tool_result)
+    
+    # 같은 도구를 3번 연속 호출했으면 중단
+    if len(history) >= 3:
+        if history[-1] == history[-2] == history[-3]:
+            raise LoopDetected("무한 루프 감지됨")
+    
+    # 도구가 존재하는지 확인
+    if tool_name not in AVAILABLE_TOOLS:
+        raise ToolNotFound(f"{tool_name}은 없음")
+    
+    # 도구 실행 권한 확인
+    if not user.has_permission(tool_name):
+        raise PermissionDenied(f"권한 없음: {tool_name}")</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-5')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-wed" id="tip-6">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-6')">
+        <div class="tip-meta">
+          <span class="tip-num">#136</span>
+          <span class="tip-tag tag-intermediate">🔵 중급</span>
+          <span class="tip-category">LLM 통합</span>
+        </div>
+        <h2 class="tip-title">Claude에서 MCP 서버 활용하기</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>MCP(Model Context Protocol)</strong>는 Anthropic이 제안한 표준화된 도구 연결 방식입니다. Claude 에이전트가 다양한 외부 시스템에 쉽게 연결되도록 합니다.</p>
+        <p>MCP를 사용하면 <strong>별도의 복잡한 통합 로직 없이 플러그앤플레이처럼</strong> 도구를 추가할 수 있습니다.</p>
+        <p><strong>MCP의 세 가지 핵심 역할:</strong></p>
+        <p>1️⃣ <strong>Tool Definition(도구 정의):</strong> 도구가 뭔지, 어떤 인자를 받는지 명시<br>2️⃣ <strong>Resource Access(리소스 접근):</strong> 파일, 데이터베이스 등 접근<br>3️⃣ <strong>Prompt Support(프롬프트 지원):</strong> 도구 사용 방법을 명확하게 설명</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🔌 MCP로 도구 정의</div>
+          <code>{
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "주어진 도시의 날씨 정보 조회",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "도시명"
+          },
+          "date": {
+            "type": "string",
+            "description": "조회 날짜 (YYYY-MM-DD)"
+          }
+        },
+        "required": ["city"]
+      }
+    }
+  ]
+}</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-6')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-thu" id="tip-7">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-7')">
+        <div class="tip-meta">
+          <span class="tip-num">#137</span>
+          <span class="tip-tag tag-intermediate">🔵 중급</span>
+          <span class="tip-category">검색·생성 통합</span>
+        </div>
+        <h2 class="tip-title">검색 보강 생성(RAG) 기초</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>RAG(Retrieval-Augmented Generation)</strong>는 "검색 → 생성" 구조로 에이전트의 답변 정확도를 크게 높입니다. 단순한 LLM의 고정 지식에만 의존하지 않고, 최신 정보를 동적으로 가져옵니다.</p>
+        <p><strong>RAG의 세 단계:</strong></p>
+        <p>1️⃣ <strong>Retrieval(검색):</strong> 사용자 질문과 관련된 문서/데이터 검색<br>2️⃣ <strong>Context 준비:</strong> 검색된 정보를 프롬프트에 포함<br>3️⃣ <strong>Generation(생성):</strong> 검색 결과를 바탕으로 답변 생성</p>
+        <p>에이전트 관점에서 RAG는 <strong>"검색" 도구의 고도화 버전</strong>입니다. 단순 웹 검색 대신, 회사 내부 문서나 데이터베이스에서도 정보를 가져올 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🔍 RAG 사이클</div>
+          <code>사용자 질문:
+"우리 회사 2024년 경영 방침은 뭐야?"
+
+1️⃣ RETRIEVAL:
+내부 wiki 검색 + 임베딩 유사도 계산
+→ "2024_company_strategy.pdf" 검색됨
+
+2️⃣ CONTEXT 준비:
+문서에서 "경영 방침" 섹션 추출
+→ "Digital-First, Cost Optimization, ..."
+
+3️⃣ GENERATION:
+프롬프트:
+"다음 문서를 바탕으로 경영 방침을 설명:
+[검색된 내용]
+질문: 우리 회사 2024년 경영 방침은?"
+
+최종 답변:
+"2024년 우리 회사의 경영 방침은
+다음 세 가지입니다:
+1. Digital-First Transformation
+2. Cost Optimization
+3. ..."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-7')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-thu" id="tip-8">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-8')">
+        <div class="tip-meta">
+          <span class="tip-num">#138</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">함수 호출</span>
+        </div>
+        <h2 class="tip-title">함수 호출(Function Calling) 실전</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>Function Calling</strong>은 도구 사용의 기술적 구현입니다. LLM이 "이 함수를 이 인자로 호출하라"고 명시적으로 말하면, 시스템이 그 함수를 실행하는 방식입니다.</p>
+        <p>핵심은 <strong>LLM의 출력을 구조화하는 것</strong>입니다. JSON 형식으로 도구 이름과 인자를 명시하면, 프로그램이 자동으로 파싱해 실행할 수 있습니다.</p>
+        <p><strong>Function Calling의 실전 흐름:</strong><br>1️⃣ 사용자 질문과 함께 "사용 가능한 함수 목록" 전달<br>2️⃣ LLM이 어떤 함수를 써야 할지 결정<br>3️⃣ LLM이 함수명과 인자를 JSON으로 반환<br>4️⃣ 시스템이 JSON을 파싱해 함수 실행<br>5️⃣ 실행 결과를 다시 LLM에 전달<br>6️⃣ LLM이 결과를 해석해 최종 답변 생성</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📞 Function Calling 예시</div>
+          <code>사용자 요청:
+"서울의 내일 날씨 알려줘"
+
+시스템이 LLM에 전달:
+available_functions: [
+  {
+    "name": "get_weather",
+    "parameters": {
+      "city": "string",
+      "date": "string (YYYY-MM-DD)"
+    }
+  }
+]
+
+LLM의 응답:
+{
+  "type": "function_call",
+  "function": {
+    "name": "get_weather",
+    "arguments": {
+      "city": "Seoul",
+      "date": "2026-04-08"
+    }
+  }
+}
+
+시스템이 함수 실행:
+result = get_weather(city="Seoul", date="2026-04-08")
+→ {"temp": 15, "condition": "rainy"}
+
+LLM이 최종 답변:
+"서울의 내일 날씨는 빗소식입니다. 
+기온은 15°C 정도로 쌀쌀하니
+우산을 챙기세요."</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-8')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-fri" id="tip-9">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-9')">
+        <div class="tip-meta">
+          <span class="tip-num">#139</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">에이전트 메모리</span>
+        </div>
+        <h2 class="tip-title">에이전트 메모리 설계</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>메모리(Memory)</strong>는 에이전트가 과거에서 배우고, 문맥을 유지하는 능력입니다. 메모리 없이는 매번 같은 실수를 반복하고, 대화의 맥락을 잃습니다.</p>
+        <p><strong>세 가지 메모리 타입:</strong></p>
+        <p>1️⃣ <strong>Short-term Memory(단기 메모리):</strong> 현재 대화 내에서의 문맥. 최근 메시지들만 저장.<br>→ 사용: 매 질문에 최근 5개 메시지 포함</p>
+        <p>2️⃣ <strong>Long-term Memory(장기 메모리):</strong> 여러 대화에 걸친 사실과 패턴. 데이터베이스에 저장.<br>→ 사용: "사용자는 마케팅 담당자다"같은 정보</p>
+        <p>3️⃣ <strong>Episodic Memory(에피소드 메모리):</strong> 과거 상호작용의 구체적 기록. "아, 지난주 이 에러를 해결했었다"는 식의 기억.<br>→ 사용: 해결된 문제 목록, 실패 사례 분석</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🧠 메모리 저장 예시</div>
+          <code># 단기 메모리 (현재 세션)
+conversation_history = [
+  {"role": "user", "content": "분기 실적 분석해줘"},
+  {"role": "assistant", "content": "..."},
+  {"role": "user", "content": "작년과 비교하면?"}
+]
+
+# 장기 메모리 (사용자 프로필)
+user_profile = {
+  "name": "박마케팅",
+  "role": "Marketing Manager",
+  "department": "B2B Marketing",
+  "preferences": ["data-driven", "brief_summary"]
+}
+
+# 에피소드 메모리 (문제 해결 이력)
+solved_issues = [
+  {
+    "date": "2026-04-01",
+    "issue": "CSV 임포트 실패",
+    "solution": "인코딩을 UTF-8로 변경",
+    "tags": ["data", "import"]
+  }
+]
+
+# LLM이 새로운 CSV 문제 받으면:
+if "CSV" in current_query and "import" in current_query:
+  → solved_issues에서 유사한 해결책 검색
+  → "작년에 이런 문제 해결했어요!"라고 제안</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-9')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card tip-day-fri" id="tip-10">
+      <div class="tip-day-bar"></div>
+      <div class="tip-header" onclick="toggleTip('tip-10')">
+        <div class="tip-meta">
+          <span class="tip-num">#140</span>
+          <span class="tip-tag tag-advanced">⚡ 고급</span>
+          <span class="tip-category">평가 및 최적화</span>
+        </div>
+        <h2 class="tip-title">에이전트 성능 평가 방법론</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>에이전트의 성능</strong>을 어떻게 측정할까요? 단순한 챗봇처럼 "사용자 만족도"만으로는 부족합니다. 에이전트는 실제 작업을 수행하므로, 목표 달성도를 객관적으로 평가해야 합니다.</p>
+        <p><strong>네 가지 핵심 지표(KPI):</strong></p>
+        <p>1️⃣ <strong>Success Rate(성공률):</strong> 에이전트가 목표를 달성한 비율. 100회 중 95회 성공 = 95%<br>→ 목표: 90% 이상</p>
+        <p>2️⃣ <strong>Cost Efficiency(비용 효율):</strong> 작업당 토큰 사용량, API 호출 수. 에이전트가 불필요한 도구를 과다 호출하는지 확인.<br>→ 목표: 평균 이하 토큰 사용</p>
+        <p>3️⃣ <strong>Latency(처리 속도):</strong> 요청부터 답변까지 걸린 시간. 실시간 응답이 필요한 시스템에서 중요.<br>→ 목표: 평균 3초 이내</p>
+        <p>4️⃣ <strong>Human Intervention Rate(인간 개입률):</strong> 에이전트가 스스로 해결하지 못해 인간이 개입해야 했던 비율.<br>→ 목표: 5% 이하</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📊 평가 프레임워크</div>
+          <code>평가 대상: "일정 자동 조정 에이전트"
+
+테스트 케이스 100개 실행:
+
+✅ 성공 케이스: 92개
+   - 올바른 일정 변경: 85개
+   - 참석자 통보까지 완료: 92개
+   → Success Rate: 92%
+
+💰 비용 효율:
+   - 평균 토큰 사용: 1,200 토큰/요청
+   - 평균 API 호출: 2.5회
+   → 예상 월 비용: $15 (100개 요청/일 기준)
+
+⚡ 처리 속도:
+   - 평균 시간: 2.3초
+   - 최대 시간: 5.1초
+   → Latency: Good
+
+👤 인간 개입률:
+   - 재일정이 불가능한 경우: 8개
+   → Intervention Rate: 8%
+
+개선 권고:
+1. 일정 충돌 해결 로직 강화 → Success Rate 95%로
+2. 불필요한 정보 조회 제거 → Cost 10% 절감
+3. 병렬 처리 구현 → Latency 1.5초로</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-10')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 큰 그림: W14를 마치며</div>
+    <p>지난 5일 동안 에이전트의 모든 층을 살펴봤습니다. <strong>개념(무엇인가) → 설계(어떻게 만드나) → 실행(도구 사용) → 안전(어떻게 보호하나) → 최적화(어떻게 평가하나)</strong>라는 전체 흐름입니다.</p>
+    <p>에이전트를 만든다는 것은 단순히 "더 똑똑한 챗봇"을 만드는 게 아닙니다. <strong>"스스로 생각하고, 행동하고, 실패에서 배우는 자율 시스템"을 창조</strong>하는 것입니다. W15부터는 이 개념들을 직접 코드로 구현하는 실전 주간이 시작됩니다. 당신은 이제 에이전트의 언어를 읽을 준비가 되었습니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 이번 주 핵심 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">ReAct</div>
+      <div class="glossary-en">Reasoning + Acting</div>
+      <div class="glossary-def">LLM이 추론(Reasoning)과 행동(Acting)을 반복하면서 문제를 해결하는 패턴. 투명하고 추적 가능한 의사결정 과정을 제공합니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">Tool Use</div>
+      <div class="glossary-en">Tool Use / Function Calling</div>
+      <div class="glossary-def">에이전트가 LLM 자체의 능력을 넘어서 외부 도구(API, 함수, 데이터베이스)를 호출하고 활용하는 기능.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">RAG</div>
+      <div class="glossary-en">Retrieval-Augmented Generation</div>
+      <div class="glossary-def">외부 정보 소스에서 관련 데이터를 검색한 후, 그 정보를 바탕으로 텍스트를 생성하는 기법. LLM의 고정 지식의 한계를 극복합니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">MCP</div>
+      <div class="glossary-en">Model Context Protocol</div>
+      <div class="glossary-def">Anthropic이 제안한 표준화된 도구 연결 프로토콜. Claude와 다양한 외부 시스템을 쉽게 통합할 수 있습니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">할루시네이션</div>
+      <div class="glossary-en">Hallucination</div>
+      <div class="glossary-def">LLM이 존재하지 않는 정보나 거짓된 사실을 마치 참인 것처럼 생성하는 현상. 에이전트의 주요 실패 모드 중 하나.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · W14 · PHASE 3 — by Ian Jung</div>
+    <div class="footer-note">다음 주부터는 직접 빌드하는 실전 주간입니다 🚀</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
