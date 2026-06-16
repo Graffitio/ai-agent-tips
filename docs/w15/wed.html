@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W15 WED — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1B1464;stop-opacity:1" /><stop offset="100%" style="stop-color:#3569B8;stop-opacity:1" /></linearGradient></linearGradient></defs><text x="10" y="28" font-family="JetBrains Mono" font-size="24" font-weight="700" fill="url(#grad1)">4lynx</text></svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W15 · WED</div>
+      <h1 class="header-title">멀티 에이전트 디버깅 전략과 리서치 에이전트 만들기</h1>
+      <p class="header-sub">복잡한 시스템의 문제 추적법 · 검색→요약→보고 자동화</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.17 WED<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>여러 에이전트가 협력할 때 발생하는 문제를 찾아내는 것은 단일 에이전트보다 훨씬 복잡합니다. 오늘은 <strong>멀티 에이전트 시스템의 문제 추적 방법론</strong>과 실전에서 즉시 써먹을 수 있는 <strong>리서치 에이전트 구현법</strong>을 배웁니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#145</span>
+          <span class="tip-tag tag-advanced">🔥 고급</span>
+          <span class="tip-category">디버깅</span>
+        </div>
+        <h2 class="tip-title">멀티 에이전트 디버깅 전략: 복잡한 시스템의 문제 추적법</h2>
+      </div>
+      <div class="tip-body">
+        <p>멀티 에이전트 시스템에서는 <strong>어느 에이전트가, 어디서, 왜 실패하는지</strong> 파악하기가 어렵습니다. 문제는 한 에이전트가 아닌 에이전트 간의 상호작용에서 비롯되기도 합니다. 해결책은 세 가지 디버깅 레이어입니다.</p>
+        <p><strong>첫째, 각 에이전트를 독립적으로 테스트</strong>합니다. 같은 입력을 개별 에이전트에 주고 출력을 확인하세요. <strong>둘째, 에이전트 간 메시지 로깅</strong>을 설정합니다. 누가 누구에게 뭘 보냈는지 기록하면 문제 지점이 명확해집니다. <strong>셋째, 상태 추이 추적</strong>으로 각 단계별 시스템 상태를 저장해두고, 문제 발생 시 직전 상태로 돌아가 다시 실행해볼 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💻 구현 패턴</div>
+          <code>class MultiAgentDebugger:
+  def __init__(self):
+    self.message_log = []
+    self.state_snapshots = []
+  
+  # 메시지 로깅
+  def log_message(self, from_agent, to_agent, msg):
+    self.message_log.append({
+      'from': from_agent,
+      'to': to_agent,
+      'msg': msg,
+      'timestamp': time.time()
+    })
+  
+  # 상태 저장
+  def save_state(self, agent_id, state):
+    self.state_snapshots.append({
+      'agent': agent_id,
+      'state': state,
+      'ts': time.time()
+    })
+  
+  # 분석: 어느 에이전트의 출력이 다음 에이전트의
+  # 입력과 맞지 않는가?
+  def find_mismatch(self):
+    for i in range(len(self.message_log)-1):
+      current = self.message_log[i]
+      next_msg = self.message_log[i+1]
+      if current['to'] == next_msg['from']:
+        if not self._is_compatible(current['msg'],
+                                   next_msg['msg']):
+          return (current, next_msg)
+    return None</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#146</span>
+          <span class="tip-tag tag-intermediate">📊 중급</span>
+          <span class="tip-category">리서치</span>
+        </div>
+        <h2 class="tip-title">리서치 에이전트 만들기: 검색→요약→보고 자동화</h2>
+      </div>
+      <div class="tip-body">
+        <p>웹 검색 → 정보 요약 → 리포트 생성의 3단계를 자동화하는 리서치 에이전트를 구축합니다. 이 패턴은 시장 조사, 경쟁 분석, 뉴스 모니터링 등 실무에서 매일 필요합니다.</p>
+        <p><strong>첫 번째 에이전트(Search Agent)</strong>는 키워드로 웹을 검색해 관련 URL 수집. <strong>두 번째(Summarizer Agent)</strong>는 각 페이지를 읽고 요점 추출. <strong>세 번째(Report Agent)</strong>는 요약본들을 통합해 최종 리포트 작성. 각 에이전트는 독립적이므로 병렬 실행도 가능합니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🏗️ 구조도</div>
+          <code>User Query
+    ↓
+[Search Agent]
+  ├─ 구글 검색 API
+  ├─ 상위 10개 URL 추출
+  └─ URLs → [Summarizer Agent]
+           ├─ URL 1 읽고 요약
+           ├─ URL 2 읽고 요약
+           ├─ URL 3 읽고 요약
+           └─ 3개 요약 → [Report Agent]
+                        ├─ 공통점 찾기
+                        ├─ 차이점 분석
+                        ├─ 인사이트 도출
+                        └─ 최종 리포트 생성
+                            ↓
+                          User</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>멀티 에이전트 시스템은 강력하지만 예측 불가능합니다. 따라서 <strong>"투명성"</strong>이 필수입니다. 모든 에이전트의 행동을 기록하고, 각 단계의 상태를 저장하고, 문제 발생 시 재현할 수 있어야 합니다. 이렇게 하면 아무리 복잡한 멀티 에이전트 시스템도 차근차근 디버깅할 수 있습니다. 그리고 리서치 에이전트처럼 <strong>일반화된 패턴</strong>을 찾아두면 비슷한 작업을 계속 재사용할 수 있습니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">멀티 에이전트 시스템</div>
+      <div class="glossary-en">Multi-Agent System</div>
+      <div class="glossary-def">여러 개의 에이전트가 협력하여 복잡한 문제를 해결하는 시스템. 각 에이전트는 특정 역할을 수행하고 메시지를 주고받으며 상호작용합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">상태 추이 추적</div>
+      <div class="glossary-en">State Tracking</div>
+      <div class="glossary-def">시스템의 각 단계별 상태를 기록하고 저장하는 기법. 문제 발생 시 특정 시점으로 돌아가 재실행하거나, 상태 변화 과정을 분석할 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
