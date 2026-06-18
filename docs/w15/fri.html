@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W15 FRI — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#1B1464;stop-opacity:1"/>
+              <stop offset="100%" style="stop-color:#3569B8;stop-opacity:1"/>
+            </linearGradient>
+          </defs>
+          <text x="8" y="28" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="url(#logoGrad)">4lynx</text>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W15 · FRI</div>
+      <h1 class="header-title">고객 지원 에이전트<br>프로덕션 배포</h1>
+      <p class="header-sub">테스트→모니터링→개선 사이클 · 성공/실패 사례에서 배우기</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.19 FRI<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>멀티 에이전트 시스템을 개발하는 것도 어렵지만, <strong>"프로덕션에 안정적으로 배포하는 것"</strong>은 또 다른 차원의 도전입니다. 오늘은 고객 지원 에이전트를 실제 서비스에 배포하고, 모니터링하고, 지속적으로 개선하는 3단계 프로세스를 다룹니다. 25주의 여정도 이 단계에 접어들었습니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#149</span>
+          <span class="tip-tag tag-advanced">⚡ 심화</span>
+          <span class="tip-category">배포 및 테스트</span>
+        </div>
+        <h2 class="tip-title">고급 지원 봇 배포: 테스트→모니터링→개선 사이클</h2>
+      </div>
+      <div class="tip-body">
+        <p>고객 지원 에이전트 배포는 세 단계로 진행됩니다. 첫째, <strong>프로덕션 전 철저한 시나리오 테스트</strong>. 고객의 100가지 시나리오를 미리 테스트하고 정확도를 기록합니다. 둘째, <strong>배포 후 실시간 모니터링</strong>. API 지연시간, 에러율, 고객 만족도 점수를 대시보드로 추적합니다. 셋째, <strong>주간 데이터 분석 및 프롬프트 튜닝</strong>. 실패한 대화 100개를 분석해 어떤 패턴에서 실패했는지 파악하고, 시스템 프롬프트와 에이전트 도구를 개선합니다.</p><p>핵심은 <strong>"배포가 끝이 아니라 시작"</strong>이라는 인식입니다. 실제 사용자 데이터가 가장 훌륭한 학습 자료이기 때문입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📊 모니터링 대시보드 항목</div>
+          <code>✅ 실시간 메트릭:
+  - 평균 응답시간 (목표: <2초)
+  - 에러율 (목표: <1%)
+  - 에이전트 해결율 (목표: >85%)
+  - 에스컬레이션 비율
+  - 고객 만족도 (1-5 점수)
+
+✅ 주간 분석:
+  - 실패 패턴 Top 10
+  - 가장 많이 물어본 주제 Top 5
+  - 프롬프트 개선 우선순위
+  
+✅ 배포 전 체크리스트:
+  - 시나리오 테스트 정확도 ≥95%
+  - 레이턴시 P95 <3초
+  - 에이전트 도구 안정성 테스트 완료
+  - 폴백 및 에스컬레이션 로직 검증
+  - 가이드라인 및 안전장치 설정</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#150</span>
+          <span class="tip-tag tag-advanced">⚡ 심화</span>
+          <span class="tip-category">프로젝트 평가</span>
+        </div>
+        <h2 class="tip-title">고급 프로젝트 리뷰: 에이전트 프로젝트 포스트모템</h2>
+      </div>
+      <div class="tip-body">
+        <p>프로덕션 배포 이후 일정 기간(보통 2-4주)이 지나면, <strong>포스트모템(사후 분석) 미팅</strong>을 진행합니다. 이는 배포의 성공/실패를 객관적으로 평가하고, 다음 프로젝트에 교훈을 남기는 중요한 단계입니다. 성공 사례로부터는 "어떤 구조와 프롬프트가 잘 작동했는가"를, 실패 사례로부터는 "왜 에이전트가 특정 상황에서 실패했는가"를 배웁니다.</p><p>포스트모템은 <strong>"누가 잘했는가"를 평가하는 것이 아니라 "무엇이 잘못되었는가"를 분석</strong>하는 자리입니다. 팀 전체가 배우고 성장하는 문화를 만드는 것이 목표입니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📋 포스트모템 템플릿</div>
+          <code>🎯 Project: 고객 지원 에이전트 (Customer Support Agent v1.0)
+📅 배포 기간: 2026.06.01 ~ 2026.06.19
+
+1️⃣ 목표 vs 결과
+   목표: 에이전트 해결율 85%, 고객 만족도 4.0/5.0
+   결과: 에이전트 해결율 78%, 고객 만족도 3.7/5.0
+   → 목표 미달성
+
+2️⃣ 성공 사례
+   ✅ 주문 상태 조회: 97% 정확도
+   ✅ 기본 FAQ 응답: 94% 만족도
+   ✅ API 통합: 0 지연시간 이슈
+   
+   원인: 프롬프트가 구체적이었고, 도구 정의가 명확함
+
+3️⃣ 실패 사례
+   ❌ 환불 정책 해석: 62% 정확도
+   ❌ 복합 문제 해결: 71% 정확도
+   
+   원인: 프롬프트가 경우의 수를 충분히 커버하지 못함
+
+4️⃣ 근본 원인 분석 (5 Why)
+   → 환불 정책이 복잡하고 예외 사항이 많은데,
+   → 에이전트 프롬프트에 모든 케이스가 포함되지 않았고,
+   → 배포 전 테스트가 기본 케이스만 다뤘음
+
+5️⃣ 실행 계획 (다음 버전)
+   [P0] 환불 정책 프롬프트 재작성 (1주일)
+   [P1] 예외 케이스 처리 에이전트 추가 (2주)
+   [P2] 모니터링 규칙 강화 (3일)</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>"완벽한 배포"는 환상입니다.</strong> 배포 직후 반드시 문제가 발견됩니다. 중요한 것은 그 문제를 얼마나 빨리 감지하고, 얼마나 빠르게 개선하는가입니다. 배포 후 모니터링 대시보드를 매일 확인하고, 실패한 대화를 주 1회 분석하고, 프롬프트를 지속적으로 튜닝하는 문화가 있으면, 에이전트는 시간이 지날수록 똑똑해집니다. 이것이 <strong>"AI를 프로덕션에서 키우기"</strong>의 핵심입니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">포스트모템</div>
+      <div class="glossary-en">Post-Mortem / Post-Incident Review</div>
+      <div class="glossary-def">프로젝트 배포 또는 사건 이후 일정 시간이 지난 후, 성공과 실패의 원인을 객관적으로 분석하는 회의. 책임 추궁이 아닌 학습과 개선을 목표로 합니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">에스컬레이션</div>
+      <div class="glossary-en">Escalation</div>
+      <div class="glossary-def">AI 에이전트가 처리하지 못한 문제를 인간 상담사에게 넘기는 것. 에이전트의 능력 범위를 벗어난 복잡한 문제는 적절히 에스컬레이션되어야 사용자 만족도를 유지할 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
