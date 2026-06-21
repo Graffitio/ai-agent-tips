@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W16 MON — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="30" height="30" fill="#1B1464" rx="4"/>
+          <rect x="60" y="10" width="30" height="30" fill="#3569B8" rx="4"/>
+          <rect x="10" y="60" width="30" height="30" fill="#3569B8" rx="4"/>
+          <rect x="60" y="60" width="30" height="30" fill="#1B1464" rx="4"/>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W16 · MON</div>
+      <h1 class="header-title">Zapier AI Actions 시작하기</h1>
+      <p class="header-sub">코드 없이 AI 워크플로 구축 · 복잡한 분기 로직 구현</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.22 MON<br>☕ 5 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>노코드 자동화의 진정한 힘은 <strong>"AI를 워크플로 안에 집어넣는 것"</strong>입니다. Zapier와 Make 같은 플랫폼은 더 이상 단순 연결 도구가 아닙니다. AI Actions를 활용하면 복잡한 조건 분기, 데이터 변환, 문서 자동화가 코드 한 줄 없이 가능해집니다. 오늘은 그 시작입니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#151</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">Zapier AI</span>
+        </div>
+        <h2 class="tip-title">Zapier AI Zapier AI Actions 시작하기 코드 없이 AI 워크플로 구축</h2>
+      </div>
+      <div class="tip-body">
+        <p>Zapier AI Actions는 워크플로 중간에 GPT-4를 직접 주입하는 기능입니다. 이메일을 받으면 AI가 자동으로 내용을 분류하고, 필요한 정보만 추출하고, 적절한 부서로 라우팅하는 식의 일이 가능합니다.</p><p><strong>핵심 3단계:</strong> 1) Zapier 워크플로에서 "AI by Zapier" 액션 추가 2) 명확한 프롬프트 입력 (앞서 배운 "구체적으로" 원칙 활용) 3) 결과를 다음 액션으로 전달. 이것만으로 복잡한 자동화가 완성됩니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📋 실전 시나리오</div>
+          <code>[ Trigger: Gmail ]
+이메일 수신
+↓
+[ Action: AI by Zapier ]
+프롬프트:
+"다음 이메일을 읽고:
+- 고객사명
+- 요청 유형 (버그/기능/계약)
+- 긴급도 (높음/중간/낮음)
+을 JSON 형식으로 추출해."
+↓
+[ Action: Google Sheets ]
+추출된 데이터 자동 입력</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#152</span>
+          <span class="tip-tag tag-intermediate">⭐ 중급</span>
+          <span class="tip-category">Make AI</span>
+        </div>
+        <h2 class="tip-title">Make.com + AI 시나리오 설계 복잡한 분기 로직 구현</h2>
+      </div>
+      <div class="tip-body">
+        <p>Make.com은 Zapier보다 유연한 조건 분기를 제공합니다. AI 결과에 따라 완전히 다른 워크플로 경로로 나가는 것이 가능하죠. 예를 들어, AI가 고객 이메일을 분석한 뒤 "이건 불만"이라고 판단하면 즉시 매니저에게 알림을, "이건 제안"이라고 판단하면 제품팀 채널로 보내는 식입니다.</p><p><strong>Make의 강점:</strong> Router 모듈로 AI 결과를 여러 경로로 분기 가능. 복잡한 문서 자동화 (계약서 작성, 보고서 생성)도 AI를 중심으로 설계할 수 있습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">🔀 분기 로직 구조</div>
+          <code>[ Slack 메시지 수신 ]
+"프로젝트 X 진행상황 보고"
+↓
+[ AI 분석 ]
+프롬프트: "이 메시지의 감정톤을 분석.
+긍정/중립/부정 중 선택"
+↓
+├─ [긍정] → 승인 알림 전송
+├─ [중립] → 관리자 검토 요청
+└─ [부정] → 즉시 리더에게 에스컬레이션</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p>노코드 + AI의 조합은 이제 <strong>"선택"이 아니라 "필수"</strong>입니다. 문서 자동화, 데이터 분류, 콘텐츠 생성 같은 업무는 더 이상 수작업이나 복잡한 코딩이 필요 없습니다. Zapier의 단순함과 Make의 유연함 중 하나를 선택해서, 오늘 배운 원칙으로 첫 AI 워크플로를 만들어 보세요. 생각보다 간단합니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">AI Actions</div>
+      <div class="glossary-en">AI-Powered Automation</div>
+      <div class="glossary-def">워크플로 안에 AI (주로 GPT-4)를 직접 단계로 삽입하는 기능. 조건 분기 없이 복잡한 논리 판단을 자동화할 수 있습니다.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Router 모듈</div>
+      <div class="glossary-en">Conditional Router</div>
+      <div class="glossary-def">Make.com에서 특정 조건에 따라 워크플로 경로를 나누는 모듈. AI 결과, 데이터 값 등 다양한 조건으로 분기를 만들 수 있습니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
