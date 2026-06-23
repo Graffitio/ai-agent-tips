@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 팁 · W16 WED — 4lynx</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sans:'Noto Sans KR',sans-serif;--mono:'JetBrains Mono',monospace;
+    --navy-deep:#1B1464;--navy-mid:#2A2082;--blue-brand:#3569B8;
+    --blue-light:#8ECAE6;--blue-pale:#C2E2F5;--bg:#F4F7FB;--surface:#FFFFFF;
+    --text-primary:#1B1464;--text-secondary:#3D3A6B;--text-muted:#8B8AAF;
+    --border:#D8DFEC;--border-light:#E8EDF5;--border-hover:#B0BCDA;
+    --radius:10px;--card-hover:0 4px 24px rgba(27,20,100,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text-primary);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(135deg,#FFF 0%,#E8EEF9 40%,#D4E0F5 100%);padding:0 20px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  header .container{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:28px}
+  .header-left{flex:1;min-width:260px}
+  .logo-area{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+  .logo-img{height:28px;width:auto}
+  .logo-divider{color:var(--border);font-size:20px;font-weight:300;margin:0 2px}
+  .logo-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--blue-brand);letter-spacing:0.06em;text-transform:uppercase}
+  .issue-meta{font-family:var(--mono);font-size:11px;color:var(--blue-brand);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  .header-title{font-size:28px;font-weight:900;color:var(--navy-deep);letter-spacing:-0.03em;line-height:1.25}
+  .header-sub{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:300}
+  .header-author{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:10px;letter-spacing:0.04em}
+  .header-author span{color:var(--blue-brand);font-weight:600}
+  .header-right{text-align:right;padding-top:46px}
+  .header-date{font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5}
+  .header-week-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--navy-deep);background:rgba(27,20,100,0.08);padding:4px 10px;border-radius:4px;margin-top:8px}
+  .section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--navy-deep)}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .intro{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .intro p{font-size:14px;line-height:1.85;color:var(--text-secondary)}
+  .intro strong{color:var(--navy-deep)}
+  .tips{margin-top:28px}
+  .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:box-shadow 0.2s,border-color 0.2s}
+  .tip-card:hover{box-shadow:var(--card-hover);border-color:var(--border-hover)}
+  .tip-header{padding:18px 22px;cursor:pointer}
+  .tip-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .tip-tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .tag-beginner{background:#D1FAE5;color:#047857}
+  .tag-intermediate{background:#E0EAFC;color:var(--navy-deep)}
+  .tag-advanced{background:#EDE9FE;color:#5B21B6}
+  .tip-category{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .tip-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.06em}
+  .tip-title{font-size:17px;font-weight:700;line-height:1.5;color:var(--text-primary)}
+  .tip-body{max-height:0;overflow:hidden;transition:max-height 0.4s,opacity 0.3s,padding 0.3s;opacity:0;padding:0 22px}
+  .tip-body.open{max-height:800px;opacity:1;padding:0 22px 20px}
+  .tip-body p{font-size:14px;line-height:1.85;color:var(--text-secondary);margin-bottom:10px}
+  .tip-body p:last-child{margin-bottom:0}
+  .tip-example{background:#F8F9FC;border:1px solid var(--border-light);border-radius:6px;padding:14px 16px;margin-top:10px}
+  .tip-example-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue-brand);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+  .tip-example code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--navy-deep);display:block;white-space:pre-wrap}
+  .tip-toggle{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px;padding:0 22px 14px;cursor:pointer}
+  .insight-box{margin-top:28px;background:linear-gradient(135deg,#EDF1FA,#E0EAFC);border:1px solid #B0C4E8;border-radius:var(--radius);padding:22px 24px}
+  .insight-box .section-label{color:var(--navy-mid)}
+  .insight-box p{font-size:14px;line-height:1.85;color:var(--navy-deep)}
+  .insight-box strong{color:var(--navy-deep);font-weight:700}
+  .glossary{margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+  .glossary .section-label{color:var(--blue-brand)}
+  .glossary-item{padding:14px 0;border-bottom:1px solid var(--border-light)}
+  .glossary-item:last-child{border-bottom:none}
+  .glossary-term{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--navy-deep);margin-bottom:4px}
+  .glossary-en{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .glossary-def{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+  footer{margin-top:32px;padding:20px 0 36px;text-align:center;position:relative}
+  footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:680px;height:3px;background:linear-gradient(90deg,var(--navy-deep),var(--blue-brand),var(--blue-light),var(--blue-pale))}
+  .footer-brand{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.12em;margin-top:12px}
+  .footer-note{font-size:12px;color:var(--text-muted);margin-top:6px}
+  @media print{.tip-body{max-height:none!important;opacity:1!important;padding:0 22px 20px!important}.tip-toggle{display:none}}
+  @media(max-width:480px){.header-title{font-size:22px}.container{padding:0 16px}.header-right{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-left">
+      <div class="logo-area">
+        <svg class="logo-img" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="8" fill="#1B1464"/>
+          <text x="20" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">4L</text>
+        </svg>
+        <span class="logo-divider">|</span>
+        <span class="logo-label">AI Agent Tips</span>
+      </div>
+      <div class="issue-meta">W16 · WED</div>
+      <h1 class="header-title">노코드 vs 코드: 선택 기준 매트릭스</h1>
+      <p class="header-sub">규모·복잡도·유지보수 기준 · 계약서·인보이스 데이터 추출</p>
+      <div class="header-author">by <span>Ian Jung</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-date">2026.06.24 WED<br>☕ 4 min read</div>
+      <div class="header-week-badge">PHASE 3 · 에이전트 심화</div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:4px;padding-bottom:32px;">
+  <div class="intro">
+    <div class="section-label">👋 오늘의 한마디</div>
+    <p>에이전트 구축의 핵심은 <strong>"올바른 도구 선택"</strong>입니다. 노코드는 빠르지만 제한적이고, 코드는 자유롭지만 복잡합니다. 규모·복잡도·유지보수를 축으로 한 명확한 선택 기준을 세우는 것이 프로젝트 성공의 50%를 좌우합니다. 오늘은 그 매트릭스를 구축합니다.</p>
+  </div>
+
+  <div class="tips">
+    <div class="section-label">🎯 오늘의 팁 2선</div>
+    
+    <article class="tip-card" id="tip-1">
+      <div class="tip-header" onclick="toggleTip('tip-1')">
+        <div class="tip-meta">
+          <span class="tip-num">#155</span>
+          <span class="tip-tag tag-advanced">🚀 고급</span>
+          <span class="tip-category">도구 선택</span>
+        </div>
+        <h2 class="tip-title">노코드 vs 코드: 선택 기준 매트릭스</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>"언제 노코드를 쓸까, 언제 코드를 짤까?"</strong> 이 질문에 답하는 가장 객관적인 방법은 세 가지 축으로 판단하는 것입니다: 규모(Scale), 복잡도(Complexity), 유지보수(Maintenance).</p>
+        <p><strong>규모 기준:</strong> 일회성 or 소규모라면 노코드. 월 수만 건 이상의 대규모 처리가 필요하면 코드.</p>
+        <p><strong>복잡도 기준:</strong> 단순한 if-then 로직이면 노코드로 충분. 조건분기 3단계 이상, 외부 API 10개 이상 통합이면 코드.</p>
+        <p><strong>유지보수 기준:</strong> 6개월 이상 장기 운영이라면 코드로 작성한 것이 변경·개선 비용이 훨씬 낮습니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">📊 선택 매트릭스</div>
+          <code>┌─────────────────────────────────────┐
+│  도구 선택 판단표                │
+├──────┬─────────┬──────────────────┤
+│ 기준 │ 노코드  │ 코드 추천        │
+├──────┼─────────┼──────────────────┤
+│규모  │<1만/월  │>5만/월           │
+│복잡도│조건<3개 │조건≥3개, API>10 │
+│운영  │<3개월   │>6개월            │
+│팀규모│1-2명    │3명 이상          │
+└──────┴─────────┴──────────────────┘
+
+🎯 하이브리드 전략:
+- 파일럿(1-2개월) → 노코드 검증
+- 검증 후 본격 운영 → 코드 전환</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-1')">▼ 자세히 보기</div>
+    </article>
+
+    <article class="tip-card" id="tip-2">
+      <div class="tip-header" onclick="toggleTip('tip-2')">
+        <div class="tip-meta">
+          <span class="tip-num">#156</span>
+          <span class="tip-tag tag-beginner">🌱 입문</span>
+          <span class="tip-category">PDF 분석</span>
+        </div>
+        <h2 class="tip-title">PDF 문서 분석 자동화: 계약서·인보이스 데이터 추출</h2>
+      </div>
+      <div class="tip-body">
+        <p><strong>계약서, 인보이스, 영수증</strong> 같은 비정형 PDF 문서에서 데이터를 수동으로 추출하는 것은 시간 낭비의 극치입니다. AI 비전 모델을 활용하면 몇 줄의 프롬프트로 자동화할 수 있습니다.</p>
+        <p><strong>핵심 아이디어:</strong> PDF를 이미지로 변환 → Claude 또는 GPT-4 Vision으로 OCR + 구조화 → 스프레드시트에 자동 입력. 정확도는 95% 이상입니다.</p>
+        <p><strong>무엇을 추출할 것인가?</strong> 계약서에서는 당사자, 계약금액, 기간, 특별조건. 인보이스에서는 공급자, 청구금액, 기한, 품목명. 이들을 JSON 형식으로 구조화하면 다운스트림 자동화와 통합이 쉬워집니다.</p>
+        <div class="tip-example">
+          <div class="tip-example-label">💬 프롬프트 예시</div>
+          <code>다음 인보이스 PDF에서 아래 정보를 
+추출해 JSON으로 반환해:
+
+{
+  "supplier": "공급사명",
+  "invoice_date": "YYYY-MM-DD",
+  "total_amount": "숫자 (통화 제외)",
+  "due_date": "YYYY-MM-DD",
+  "items": [
+    {
+      "description": "품목명",
+      "quantity": "수량",
+      "unit_price": "단가",
+      "line_total": "합계"
+    }
+  ]
+}
+
+부정확한 부분은 [UNCERTAIN]로 표시</code>
+        </div>
+      </div>
+      <div class="tip-toggle" onclick="toggleTip('tip-2')">▼ 자세히 보기</div>
+    </article>
+  </div>
+
+  <div class="insight-box">
+    <div class="section-label">💡 오늘의 인사이트</div>
+    <p><strong>"노코드냐 코드냐"</strong>는 이항선택이 아닙니다. 실전에서는 <strong>"언제까지 노코드로 가고, 언제 코드로 전환할 것인가"</strong>를 판단하는 것이 더 중요합니다. 가장 현명한 전략은 <strong>파일럿을 빠르게 노코드로 검증한 후, 비용-편익 분석을 통해 본격 운영 단계에서만 코드화하는 것</strong>입니다. 이렇게 하면 리스크를 최소화하면서 최적의 선택을 할 수 있습니다.</p>
+  </div>
+
+  <div class="glossary">
+    <div class="section-label">📖 오늘의 용어</div>
+    
+    <div class="glossary-item">
+      <div class="glossary-term">비정형 데이터</div>
+      <div class="glossary-en">Unstructured Data</div>
+      <div class="glossary-def">PDF, 이미지, 스캔본처럼 사전에 정해진 형식 없이 저장된 데이터를 말합니다. 구조화 전에 OCR이나 AI 비전 모델을 거쳐야 추출 가능합니다.</div>
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">하이브리드 아키텍처</div>
+      <div class="glossary-en">Hybrid Architecture</div>
+      <div class="glossary-def">초기 검증 단계에는 노코드 도구를 사용하고, 운영 확대 단계에서 코드 기반으로 전환하는 점진적 아키텍처 설계 방식입니다.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">AI AGENT TIPS · WEEKLY — by Ian Jung</div>
+    <div class="footer-note">내일도 새로운 팁으로 만나요 ☕</div>
+  </div>
+</footer>
+
+<script>
+function toggleTip(id){
+  const card=document.getElementById(id);
+  const body=card.querySelector('.tip-body');
+  const toggle=card.querySelector('.tip-toggle');
+  const isOpen=body.classList.contains('open');
+  document.querySelectorAll('.tip-body.open').forEach(el=>{
+    el.classList.remove('open');
+    el.closest('.tip-card').querySelector('.tip-toggle').textContent='▼ 자세히 보기';
+  });
+  if(!isOpen){body.classList.add('open');toggle.textContent='▲ 접기';}
+}
+</script>
+
+</body>
+</html>
